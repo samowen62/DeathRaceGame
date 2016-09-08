@@ -6,31 +6,29 @@ using System.Collections;
  */
 public class Player : MonoBehaviour {
 
-    private float speed = 0.3f;
-    private float jumpSpeed = 35f;
+    private float speed = 1f;
+    private float jumpSpeed = 1f;
+    private float gravity = 10f;
 
-    private const float gravity = 330f;
     private const float jumpsBetweenWindow = 0.25f;
     private const float jumpDuration = 0.1f;
 
     private float lastJumpTime;
 
-    private bool isGrounded;
     public bool isCameraMovementBlocked { get; set; }
 
-    private Vector3 playerToCamera;
     private Vector3 moveDirection = Vector3.zero;
 
-    private CameraControl mainCamera;
+    private CharacterController character;
 
-    private CharacterController controller;
+    private CameraControl mainCamera;
 
     // Use this for initialization
     void Awake () {
         isCameraMovementBlocked = false;
-        isGrounded = true;
         lastJumpTime = Time.realtimeSinceStartup;
 
+        character = GetComponent<CharacterController>();
         mainCamera = FindObjectOfType<CameraControl>();
     }
 
@@ -38,56 +36,32 @@ public class Player : MonoBehaviour {
     void Update () {
         moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
         moveDirection *= speed;
-        if (isGrounded)
+        if (character.isGrounded)
         {
             if (Input.GetButton("Jump") && canJump())
             {
-                moveDirection.y = jumpSpeed * Time.deltaTime;
-                isGrounded = false;
+                //TODO: x/y jump speeds
+                moveDirection.y = jumpSpeed;
                 lastJumpTime = Time.realtimeSinceStartup;
             }
-        }else
+        }
+        else
         {
             if (stillJumping())
             {
-                Debug.Log("going up");
-                moveDirection.y = jumpSpeed * Time.deltaTime;
+                moveDirection.y = jumpSpeed;
             }
-            moveDirection.y -= gravity * Time.deltaTime * Time.deltaTime;
         }
-        
-        moveTo(moveDirection * Time.deltaTime);
-    }
 
-    private void moveTo(Vector3 position)
-    {
-        gameObject.transform.position = transform.TransformPoint(moveDirection);
-        GetComponent<Collider>().transform.position = transform.TransformPoint(moveDirection);
+        moveDirection.y -= gravity * Time.deltaTime;
+        character.Move(moveDirection);
+
         if (!isCameraMovementBlocked)
         {
             mainCamera.cameraUpdate();
         }
     }
-
-    void OnTriggerEnter(Collider enteredCollider)
-    {
-        //Landed on Ground
-        if (enteredCollider.CompareTag("Ground"))
-        {
-            isGrounded = true;
-            lastJumpTime = Time.realtimeSinceStartup;
-        }
-    }
-
-    void OnTriggerExit(Collider enteredCollider)
-    {
-        if (enteredCollider.CompareTag("Ground"))
-        {
-            //TODO: check if in contact with other ground first. This will have the effect of falling
-            //isGrounded = false;
-        }
-    }
-
+    
     private bool canJump()
     {
         return Time.realtimeSinceStartup - lastJumpTime > jumpsBetweenWindow;
