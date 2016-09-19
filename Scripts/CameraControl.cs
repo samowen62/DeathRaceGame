@@ -3,7 +3,7 @@ using System.Collections;
 
 public class CameraControl : MonoBehaviour {
 
-    public GameObject target;
+    public AntiGravCharacter target;
 
     private Vector3 fromTarget;
 
@@ -16,7 +16,12 @@ public class CameraControl : MonoBehaviour {
     {
         if (target)
         {
-            transform.position = target.transform.position + fromTarget;
+            transform.position = target.transform.position + target.getRelativeCameraPos();
+            //transform.position = Vector3.Slerp(transform.position, target.transform.position + target.getRelativeCameraPos(), Time.deltaTime * 0.5f);
+
+            //TODO: don't set it explicitly but slowly move in the direction
+            //transform.rotation = Quaternion.Slerp(transform.rotation, target.transform.rotation, Time.deltaTime * 2.5f);
+            transform.rotation = target.transform.rotation;
         }
     }
 }

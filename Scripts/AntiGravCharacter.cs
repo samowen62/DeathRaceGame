@@ -1,13 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+//TODO: 
 public class AntiGravCharacter : MonoBehaviour {
 
     private float speed = 1f;
     private float jumpSpeed = 1f;
     private float gravity = 16f;
 
-    //will have to assign somehow else
+    private float turnSpeed = 5f;
+
+    private const float cameraZ = -10f;
+    private const float cameraY = 3f;
+
+    //TODO: will have to assign somehow else
     private float halfHeight = 1f;
 
     private const float jumpsBetweenWindow = 0.25f;
@@ -21,11 +27,9 @@ public class AntiGravCharacter : MonoBehaviour {
 
     private Vector3 moveDirection = Vector3.zero;
 
-    //private CharacterController character;
-
     private CameraControl mainCamera;
 
-    private Vector3 downVec;
+    private Vector3 upVec;
     private Vector3 sideVec;
     private Vector3 fwdVec;
 
@@ -37,65 +41,84 @@ public class AntiGravCharacter : MonoBehaviour {
         isCameraMovementBlocked = false;
         lastJumpTime = Time.realtimeSinceStartup;
 
-        //character = GetComponent<CharacterController>();
         mainCamera = FindObjectOfType<CameraControl>();
 
         //initiailze orientation
         //TODO: generalize this to not start on flat surface
         fwdVec = Vector3.forward;
-        downVec = Vector3.down;
+        upVec = Vector3.up;
         sideVec = Vector3.left;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-
-       // moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-        moveDirection = Input.GetAxis("Horizontal") * sideVec + Input.GetAxis("Vertical") * fwdVec;
+        moveDirection =  Input.GetAxis("Vertical") * fwdVec;
         moveDirection *= speed;
         if (isGrounded)//need to determine if grounded
         {
             if (Input.GetButton("Jump") && canJump())
             {
                 //TODO: x/y jump speeds
-                //moveDirection.y = jumpSpeed;
-                moveDirection += downVec * -jumpSpeed;
+                isGrounded = false;
+                moveDirection += upVec * jumpSpeed;
                 lastJumpTime = Time.realtimeSinceStartup;
             }
         }
         else
         {
+            //Debug.Log("in the air");
             if (stillJumping())
             {
-                // moveDirection.y = jumpSpeed;
-                moveDirection += downVec * -jumpSpeed;
+                moveDirection += upVec * jumpSpeed;
             }else
             {
-                moveDirection += downVec * gravity * Time.deltaTime;
+                //Debug.Log("falling");
+                moveDirection -= upVec * gravity * Time.deltaTime;
             }
         }
-        // moveDirection += downVec * -halfHeight;
+
+        fwdVec  = Quaternion.AngleAxis(Input.GetAxis("Horizontal") * turnSpeed, upVec) * fwdVec;
+        sideVec = Quaternion.AngleAxis(Input.GetAxis("Horizontal") * turnSpeed, upVec) * sideVec;
 
         //Debug.Log(moveDirection.x);
         //Debug.Log(moveDirection.y);
         //Debug.Log(moveDirection.z);
 
-        if (Physics.Raycast(transform.position, downVec, out downHit, 20))
+        if (Physics.Raycast(transform.position, -upVec, out downHit, 20))
         {
-            downVec = -downHit.normal;
+            upVec = downHit.normal;
+            //project fwdVec on tangent plane
 
             //must keep fwdVec a unity normal. Will have to update on every frame
-            sideVec = Vector3.Cross(fwdVec, downVec);
+            sideVec = Vector3.Cross(upVec, fwdVec);
+            sideVec.Normalize();
+
+            fwdVec = Vector3.Cross(sideVec, upVec);
+            fwdVec.Normalize();
+
             float moveDist = halfHeight - downHit.distance;
             if (moveDist > 0 && !stillJumping())
             {
-                moveDirection -= downVec * moveDist;
+                //Debug.Log("adjusting");
+                isGrounded = true;
+                moveDirection += upVec * moveDist;
             }
+        }else
+        {
+            //need to make sure this is the ground though
+            //Debug.Log("fell");
+            isGrounded = false;
         }
 
         transform.position += moveDirection;
+
+        Quaternion rotation = Quaternion.LookRotation(fwdVec, upVec);
+
+        float dd = 10f;
+        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * dd);
+        Debug.Log(dd);
+        //transform.rotation = rotation;
 
         if (!isCameraMovementBlocked)
         {
@@ -103,20 +126,9 @@ public class AntiGravCharacter : MonoBehaviour {
         }
     }
 
-    void OnCollisionEnter(Collision collision)
+    public Vector3 getRelativeCameraPos()
     {
-        foreach (ContactPoint contact in collision.contacts)
-        {
-            isGrounded = true;
-        }
-    }
-
-    void OnCollisionStay(Collision collision)
-    {
-        foreach (ContactPoint contact in collision.contacts)
-        {
-            isGrounded = true;
-        }
+        return cameraZ * fwdVec + cameraY * upVec;
     }
 
     private bool canJump()
