@@ -10,22 +10,20 @@ public class AntiGravCharacter : MonoBehaviour {
 
     private float turnSpeed = 5f;
 
-    private const float cameraZ = -10f;
-    private const float cameraY = 3f;
-
     //TODO: will have to assign somehow else
-    private float halfHeight = 1f;
+    private float halfHeight = 2f;
+
+    private float rotationLeeway = 1f;
 
     private const float jumpsBetweenWindow = 0.25f;
     private const float jumpDuration = 0.1f;
 
     private float lastJumpTime;
 
-    public bool isCameraMovementBlocked { get; set; }
-
     public bool isGrounded = true;
 
     private Vector3 moveDirection = Vector3.zero;
+    private Vector3 nextPosition;
 
     private CameraControl mainCamera;
 
@@ -38,20 +36,18 @@ public class AntiGravCharacter : MonoBehaviour {
     // Use this for initialization
     void Awake()
     {
-        isCameraMovementBlocked = false;
         lastJumpTime = Time.realtimeSinceStartup;
 
         mainCamera = FindObjectOfType<CameraControl>();
 
         //initiailze orientation
-        //TODO: generalize this to not start on flat surface
-        fwdVec = Vector3.forward;
-        upVec = Vector3.up;
-        sideVec = Vector3.left;
+        fwdVec  = gameObject.transform.forward;
+        upVec   = gameObject.transform.up;
+        sideVec = Vector3.Cross(upVec, fwdVec);
     }
 
-    // Update is called once per frame
-    void Update()
+
+    void FixedUpdate()
     {
         moveDirection =  Input.GetAxis("Vertical") * fwdVec;
         moveDirection *= speed;
@@ -81,54 +77,37 @@ public class AntiGravCharacter : MonoBehaviour {
         fwdVec  = Quaternion.AngleAxis(Input.GetAxis("Horizontal") * turnSpeed, upVec) * fwdVec;
         sideVec = Quaternion.AngleAxis(Input.GetAxis("Horizontal") * turnSpeed, upVec) * sideVec;
 
-        //Debug.Log(moveDirection.x);
-        //Debug.Log(moveDirection.y);
-        //Debug.Log(moveDirection.z);
+        nextPosition = transform.position + moveDirection;
 
-        if (Physics.Raycast(transform.position, -upVec, out downHit, 20))
+        if (Physics.Raycast(nextPosition, -upVec, out downHit, 20))
         {
             upVec = downHit.normal;
-            //project fwdVec on tangent plane
+            Debug.Log(upVec.magnitude);
 
-            //must keep fwdVec a unity normal. Will have to update on every frame
+            //project fwdVec on tangent plane
             sideVec = Vector3.Cross(upVec, fwdVec);
             sideVec.Normalize();
 
             fwdVec = Vector3.Cross(sideVec, upVec);
             fwdVec.Normalize();
 
-            float moveDist = halfHeight - downHit.distance;
-            if (moveDist > 0 && !stillJumping())
+            //will have to have a tolerance for donwHit.distance above the ground
+            if (!stillJumping())
             {
                 //Debug.Log("adjusting");
                 isGrounded = true;
-                moveDirection += upVec * moveDist;
+                nextPosition = downHit.point + upVec * halfHeight;
             }
         }else
         {
             //need to make sure this is the ground though
-            //Debug.Log("fell");
+            Debug.Log("fell");
             isGrounded = false;
         }
 
-        transform.position += moveDirection;
-
-        Quaternion rotation = Quaternion.LookRotation(fwdVec, upVec);
-
-        float dd = 10f;
-        transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * dd);
-        Debug.Log(dd);
-        //transform.rotation = rotation;
-
-        if (!isCameraMovementBlocked)
-        {
-            mainCamera.cameraUpdate();
-        }
-    }
-
-    public Vector3 getRelativeCameraPos()
-    {
-        return cameraZ * fwdVec + cameraY * upVec;
+        transform.position = nextPosition;
+        transform.rotation = Quaternion.LookRotation(fwdVec, upVec);
+        
     }
 
     private bool canJump()
