@@ -14,6 +14,7 @@ public class RacePlayer : MonoBehaviour {
     private Vector3 previousGravity;
     private Vector3 torqueVector;
     private Vector3 moveDirection = Vector3.zero;
+    private Vector3 previousDirection = Vector3.zero;
 
     private RaycastHit downHit;
 
@@ -52,7 +53,8 @@ public class RacePlayer : MonoBehaviour {
             //Debug.Log("p: " + previousGravity);
             //Debug.Log("m : " + moveDirection);
             rigidBody.AddForce(previousGravity);
-            rigidBody.AddForce(moveDirection);
+            rigidBody.AddForce(moveDirection - (0.5f * rigidBody.velocity));
+            previousDirection = moveDirection;
             //rigidBody.velocity = moveDirection;
 
             //rigidBody.MoveRotation(rigidBody.rotation * Quaternion.AngleAxis(Input.GetAxis("Horizontal") * turnSpeed, downHit.normal));// rigidBody.transform.up));
