@@ -7,7 +7,7 @@ The main focus is recreating the intense, high speed, antigravity physics in the
 
 Showcasing the racing machine with some other primitive assets.
 
-<img src="Screenshots/ScreenShot01.PNG" alt="scrot-02" style="width: 450px;"/><br />
+<img src="Screenshots/ScreenShot02.PNG" alt="scrot-02" style="width: 450px;"/><br />
 
 In game thrid person screenshot of the machine on the anti-grav track.
 
