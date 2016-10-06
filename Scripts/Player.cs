@@ -8,7 +8,7 @@ public class Player : MonoBehaviour {
 
     private float speed = 1f;
     private float jumpSpeed = 1f;
-    private float gravity = 10f;
+    private float gravity = 16f;
 
     private const float jumpsBetweenWindow = 0.25f;
     private const float jumpDuration = 0.1f;
@@ -34,6 +34,7 @@ public class Player : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
+        Debug.Log("fsdafasfasf");
         moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
         moveDirection *= speed;
         if (character.isGrounded)
@@ -61,7 +62,14 @@ public class Player : MonoBehaviour {
             mainCamera.cameraUpdate();
         }
     }
-    
+
+    void OnCollisionStay(Collision collision)
+    {
+        Debug.Log(collision.contacts.Length);
+        ContactPoint contact = collision.contacts[0];
+        Debug.Log(contact.point.x + " " + contact.point.y + " " + contact.point.z);
+    }
+
     private bool canJump()
     {
         return Time.realtimeSinceStartup - lastJumpTime > jumpsBetweenWindow;
