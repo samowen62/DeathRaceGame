@@ -12,6 +12,7 @@ public class RacePlayer : MonoBehaviour {
     public float velocityCompensation = 0.5f;
     public float maxAntiGravMagnitude = -0.1f;
     public float rayCastDistance = 20f;
+    public float hardDriftSpeed = 10f;
 
     private Rigidbody rigidBody;
 
@@ -35,7 +36,13 @@ public class RacePlayer : MonoBehaviour {
     void Update()
     {
 
-
+        /**
+         * An alernative approach might be to find the desired next position based on the track
+         * and apply a force/torque that would complement this.
+         * 
+         * If no position is found on the track we can just have the default gravity and no angular momentum
+         * 
+         */
         if (Physics.Raycast(transform.position, -rigidBody.transform.up, out downHit, rayCastDistance))
         {
 
@@ -44,10 +51,21 @@ public class RacePlayer : MonoBehaviour {
             //maybe try smoothing the normals by saving the last few? It's an unwritten rule that there won't be any sharp surfaces
             float downForce = (downHit.distance - hoverHeight);
             downForce = Mathf.Max(maxAntiGravMagnitude, downForce) * gravity;
-            previousGravity = downHit.normal * downForce;
+            previousGravity = downHit.normal * gravity;
 
-            rigidBody.AddForce(previousGravity);
+            rigidBody.AddForce(downHit.normal * downForce);
             rigidBody.AddForce(moveDirection - (velocityCompensation * rigidBody.velocity));
+
+            //hard drifts (hard turns for now)
+            if (Input.GetAxis("Hard Drift") > 0)
+            {
+                rigidBody.AddForce(hardDriftSpeed * rigidBody.transform.right);
+            }
+            else if (Input.GetAxis("Hard Drift") < 0)
+            {
+                rigidBody.AddForce(-hardDriftSpeed * rigidBody.transform.right);
+            }
+
 
             //hard turns should increase turnSpeed
             if (Input.GetAxis("Horizontal") != 0)
@@ -73,9 +91,8 @@ public class RacePlayer : MonoBehaviour {
         {
             //need to make sure this is the ground though
             //Debug.Log("fell");
-            rigidBody.AddForce(previousGravity * 10f);
+            rigidBody.AddForce(previousGravity);
         }
-
     }
 
 }
