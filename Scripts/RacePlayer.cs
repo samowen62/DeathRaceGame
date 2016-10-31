@@ -84,6 +84,7 @@ public class RacePlayer : MonoBehaviour {
                 rigidBody.angularVelocity = Vector3.zero;
             }
 
+            //this isn't working too well :(
             rigidBody.AddTorque(torqueSpeed * Vector3.Cross(rigidBody.transform.forward, downHit.normal));
 
         }
