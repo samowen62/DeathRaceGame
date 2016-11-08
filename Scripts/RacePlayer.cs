@@ -66,26 +66,39 @@ public class RacePlayer : MonoBehaviour {
                 rigidBody.AddForce(-hardDriftSpeed * rigidBody.transform.right);
             }
 
+            Vector3 right = rigidBody.transform.forward;
+            right = (right - Vector3.Dot(right, downHit.normal) * downHit.normal).normalized;
+            //need to project right onto tangent plane!!!
 
             //hard turns should increase turnSpeed
             if (Input.GetAxis("Horizontal") != 0)
             {
+                
                 if (Input.GetAxis("Horizontal") > 0)
                 {
-                    rigidBody.AddTorque(turnSpeed * transform.up);
+                    right = Quaternion.AngleAxis(turnSpeed, downHit.normal) * right;
+                    //upwards = upwards - (Vector3.Dot(right, downHit.normal) * right);
+                   // upwards.Normalize();
+                    //rigidBody.AddTorque(turnSpeed * transform.up);
                 }
                 else
                 {
-                    rigidBody.AddTorque(-turnSpeed * transform.up);
+                    right = Quaternion.AngleAxis(-turnSpeed, downHit.normal) * right;
+                    //upwards = upwards - (Vector3.Dot(right, downHit.normal) * right);
+                    //upwards.Normalize();
+                    //rigidBody.AddTorque(-turnSpeed * transform.up);
                 }
             }
             else
             {
-                rigidBody.angularVelocity = Vector3.zero;
+                //rigidBody.angularVelocity = Vector3.zero;
             }
 
             //this isn't working too well :(
-            rigidBody.AddTorque(torqueSpeed * Vector3.Cross(rigidBody.transform.forward, downHit.normal));
+            //rigidBody.AddTorque(torqueSpeed * Vector3.Cross(rigidBody.transform.forward, downHit.normal));
+            Debug.Log(Vector3.Dot(right, downHit.normal));//not 0???!
+            rigidBody.MoveRotation(Quaternion.LookRotation(right, downHit.normal));
+            
 
         }
         else
