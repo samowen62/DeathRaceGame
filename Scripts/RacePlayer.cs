@@ -13,6 +13,7 @@ public class RacePlayer : MonoBehaviour {
     public float maxAntiGravMagnitude = -0.1f;
     public float rayCastDistance = 20f;
     public float hardDriftSpeed = 10f;
+    public float timeAllowedNotOnTrack = 1f;
 
     private Rigidbody rigidBody;
 
@@ -22,11 +23,24 @@ public class RacePlayer : MonoBehaviour {
 
     private RaycastHit downHit;
 
+    private CheckPoint lastCheckPoint;
+
+    private int bitMask = 1 << 8;
+
+    private float lastTimeOnGround;
+
     void Awake()
     {
-        rigidBody = GetComponent<Rigidbody>();
+        Track[] track = FindObjectsOfType(typeof(Track)) as Track[];
+        if(track.Length != 1)
+        {
+            Debug.LogError("Error: only 1 component of type 'Track' allowed in the scene");
+        }
 
-        if (Physics.Raycast(transform.position, -rigidBody.transform.up, out downHit, rayCastDistance))
+        lastCheckPoint = track[0].startingCheckPoint;
+        rigidBody = GetComponent<Rigidbody>();  
+
+        if (Physics.Raycast(transform.position, -rigidBody.transform.up, out downHit, rayCastDistance, bitMask))
         {
             previousGravity = -downHit.normal;
         }
@@ -43,8 +57,11 @@ public class RacePlayer : MonoBehaviour {
          * If no position is found on the track we can just have the default gravity and no angular momentum
          * 
          */
-        if (Physics.Raycast(transform.position, -rigidBody.transform.up, out downHit, rayCastDistance))
+        
+        if (Physics.Raycast(transform.position, -rigidBody.transform.up, out downHit, rayCastDistance, bitMask))
         {
+            //reset since are on ground
+            lastTimeOnGround = 0f;
 
             moveDirection = speed * rigidBody.transform.forward;
 
@@ -96,17 +113,43 @@ public class RacePlayer : MonoBehaviour {
 
             //this isn't working too well :(
             //rigidBody.AddTorque(torqueSpeed * Vector3.Cross(rigidBody.transform.forward, downHit.normal));
-            Debug.Log(Vector3.Dot(right, downHit.normal));//not 0???!
+            //Debug.Log(Vector3.Dot(right, downHit.normal));//not 0???!
             rigidBody.MoveRotation(Quaternion.LookRotation(right, downHit.normal));
             
 
         }
         else
         {
-            //need to make sure this is the ground though
-            //Debug.Log("fell");
-            rigidBody.AddForce(previousGravity);
+            //only set this on the first frame that there is a miss
+            if (lastTimeOnGround == 0f)
+            {
+                Debug.Log("fell");
+                lastTimeOnGround = Time.fixedTime;
+            } 
+            //if we need to go back to the track no longer to a raycast  
+            else if ((Time.fixedTime - lastTimeOnGround) > timeAllowedNotOnTrack)
+            {
+                Debug.Log("returning");
+                rigidBody.transform.position = lastCheckPoint.trackPoint + lastCheckPoint.trackNormal;
+                rigidBody.transform.rotation = Quaternion.LookRotation(lastCheckPoint.trackForward, lastCheckPoint.trackNormal);
+                rigidBody.velocity = Vector3.zero;
+                rigidBody.angularVelocity = Vector3.zero;
+            }
+            else {
+                rigidBody.AddForce(previousGravity);
+            }
         }
+    }
+
+    void OnTriggerEnter(Collider coll)
+    {
+        switch (coll.gameObject.tag)
+        {
+            case "CheckPoint":
+                lastCheckPoint = coll.gameObject.GetComponent<CheckPoint>();
+                Debug.Log("checkpoint");
+                break;
+        }       
     }
 
 }
