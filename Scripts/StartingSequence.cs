@@ -4,8 +4,11 @@ using UnityEngine.UI;
 public class StartingSequence : MonoBehaviour {
 
     private float timeProgression;
-    private const float second = 1f;
     private const float scriptBegin = 2f;
+    private const float scriptEnd = scriptBegin + 5f;
+
+    private const float fontSmall = 120f;
+    private const float fontLarge = 240f;
 
     private float timePaused;
     private Text screenText;
@@ -29,8 +32,8 @@ public class StartingSequence : MonoBehaviour {
             {
                 //this is to ensure that pausing the game does not mess with timing
                 timeProgression += (Time.fixedTime - timePaused);
-                _behaviorBlocked = value;
             }
+            _behaviorBlocked = value;
         }
     }
 
@@ -43,7 +46,7 @@ public class StartingSequence : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (behaviorBlocked)
+        if (_behaviorBlocked)
         {
             return;
         }
@@ -51,22 +54,27 @@ public class StartingSequence : MonoBehaviour {
         float progress = Time.fixedTime - timeProgression;
 
         //only in sequence if in here
-        if(progress > 2f && progress < 7f)
+        if(progress > scriptBegin && progress < scriptEnd)
         {
-            if(progress < 3f)
+            if(progress < scriptBegin + 1f)
             {
+                //Debug.Log(3);
                 screenText.text = "3";
-            } else if (progress < 4f)
+                screenText.fontSize = fontSizeForSeconds(progress);
+            } else if (progress < scriptBegin + 2f)
             {
                 screenText.text = "2";
+                screenText.fontSize = fontSizeForSeconds(progress);
             }
-            else if (progress < 5f)
+            else if (progress < scriptBegin + 3f)
             {
                 screenText.text = "1";
+                screenText.fontSize = fontSizeForSeconds(progress);
             }
-            else if (progress < 6f)
+            else if (progress < scriptBegin + 4f)
             {
                 screenText.text = "GO!";
+                screenText.fontSize = 180;
                 finished = true;
             }
             else
@@ -75,5 +83,13 @@ public class StartingSequence : MonoBehaviour {
             }
         }
 
+    }
+
+    private int fontSizeForSeconds(float seconds)
+    {
+        float timeInSeq = seconds - scriptBegin;
+        //chop off int part and make into abs() function
+        timeInSeq = -2.0f * Mathf.Abs((timeInSeq - (int)timeInSeq) - 0.25f) + 0.5f;
+        return (int)Mathf.Lerp(fontSmall, fontLarge, timeInSeq);
     }
 }

@@ -12,10 +12,9 @@ Showcasing the racing machine with some other primitive assets.
 In game thrid person screenshot of the machine on the anti-grav track.
 
 ##TODO:
-* Add pause menu
 * Make a start menu to select track scene
 * Fog in the distance
-* Fix the car Physics!!
+* Fix the car start and respawn glitch
 * Add AI
 * Add enum class for RacePlayer status
 

@@ -10,19 +10,39 @@ using System.Collections;
 public class RacePlayer : MonoBehaviour {
 
     //below are various parameters used to fine-tune game mechanics
-    public float speed = 15f;
-    public float turnSpeed = 15f;
-    public float torqueSpeed = 0.1f;
-    public float gravity = -10f;
-    public float hoverHeight = 0.5f;
-    public float velocityCompensation = 0.5f;
-    public float maxAntiGravMagnitude = -0.1f;
+    public float gravity = 10f;
     public float rayCastDistance = 20f;
-    public float hardDriftSpeed = 10f;
     public float returningToTrackSpeed = 0.001f;
     public float timeAllowedNotOnTrack = 2.5f;
     public float timeSpentReturning = 3f;
 
+    /*Ship handling parameters*/
+    public float fwd_accel = 10f;
+    public float fwd_max_speed = 20f;
+    public float brake_speed = 20f;
+    public float turn_speed = 5f;
+
+    /*Auto adjust to track surface parameters*/
+    public float hover_height = 2f;     //Distance to keep from the ground
+    public float height_smooth = 10f;   //How fast the ship will readjust to "hover_height"
+    public float pitch_smooth = 5f;     //How fast the ship will adjust its rotation to match track normal
+
+    /*We will use all this stuff later*/
+    private Vector3 prev_up;
+    public float yaw;
+    private float smooth_y;
+    private float current_speed;
+  
+    private Vector3 previousGravity;
+    private RaycastHit downHit;
+
+    /* Last checkpoint of the player */
+    private CheckPoint lastCheckPoint;
+
+    /* to only ray cast on ground layer objects*/
+    private int bitMask = 1 << 8;
+
+    /* This is for pausing the game */
     private bool _behaviorBlocked;
     public bool behaviorBlocked {
         get {
@@ -35,27 +55,18 @@ public class RacePlayer : MonoBehaviour {
             else
             {
                 //this is to ensure that pausing the game does not mess with timing
+                //TODO: freeze the trail
                 if (lastTimeOnGround != -1)
                 {
                     lastTimeOnGround += (Time.fixedTime - timePaused);
                 }             
                 timeStartReturning += (Time.fixedTime - timePaused);
             }
+            
             _behaviorBlocked = value;
         }
     }
 
-    private Rigidbody rigidBody;
-
-    private Vector3 previousGravity;
-    private Vector3 torqueVector;
-    private Vector3 moveDirection = Vector3.zero;
-
-    private RaycastHit downHit;
-
-    private CheckPoint lastCheckPoint;
-
-    private int bitMask = 1 << 8;
 
     //this values will be effected by pausing the game
     private float timePaused;
@@ -65,7 +76,6 @@ public class RacePlayer : MonoBehaviour {
     //TODO:stop using clumsy booleans and use an enum for the state of the player
     private bool returningToTrack = false;
     private bool falling = false;
-
     private Quaternion returningToTrackRotationBegin;
     private Vector3 returningToTrackPositionBegin;
     private Quaternion returningToTrackRotationEnd;
@@ -82,20 +92,19 @@ public class RacePlayer : MonoBehaviour {
 
         lastTimeOnGround = -1f;
         lastCheckPoint = track[0].startingCheckPoint;
-        rigidBody = GetComponent<Rigidbody>();  
 
-        if (Physics.Raycast(transform.position, -rigidBody.transform.up, out downHit, rayCastDistance, bitMask))
+        //TODO: Fix this to avoid jumping the rotation on start
+        if (Physics.Raycast(transform.position, -transform.up, out downHit, rayCastDistance, bitMask))
         {
+            transform.rotation = Quaternion.FromToRotation(transform.up, downHit.normal) * transform.rotation;
             previousGravity = -downHit.normal;
         }
     }
 
-
     void FixedUpdate()
     {
-        if (behaviorBlocked)
+        if (_behaviorBlocked)
         {
-            rigidBody.Sleep();
             return;
         }
 
@@ -103,108 +112,72 @@ public class RacePlayer : MonoBehaviour {
         if (returningToTrack)
         {
             float deltaTime = (Time.fixedTime - timeStartReturning) * returningToTrackSpeed;
-            rigidBody.MovePosition(Vector3.Lerp(returningToTrackPositionBegin, returningToTrackPositionEnd, deltaTime));
-            rigidBody.MoveRotation(Quaternion.Lerp(returningToTrackRotationBegin, returningToTrackRotationEnd, deltaTime));
+            transform.position = Vector3.Lerp(returningToTrackPositionBegin, returningToTrackPositionEnd, deltaTime);
+            transform.rotation = Quaternion.Lerp(returningToTrackRotationBegin, returningToTrackRotationEnd, deltaTime);
             returningToTrack = (Time.fixedTime - timeStartReturning) < timeSpentReturning;
             return;
         }
 
-        /**
-         * An alernative approach might be to find the desired next position based on the track
-         * and apply a force/torque that would complement this.
-         * 
-         * If no position is found on the track we can just have the default gravity and no angular momentum
-         * 
-         */
-        if (Physics.Raycast(transform.position, -rigidBody.transform.up, out downHit, rayCastDistance, bitMask))
+        if (Input.GetKey(KeyCode.W))
         {
-            //reset since are on ground
-            returningToTrack = false;
-            falling = false;
-            lastTimeOnGround = -1f;
-
-            moveDirection = speed * rigidBody.transform.forward;
-
-            //maybe try smoothing the normals by saving the last few? It's an unwritten rule that there won't be any sharp surfaces
-            float downForce = (downHit.distance - hoverHeight);
-            downForce = Mathf.Max(maxAntiGravMagnitude, downForce) * gravity;
-            previousGravity = downHit.normal * gravity;
-
-            rigidBody.AddForce(downHit.normal * downForce);
-            rigidBody.AddForce(moveDirection - (velocityCompensation * rigidBody.velocity));
-
-            //hard drifts (hard turns for now)
-            if (Input.GetAxis("Hard Drift") > 0)
-            {
-                rigidBody.AddForce(hardDriftSpeed * rigidBody.transform.right);
-            }
-            else if (Input.GetAxis("Hard Drift") < 0)
-            {
-                rigidBody.AddForce(-hardDriftSpeed * rigidBody.transform.right);
-            }
-
-            Vector3 right = rigidBody.transform.forward;
-            right = (right - Vector3.Dot(right, downHit.normal) * downHit.normal).normalized;
-            //need to project right onto tangent plane!!!
-
-            //hard turns should increase turnSpeed
-            if (Input.GetAxis("Horizontal") != 0)
-            {
-                
-                if (Input.GetAxis("Horizontal") > 0)
-                {
-                    right = Quaternion.AngleAxis(turnSpeed, downHit.normal) * right;
-                    //upwards = upwards - (Vector3.Dot(right, downHit.normal) * right);
-                   // upwards.Normalize();
-                    //rigidBody.AddTorque(turnSpeed * transform.up);
-                }
-                else
-                {
-                    right = Quaternion.AngleAxis(-turnSpeed, downHit.normal) * right;
-                    //upwards = upwards - (Vector3.Dot(right, downHit.normal) * right);
-                    //upwards.Normalize();
-                    //rigidBody.AddTorque(-turnSpeed * transform.up);
-                }
-            }
-            else
-            {
-                //rigidBody.angularVelocity = Vector3.zero;
-            }
-
-            //this isn't working too well :(
-            //rigidBody.AddTorque(torqueSpeed * Vector3.Cross(rigidBody.transform.forward, downHit.normal));
-            //Debug.Log(Vector3.Dot(right, downHit.normal));//not 0???!
-            rigidBody.MoveRotation(Quaternion.LookRotation(right, downHit.normal));
-            
-
+            current_speed += (current_speed >= fwd_max_speed) ? 0f : fwd_accel * Time.deltaTime;
         }
         else
         {
-            //only set this on the first frame that there is a miss
+            if (current_speed > 0)
+            {
+                current_speed -= brake_speed * Time.deltaTime;
+            }
+            else
+            {
+                current_speed = 0f;
+            }
+        }
+        
+        prev_up = transform.up;
+        yaw += turn_speed * Time.deltaTime * Input.GetAxis("Horizontal");
+        transform.rotation = Quaternion.Euler(0, yaw, 0);
+
+        /* Adjust the position and rotation of the ship to the track */
+        if (Physics.Raycast(transform.position, -prev_up, out downHit, rayCastDistance, bitMask))
+        {
+            previousGravity = -downHit.normal;
+
+            Vector3 desired_up = Vector3.Lerp(prev_up, downHit.normal, Time.deltaTime * pitch_smooth);
+            Quaternion tilt = Quaternion.FromToRotation(transform.up, desired_up);
+            transform.rotation = tilt * transform.rotation;
+
+            /*Smoothly adjust our height*/
+            smooth_y = Mathf.Lerp(smooth_y, hover_height - downHit.distance, Time.deltaTime * height_smooth);
+            transform.localPosition += prev_up * smooth_y;
+            transform.position += transform.forward * (current_speed * Time.deltaTime);
+        }
+        else
+        {
+            /* only set this on the first frame that there is a miss */
             if (lastTimeOnGround == -1f)
             {
                 Debug.Log("Player left contact with track");
                 falling = true;
                 lastTimeOnGround = Time.fixedTime;
             } 
-            //if we need to go back to the track no longer do a raycast  
+            /* called once to return player to the track*/ 
             else if ((Time.fixedTime - lastTimeOnGround) > timeAllowedNotOnTrack)
             {
-                Debug.Log("returning");
+                Debug.Log("Player returning to track");
+
                 //set to -1 as a flag
                 lastTimeOnGround = -1f;
                 timeStartReturning = Time.fixedTime;
                 returningToTrack = true;
                 falling = false;
-                returningToTrackRotationBegin = rigidBody.transform.rotation;
-                returningToTrackPositionBegin = rigidBody.transform.position;
+                returningToTrackRotationBegin = transform.rotation;
+                returningToTrackPositionBegin = transform.position;
                 returningToTrackRotationEnd = Quaternion.LookRotation(lastCheckPoint.trackForward, lastCheckPoint.trackNormal);
-                returningToTrackPositionEnd = lastCheckPoint.trackPoint + lastCheckPoint.trackNormal;
-                rigidBody.velocity = Vector3.zero;
-                rigidBody.angularVelocity = Vector3.zero;
+                returningToTrackPositionEnd = lastCheckPoint.trackPoint + (hover_height * lastCheckPoint.trackNormal);
             }
             else {
-                rigidBody.AddForce(previousGravity);
+                transform.position += (gravity * Time.deltaTime * Time.deltaTime) * previousGravity + (transform.forward * (current_speed * Time.deltaTime));
             }
         }
     }
@@ -213,6 +186,7 @@ public class RacePlayer : MonoBehaviour {
     {
         switch (coll.gameObject.tag)
         {
+            //set the last checkpoint the player got to
             case "CheckPoint":
                 lastCheckPoint = coll.gameObject.GetComponent<CheckPoint>();
                 Debug.Log("Reached checkpoint " + lastCheckPoint.name);
