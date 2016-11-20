@@ -67,11 +67,11 @@ public class StartingSequence : MonoBehaviour {
             else if (progress < 6f)
             {
                 screenText.text = "GO!";
+                finished = true;
             }
             else
             {
                 screenText.text = "";
-                finished = true;
             }
         }
 
