@@ -13,13 +13,11 @@ public class CheckPoint : MonoBehaviour {
     void Awake () {
         RaycastHit downHit;
 
-        if (Physics.Raycast(gameObject.transform.position, -gameObject.transform.up, out downHit, GetComponent<SphereCollider>().radius)) //, groundMask))
+        if (Physics.Raycast(gameObject.transform.position, -gameObject.transform.up, out downHit, GetComponent<SphereCollider>().radius, groundMask))
         {
             trackNormal = downHit.normal;
             trackPoint = downHit.point;
             trackForward = gameObject.transform.forward;
-
-            Debug.Log(trackPoint + " " + trackNormal);
         } else
         {
             Debug.LogError("Error: cannot find track to checkpoint (" + gameObject.name + "). Please orient this checkpoint's y-axis up relative to the track and place the center above the track");
