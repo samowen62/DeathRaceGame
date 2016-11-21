@@ -11,7 +11,7 @@ public class RacePlayer : MonoBehaviour {
 
     //below are various parameters used to fine-tune game mechanics
     public float gravity = 10f;
-    public float rayCastDistance = 20f;
+    public float rayCastDistance = 30f;
     public float returningToTrackSpeed = 0.001f;
     public float timeAllowedNotOnTrack = 2.5f;
     public float timeSpentReturning = 3f;
@@ -21,6 +21,8 @@ public class RacePlayer : MonoBehaviour {
     public float fwd_max_speed = 20f;
     public float brake_speed = 20f;
     public float turn_speed = 5f;
+    public float hard_turn_multiplier = 2.2f;
+    public float air_turn_speed = 15f;
 
     /*Auto adjust to track surface parameters*/
     public float hover_height = 2f;     //Distance to keep from the ground
@@ -29,7 +31,7 @@ public class RacePlayer : MonoBehaviour {
 
     /*We will use all this stuff later*/
     private Vector3 prev_up;
-    public float yaw;
+    private float yaw;
     private float smooth_y;
     private float current_speed;
   
@@ -97,6 +99,7 @@ public class RacePlayer : MonoBehaviour {
         if (Physics.Raycast(transform.position, -transform.up, out downHit, rayCastDistance, bitMask))
         {
             transform.rotation = Quaternion.FromToRotation(transform.up, downHit.normal) * transform.rotation;
+            yaw = transform.rotation.eulerAngles.y;
             previousGravity = -downHit.normal;
         }
     }
@@ -118,13 +121,18 @@ public class RacePlayer : MonoBehaviour {
             return;
         }
 
-        if (Input.GetKey(KeyCode.W))
+        
+        prev_up = transform.up;
+
+        /* Adjust the position and rotation of the ship to the track */
+        if (Physics.Raycast(transform.position, -prev_up, out downHit, rayCastDistance, bitMask))
         {
-            current_speed += (current_speed >= fwd_max_speed) ? 0f : fwd_accel * Time.deltaTime;
-        }
-        else
-        {
-            if (current_speed > 0)
+            
+            if (Input.GetKey(KeyCode.W))
+            {
+                current_speed += (current_speed >= fwd_max_speed) ? 0f : fwd_accel * Time.deltaTime;
+            }
+            else if (current_speed > 0)
             {
                 current_speed -= brake_speed * Time.deltaTime;
             }
@@ -132,15 +140,8 @@ public class RacePlayer : MonoBehaviour {
             {
                 current_speed = 0f;
             }
-        }
-        
-        prev_up = transform.up;
-        yaw += turn_speed * Time.deltaTime * Input.GetAxis("Horizontal");
-        transform.rotation = Quaternion.Euler(0, yaw, 0);
-
-        /* Adjust the position and rotation of the ship to the track */
-        if (Physics.Raycast(transform.position, -prev_up, out downHit, rayCastDistance, bitMask))
-        {
+            
+            turnShip(false);
             previousGravity = -downHit.normal;
 
             Vector3 desired_up = Vector3.Lerp(prev_up, downHit.normal, Time.deltaTime * pitch_smooth);
@@ -149,6 +150,10 @@ public class RacePlayer : MonoBehaviour {
 
             /*Smoothly adjust our height*/
             smooth_y = Mathf.Lerp(smooth_y, hover_height - downHit.distance, Time.deltaTime * height_smooth);
+
+            //sanity check on smooth_y
+            smooth_y = Mathf.Max(downHit.distance / -3, smooth_y);
+            
             transform.localPosition += prev_up * smooth_y;
             transform.position += transform.forward * (current_speed * Time.deltaTime);
         }
@@ -171,12 +176,16 @@ public class RacePlayer : MonoBehaviour {
                 timeStartReturning = Time.fixedTime;
                 returningToTrack = true;
                 falling = false;
+                current_speed = 0f;
+                yaw = lastCheckPoint.yaw;
+
                 returningToTrackRotationBegin = transform.rotation;
                 returningToTrackPositionBegin = transform.position;
                 returningToTrackRotationEnd = Quaternion.LookRotation(lastCheckPoint.trackForward, lastCheckPoint.trackNormal);
-                returningToTrackPositionEnd = lastCheckPoint.trackPoint + (hover_height * lastCheckPoint.trackNormal);
+                returningToTrackPositionEnd = lastCheckPoint.trackPoint;
             }
             else {
+                turnShip(true);
                 transform.position += (gravity * Time.deltaTime * Time.deltaTime) * previousGravity + (transform.forward * (current_speed * Time.deltaTime));
             }
         }
@@ -192,6 +201,26 @@ public class RacePlayer : MonoBehaviour {
                 Debug.Log("Reached checkpoint " + lastCheckPoint.name);
                 break;
         }       
+    }
+
+    private void turnShip(bool inAir)
+    {
+        float turn_angle;
+        if (inAir)
+        {
+            turn_angle = air_turn_speed * Time.deltaTime * Input.GetAxis("Horizontal");
+        }
+        else
+        {
+            turn_angle = turn_speed * Time.deltaTime * Input.GetAxis("Horizontal");
+            if (Input.GetKey(KeyCode.Space))
+            {
+                turn_angle *= hard_turn_multiplier;
+            }
+        }      
+
+        yaw += turn_angle;
+        transform.rotation = Quaternion.Euler(0, yaw, 0);
     }
 
 }

@@ -38,7 +38,7 @@ public class GameContext : MonoBehaviour {
     private void handleInputs()
     {
         //pause game
-        if (!pauseMenu.paused && Input.GetKey(KeyCode.Space) && (Time.fixedTime - spaceBarLastPressed > buttonPressTime))
+        if (!pauseMenu.paused && Input.GetKey(KeyCode.Q) && (Time.fixedTime - spaceBarLastPressed > buttonPressTime))
         {
             Debug.Log("paused game");
             spaceBarLastPressed = Time.fixedTime;
@@ -47,7 +47,7 @@ public class GameContext : MonoBehaviour {
             staringSequence.behaviorBlocked = true;
         }
         //un pause game
-        else if(pauseMenu.paused && Input.GetKey(KeyCode.Space) && (Time.fixedTime - spaceBarLastPressed > buttonPressTime))
+        else if(pauseMenu.paused && Input.GetKey(KeyCode.Q) && (Time.fixedTime - spaceBarLastPressed > buttonPressTime))
         {
             Debug.Log("un-paused game");
             spaceBarLastPressed = Time.fixedTime;
