@@ -12,10 +12,10 @@ Showcasing the racing machine with some other primitive assets.
 In game thrid person screenshot of the machine on the anti-grav track.
 
 ##TODO:
-* Make a start menu to select track scene
-* Fog in the distance
 * Add AI
+* Fog in the distance
 * Add enum class for RacePlayer status
+* Fix issue with car clipping through track, hard to recreate
 
 
 

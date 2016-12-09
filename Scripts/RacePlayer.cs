@@ -28,8 +28,10 @@ public class RacePlayer : MonoBehaviour {
     public float hover_height = 2f;     //Distance to keep from the ground
     public float height_smooth = 10f;   //How fast the ship will readjust to "hover_height"
     public float pitch_smooth = 5f;     //How fast the ship will adjust its rotation to match track normal
+    public float height_correction = 3f;
 
     /*We will use all this stuff later*/
+    private Vector3 disired_position;
     private Vector3 prev_up;
     private float yaw;
     private float smooth_y;
@@ -127,7 +129,7 @@ public class RacePlayer : MonoBehaviour {
         /* Adjust the position and rotation of the ship to the track */
         if (Physics.Raycast(transform.position, -prev_up, out downHit, rayCastDistance, bitMask))
         {
-            
+
             if (Input.GetKey(KeyCode.W))
             {
                 current_speed += (current_speed >= fwd_max_speed) ? 0f : fwd_accel * Time.deltaTime;
@@ -140,7 +142,7 @@ public class RacePlayer : MonoBehaviour {
             {
                 current_speed = 0f;
             }
-            
+
             turnShip(false);
             previousGravity = -downHit.normal;
 
@@ -153,9 +155,23 @@ public class RacePlayer : MonoBehaviour {
 
             //sanity check on smooth_y
             smooth_y = Mathf.Max(downHit.distance / -3, smooth_y);
-            
+
             transform.localPosition += prev_up * smooth_y;
-            transform.position += transform.forward * (current_speed * Time.deltaTime);
+            disired_position = transform.position + transform.forward * (current_speed * Time.deltaTime);
+
+            if (Physics.Raycast(disired_position + height_correction * transform.up, -transform.up, out downHit, rayCastDistance, bitMask))
+            {
+                //this is so we do not fall through the track
+                if (downHit.distance < height_correction + 0.1)
+                {
+                    Debug.Log("passed through" + downHit.distance);
+                }
+                else
+                {
+                    transform.position = disired_position;
+                }
+                
+            }
         }
         else
         {
@@ -165,8 +181,8 @@ public class RacePlayer : MonoBehaviour {
                 Debug.Log("Player left contact with track");
                 falling = true;
                 lastTimeOnGround = Time.fixedTime;
-            } 
-            /* called once to return player to the track*/ 
+            }
+            /* called once to return player to the track*/
             else if ((Time.fixedTime - lastTimeOnGround) > timeAllowedNotOnTrack)
             {
                 Debug.Log("Player returning to track");
@@ -184,7 +200,8 @@ public class RacePlayer : MonoBehaviour {
                 returningToTrackRotationEnd = Quaternion.LookRotation(lastCheckPoint.trackForward, lastCheckPoint.trackNormal);
                 returningToTrackPositionEnd = lastCheckPoint.trackPoint;
             }
-            else {
+            else
+            {
                 turnShip(true);
                 transform.position += (gravity * Time.deltaTime * Time.deltaTime) * previousGravity + (transform.forward * (current_speed * Time.deltaTime));
             }
