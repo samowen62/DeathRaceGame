@@ -13,6 +13,7 @@ In game thrid person screenshot of the machine on the anti-grav track.
 
 ##TODO:
 * Add AI
+* On collision with walls, bounce
 * Fog in the distance
 * Add enum class for RacePlayer status
 * Fix issue with car clipping through track, hard to recreate
