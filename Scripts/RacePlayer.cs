@@ -217,8 +217,16 @@ public class RacePlayer : MonoBehaviour {
                 lastCheckPoint = coll.gameObject.GetComponent<CheckPoint>();
                 Debug.Log("Reached checkpoint " + lastCheckPoint.name);
                 break;
-        }       
+            case "CollissionWall":
+                Debug.Log("Hit wall");
+                Debug.DrawRay(coll.ClosestPointOnBounds(transform.position), 20f * transform.forward, Color.green);
+                break;
+            default:
+                Debug.LogWarning("No behavior for OnTriggerEnter with tag: " + coll.gameObject.tag);
+                break;
+        }
     }
+
 
     private void turnShip(bool inAir)
     {
