@@ -18,9 +18,13 @@ public class GameContext : MonoBehaviour {
 
         spaceBarLastPressed = 0f;
 
-        player.behaviorBlocked = true;
+        /**
+         * set player.behaviorBlocked/staringSequence.behaviorBlocked to true/false 
+         * in an actual game and false/true when testing to skip sequence
+         */
+        player.behaviorBlocked = false;
 
-        staringSequence.behaviorBlocked = false;
+        staringSequence.behaviorBlocked = true;
 
         pauseMenu.paused = false;
     }

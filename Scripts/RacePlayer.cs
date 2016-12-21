@@ -24,6 +24,11 @@ public class RacePlayer : MonoBehaviour {
     public float hard_turn_multiplier = 2.2f;
     public float air_turn_speed = 15f;
 
+    /*parameters for bouncing against the wall */
+    public float wall_bounce_deccel = 0.6f;//must be < 1!!
+    public float wall_bounce_threshold = 3f;
+    public float wall_bounce_speed_to_bounce_ratio = 0.08f;
+
     /*Auto adjust to track surface parameters*/
     public float hover_height = 2f;     //Distance to keep from the ground
     public float height_smooth = 10f;   //How fast the ship will readjust to "hover_height"
@@ -39,12 +44,19 @@ public class RacePlayer : MonoBehaviour {
   
     private Vector3 previousGravity;
     private RaycastHit downHit;
+    private RaycastHit wallHit;
+
+    private float wall_bounce_velocity = 0f;
 
     /* Last checkpoint of the player */
     private CheckPoint lastCheckPoint;
 
+    //TODO: put these in seperate util class
     /* to only ray cast on ground layer objects*/
-    private int bitMask = 1 << 8;
+    private int groundBitMask = 1 << 8;
+
+    /* to only ray cast on wall layer objects*/
+    private int wallBitMask = 1 << 11;
 
     /* This is for pausing the game */
     private bool _behaviorBlocked;
@@ -98,7 +110,7 @@ public class RacePlayer : MonoBehaviour {
         lastCheckPoint = track[0].startingCheckPoint;
 
         //TODO: Fix this to avoid jumping the rotation on start
-        if (Physics.Raycast(transform.position, -transform.up, out downHit, rayCastDistance, bitMask))
+        if (Physics.Raycast(transform.position, -transform.up, out downHit, rayCastDistance, groundBitMask))
         {
             transform.rotation = Quaternion.FromToRotation(transform.up, downHit.normal) * transform.rotation;
             yaw = transform.rotation.eulerAngles.y;
@@ -123,11 +135,23 @@ public class RacePlayer : MonoBehaviour {
             return;
         }
 
-        
+        //TODO: fix this!!!
+        if(wall_bounce_velocity != 0 && false)
+        {
+            Debug.Log("bouncing " + wall_bounce_velocity * transform.right);
+            transform.position += wall_bounce_velocity * transform.right;
+            wall_bounce_velocity /= wall_bounce_deccel;
+
+            if(Mathf.Abs(wall_bounce_velocity) < wall_bounce_threshold)
+            {
+                wall_bounce_velocity = 0;
+            }
+        }
+
         prev_up = transform.up;
 
         /* Adjust the position and rotation of the ship to the track */
-        if (Physics.Raycast(transform.position, -prev_up, out downHit, rayCastDistance, bitMask))
+        if (Physics.Raycast(transform.position, -prev_up, out downHit, rayCastDistance, groundBitMask))
         {
 
             if (Input.GetKey(KeyCode.W))
@@ -159,7 +183,7 @@ public class RacePlayer : MonoBehaviour {
             transform.localPosition += prev_up * smooth_y;
             disired_position = transform.position + transform.forward * (current_speed * Time.deltaTime);
 
-            if (Physics.Raycast(disired_position + height_correction * transform.up, -transform.up, out downHit, rayCastDistance, bitMask))
+            if (Physics.Raycast(disired_position + height_correction * transform.up, -transform.up, out downHit, rayCastDistance, groundBitMask))
             {
                 //this is so we do not fall through the track
                 if (downHit.distance < height_correction + 0.1)
@@ -181,6 +205,7 @@ public class RacePlayer : MonoBehaviour {
                 Debug.Log("Player left contact with track");
                 falling = true;
                 lastTimeOnGround = Time.fixedTime;
+                wall_bounce_velocity = 0;
             }
             /* called once to return player to the track*/
             else if ((Time.fixedTime - lastTimeOnGround) > timeAllowedNotOnTrack)
@@ -218,8 +243,22 @@ public class RacePlayer : MonoBehaviour {
                 Debug.Log("Reached checkpoint " + lastCheckPoint.name);
                 break;
             case "CollissionWall":
-                Debug.Log("Hit wall");
-                Debug.DrawRay(coll.ClosestPointOnBounds(transform.position), 20f * transform.forward, Color.green);
+
+                if (Physics.Raycast(transform.position, -transform.right, out wallHit, rayCastDistance, wallBitMask))
+                {
+                    Debug.Log("Hit wall on left");
+                    wall_bounce_velocity = wall_bounce_speed_to_bounce_ratio * current_speed * Vector3.Dot(wallHit.normal, transform.forward);
+                    Debug.Log(wall_bounce_velocity + " " + current_speed);
+                }
+                else if (Physics.Raycast(transform.position, transform.right, out wallHit, rayCastDistance, wallBitMask))
+                {
+                    Debug.Log("Hit wall on right");
+                    wall_bounce_velocity = -current_speed * wall_bounce_speed_to_bounce_ratio * Vector3.Dot(wallHit.normal, transform.forward);
+                    Debug.Log(wall_bounce_velocity + " " + current_speed);
+                } else
+                {
+                    Debug.LogWarning("Detected hit with wall but cannot find wall on left or right!");
+                }
                 break;
             default:
                 Debug.LogWarning("No behavior for OnTriggerEnter with tag: " + coll.gameObject.tag);
