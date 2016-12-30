@@ -49,6 +49,8 @@ public class GameContext : MonoBehaviour {
             pauseMenu.paused = true;
             player.behaviorBlocked = true;
             staringSequence.behaviorBlocked = true;
+
+            blockPrefabBehavior();
         }
         //un pause game
         else if(pauseMenu.paused && Input.GetKey(KeyCode.Q) && (Time.fixedTime - spaceBarLastPressed > buttonPressTime))
@@ -56,12 +58,34 @@ public class GameContext : MonoBehaviour {
             Debug.Log("un-paused game");
             spaceBarLastPressed = Time.fixedTime;
             pauseMenu.paused = false;
-            
+
+            unblockPrefabBehavior();
+
             staringSequence.behaviorBlocked = false;
             if (staringSequence.finished)
             {
                 player.behaviorBlocked = false;
             }
+        }
+    }
+
+    private void blockPrefabBehavior()
+    {
+        var bannerPrefabs = FindObjectsOfType<BannerScroll>();
+
+        foreach(var banner in bannerPrefabs)
+        {
+            banner.behaviorBlocked = true;
+        }
+    }
+
+    private void unblockPrefabBehavior()
+    {
+        var bannerPrefabs = FindObjectsOfType<BannerScroll>();
+
+        foreach (var banner in bannerPrefabs)
+        {
+            banner.behaviorBlocked = false;
         }
     }
 }

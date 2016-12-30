@@ -16,18 +16,22 @@ public class RacePlayer : MonoBehaviour {
     public float timeAllowedNotOnTrack = 2.5f;
     public float timeSpentReturning = 3f;
 
-    /*Ship handling parameters*/
+    /*Ship handling parameters, must be multiples of 5!! */
     public float fwd_accel = 10f;
     public float fwd_max_speed = 20f;
+    public float fwd_boost_speed = 170f;
+    public float fwd_boost_decel = 5f;
+
     public float brake_speed = 20f;
     public float turn_speed = 5f;
     public float hard_turn_multiplier = 2.2f;
     public float air_turn_speed = 15f;
 
     /*parameters for bouncing against the wall */
-    public float wall_bounce_deccel = 0.6f;//must be < 1!!
+    public float wall_bounce_deccel = 10f;//must be > 1!!
     public float wall_bounce_threshold = 3f;
     public float wall_bounce_speed_to_bounce_ratio = 0.08f;
+    public float wall_bounce_curr_speed_deccel = 10f;//must be > 1!!
 
     /*Auto adjust to track surface parameters*/
     public float hover_height = 2f;     //Distance to keep from the ground
@@ -71,7 +75,7 @@ public class RacePlayer : MonoBehaviour {
             else
             {
                 //this is to ensure that pausing the game does not mess with timing
-                //TODO: freeze the trail
+                //TODO: freeze the trail behind the engine
                 if (lastTimeOnGround != -1)
                 {
                     lastTimeOnGround += (Time.fixedTime - timePaused);
@@ -99,6 +103,9 @@ public class RacePlayer : MonoBehaviour {
 
     void Awake()
     {
+
+        //(FindObjectsOfType(typeof(BoostPanel)) as BoostPanel[])[0].boostAnimation();
+
         //TODO: sanity check to assert that the public parameters are within reasonable range (positive or negative)
         Track[] track = FindObjectsOfType(typeof(Track)) as Track[];
         if(track.Length != 1)
@@ -135,10 +142,10 @@ public class RacePlayer : MonoBehaviour {
             return;
         }
 
-        //TODO: fix this!!!
-        if(wall_bounce_velocity != 0 && false)
+        //TODO: fix glitch where bouncing and falling under the track. 
+        //Fix this by adding a ray cast with height adjustment
+        if(wall_bounce_velocity != 0)
         {
-            Debug.Log("bouncing " + wall_bounce_velocity * transform.right);
             transform.position += wall_bounce_velocity * transform.right;
             wall_bounce_velocity /= wall_bounce_deccel;
 
@@ -156,7 +163,7 @@ public class RacePlayer : MonoBehaviour {
 
             if (Input.GetKey(KeyCode.W))
             {
-                current_speed += (current_speed >= fwd_max_speed) ? 0f : fwd_accel * Time.deltaTime;
+                current_speed += (current_speed >= fwd_max_speed) ? ((current_speed == fwd_max_speed) ? 0 : -fwd_boost_decel) : fwd_accel * Time.deltaTime;
             }
             else if (current_speed > 0)
             {
@@ -174,7 +181,7 @@ public class RacePlayer : MonoBehaviour {
             Quaternion tilt = Quaternion.FromToRotation(transform.up, desired_up);
             transform.rotation = tilt * transform.rotation;
 
-            /*Smoothly adjust our height*/
+            //Smoothly adjust our height
             smooth_y = Mathf.Lerp(smooth_y, hover_height - downHit.distance, Time.deltaTime * height_smooth);
 
             //sanity check on smooth_y
@@ -242,24 +249,37 @@ public class RacePlayer : MonoBehaviour {
                 lastCheckPoint = coll.gameObject.GetComponent<CheckPoint>();
                 Debug.Log("Reached checkpoint " + lastCheckPoint.name);
                 break;
+
+            //create a velocity vector from bouncing off the wall
             case "CollissionWall":
 
                 if (Physics.Raycast(transform.position, -transform.right, out wallHit, rayCastDistance, wallBitMask))
                 {
                     Debug.Log("Hit wall on left");
-                    wall_bounce_velocity = wall_bounce_speed_to_bounce_ratio * current_speed * Vector3.Dot(wallHit.normal, transform.forward);
-                    Debug.Log(wall_bounce_velocity + " " + current_speed);
+                    wall_bounce_velocity = -wall_bounce_speed_to_bounce_ratio * current_speed * Vector3.Dot(wallHit.normal, transform.forward);
+                    current_speed /= wall_bounce_curr_speed_deccel;
                 }
                 else if (Physics.Raycast(transform.position, transform.right, out wallHit, rayCastDistance, wallBitMask))
                 {
                     Debug.Log("Hit wall on right");
-                    wall_bounce_velocity = -current_speed * wall_bounce_speed_to_bounce_ratio * Vector3.Dot(wallHit.normal, transform.forward);
-                    Debug.Log(wall_bounce_velocity + " " + current_speed);
+                    wall_bounce_velocity = current_speed * wall_bounce_speed_to_bounce_ratio * Vector3.Dot(wallHit.normal, transform.forward);
+                    current_speed /= wall_bounce_curr_speed_deccel;
                 } else
                 {
                     Debug.LogWarning("Detected hit with wall but cannot find wall on left or right!");
                 }
                 break;
+
+            //when we hit a boost panel
+            case "BoostPanel":
+                Debug.Log("Boosting!");
+                current_speed = fwd_boost_speed;
+
+                //trigger the animation
+                coll.gameObject.GetComponent<BoostPanel>().boostAnimation();
+                break;
+
+            //Log warning for unhandled tag
             default:
                 Debug.LogWarning("No behavior for OnTriggerEnter with tag: " + coll.gameObject.tag);
                 break;
