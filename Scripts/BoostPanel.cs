@@ -12,7 +12,7 @@ public class BoostPanel : MonoBehaviour {
 
     //TODO: SAME AS HOVER HEIGHT (this should be set in RacePlayer.cs and CheckPoint.cs as well so far)
     //Height of boost panels above the track
-    private float trackHeight = 1.8f;
+    private float trackHeight = 3f;
 
     private MeshRenderer innerCone;
     private MeshRenderer outerCone;
@@ -68,9 +68,9 @@ public class BoostPanel : MonoBehaviour {
 
     void Awake()
     {
-        findCones();
-
         orientPanel();
+
+        findCones();
     }
 
     /**
