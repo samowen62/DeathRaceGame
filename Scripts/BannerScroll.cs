@@ -4,7 +4,7 @@ using System.Collections;
 public class BannerScroll : MonoBehaviour {
 
     private Renderer banner;
-    private float banner_speed = 0.8f;
+    private float banner_speed = 0.6f;
     private float pause_start = 0f;
 
     /* This is for pausing the game */
@@ -34,7 +34,6 @@ public class BannerScroll : MonoBehaviour {
         }
     }
 
-    // Use this for initialization
     void Start () {
         banner = GetComponent<MeshRenderer>();
 	}

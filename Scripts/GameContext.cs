@@ -14,7 +14,12 @@ public class GameContext : MonoBehaviour {
 
     private float spaceBarLastPressed;
 
+    //used for controlling player input
+    private PlayerInputDTO playerInput;
+
     void Awake () {
+
+        playerInput = new PlayerInputDTO();
 
         spaceBarLastPressed = 0f;
 
@@ -44,28 +49,45 @@ public class GameContext : MonoBehaviour {
         //pause game
         if (!pauseMenu.paused && Input.GetKey(KeyCode.Q) && (Time.fixedTime - spaceBarLastPressed > buttonPressTime))
         {
-            Debug.Log("paused game");
-            spaceBarLastPressed = Time.fixedTime;
-            pauseMenu.paused = true;
-            player.behaviorBlocked = true;
-            staringSequence.behaviorBlocked = true;
-
-            blockPrefabBehavior();
+            pauseGame();
         }
         //un pause game
         else if(pauseMenu.paused && Input.GetKey(KeyCode.Q) && (Time.fixedTime - spaceBarLastPressed > buttonPressTime))
         {
-            Debug.Log("un-paused game");
-            spaceBarLastPressed = Time.fixedTime;
-            pauseMenu.paused = false;
+            unpauseGame();
+        }
 
-            unblockPrefabBehavior();
+        //if the player is in fact playing
+        if (true)
+        {
+            playerInput.setFromUser();
+            player.passPlayerInputs(playerInput);
+        }
+    }
 
-            staringSequence.behaviorBlocked = false;
-            if (staringSequence.finished)
-            {
-                player.behaviorBlocked = false;
-            }
+    private void pauseGame()
+    {
+        Debug.Log("paused game");
+        spaceBarLastPressed = Time.fixedTime;
+        pauseMenu.paused = true;
+        player.behaviorBlocked = true;
+        staringSequence.behaviorBlocked = true;
+
+        blockPrefabBehavior();
+    }
+
+    private void unpauseGame()
+    {
+        Debug.Log("un-paused game");
+        spaceBarLastPressed = Time.fixedTime;
+        pauseMenu.paused = false;
+
+        unblockPrefabBehavior();
+
+        staringSequence.behaviorBlocked = false;
+        if (staringSequence.finished)
+        {
+            player.behaviorBlocked = false;
         }
     }
 

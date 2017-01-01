@@ -7,10 +7,6 @@ public class BoostPanel : MonoBehaviour {
     public float movement_amplitude = 3f;
     public float movement_spin_speed = 1f;
 
-    //TODO: put layermasks in seperate enum class
-    private int groundMask = 1 << 8;
-
-    //TODO: SAME AS HOVER HEIGHT (this should be set in RacePlayer.cs and CheckPoint.cs as well so far)
     //Height of boost panels above the track
     private float trackHeight = 3f;
 
@@ -61,7 +57,6 @@ public class BoostPanel : MonoBehaviour {
      */
     public void boostAnimation()
     {
-        Debug.Log("animation firing");
         spin_animation_running = true;
         spin_animation_start_time = Time.realtimeSinceStartup;
     }
@@ -110,7 +105,7 @@ public class BoostPanel : MonoBehaviour {
     {
         RaycastHit downHit;
 
-        if (Physics.Raycast(gameObject.transform.position, -gameObject.transform.up, out downHit, 30f, groundMask))
+        if (Physics.Raycast(gameObject.transform.position, -gameObject.transform.up, out downHit, 30f, AppConfig.groundMask))
         {
             transform.rotation = Quaternion.LookRotation(transform.forward, downHit.normal);
             transform.position += transform.up * (trackHeight - downHit.distance);

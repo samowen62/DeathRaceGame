@@ -34,9 +34,9 @@ public class RacePlayer : MonoBehaviour {
     public float wall_bounce_curr_speed_deccel = 10f;//must be > 1!!
 
     /*Auto adjust to track surface parameters*/
-    public float hover_height = 2f;     //Distance to keep from the ground
-    public float height_smooth = 10f;   //How fast the ship will readjust to "hover_height"
-    public float pitch_smooth = 5f;     //How fast the ship will adjust its rotation to match track normal
+    public float hover_height = AppConfig.hoverHeight - 0.5f;       //Distance to keep from the ground
+    public float height_smooth = 10f;                               //How fast the ship will readjust to "hover_height"
+    public float pitch_smooth = 5f;                                 //How fast the ship will adjust its rotation to match track normal
     public float height_correction = 3f;
 
     /*We will use all this stuff later*/
@@ -54,13 +54,6 @@ public class RacePlayer : MonoBehaviour {
 
     /* Last checkpoint of the player */
     private CheckPoint lastCheckPoint;
-
-    //TODO: put these in seperate util class
-    /* to only ray cast on ground layer objects*/
-    private int groundBitMask = 1 << 8;
-
-    /* to only ray cast on wall layer objects*/
-    private int wallBitMask = 1 << 11;
 
     /* This is for pausing the game */
     private bool _behaviorBlocked;
@@ -101,9 +94,11 @@ public class RacePlayer : MonoBehaviour {
     private Quaternion returningToTrackRotationEnd;
     private Vector3 returningToTrackPositionEnd;
 
+    private PlayerInputDTO player_inputs { set; get; }
+
     void Awake()
     {
-
+        player_inputs = new PlayerInputDTO();
         //(FindObjectsOfType(typeof(BoostPanel)) as BoostPanel[])[0].boostAnimation();
 
         //TODO: sanity check to assert that the public parameters are within reasonable range (positive or negative)
@@ -117,7 +112,7 @@ public class RacePlayer : MonoBehaviour {
         lastCheckPoint = track[0].startingCheckPoint;
 
         //TODO: Fix this to avoid jumping the rotation on start
-        if (Physics.Raycast(transform.position, -transform.up, out downHit, rayCastDistance, groundBitMask))
+        if (Physics.Raycast(transform.position, -transform.up, out downHit, rayCastDistance, AppConfig.groundMask))
         {
             transform.rotation = Quaternion.FromToRotation(transform.up, downHit.normal) * transform.rotation;
             yaw = transform.rotation.eulerAngles.y;
@@ -142,8 +137,7 @@ public class RacePlayer : MonoBehaviour {
             return;
         }
 
-        //TODO: fix glitch where bouncing and falling under the track. 
-        //Fix this by adding a ray cast with height adjustment
+        
         if(wall_bounce_velocity != 0)
         {
             transform.position += wall_bounce_velocity * transform.right;
@@ -158,10 +152,10 @@ public class RacePlayer : MonoBehaviour {
         prev_up = transform.up;
 
         /* Adjust the position and rotation of the ship to the track */
-        if (Physics.Raycast(transform.position, -prev_up, out downHit, rayCastDistance, groundBitMask))
+        if (Physics.Raycast(transform.position, -prev_up, out downHit, rayCastDistance, AppConfig.groundMask))
         {
 
-            if (Input.GetKey(KeyCode.W))
+            if (player_inputs.w_key)
             {
                 current_speed += (current_speed >= fwd_max_speed) ? ((current_speed == fwd_max_speed) ? 0 : -fwd_boost_decel) : fwd_accel * Time.deltaTime;
             }
@@ -190,7 +184,9 @@ public class RacePlayer : MonoBehaviour {
             transform.localPosition += prev_up * smooth_y;
             disired_position = transform.position + transform.forward * (current_speed * Time.deltaTime);
 
-            if (Physics.Raycast(disired_position + height_correction * transform.up, -transform.up, out downHit, rayCastDistance, groundBitMask))
+            //TODO: fix glitch where bouncing and falling under the track. 
+            //Fix this by adding a ray cast with height adjustment
+            if (Physics.Raycast(disired_position + height_correction * transform.up, -transform.up, out downHit, rayCastDistance, AppConfig.groundMask))
             {
                 //this is so we do not fall through the track
                 if (downHit.distance < height_correction + 0.1)
@@ -253,15 +249,13 @@ public class RacePlayer : MonoBehaviour {
             //create a velocity vector from bouncing off the wall
             case "CollissionWall":
 
-                if (Physics.Raycast(transform.position, -transform.right, out wallHit, rayCastDistance, wallBitMask))
+                if (Physics.Raycast(transform.position, -transform.right, out wallHit, rayCastDistance, AppConfig.wallMask))
                 {
-                    Debug.Log("Hit wall on left");
                     wall_bounce_velocity = -wall_bounce_speed_to_bounce_ratio * current_speed * Vector3.Dot(wallHit.normal, transform.forward);
                     current_speed /= wall_bounce_curr_speed_deccel;
                 }
-                else if (Physics.Raycast(transform.position, transform.right, out wallHit, rayCastDistance, wallBitMask))
+                else if (Physics.Raycast(transform.position, transform.right, out wallHit, rayCastDistance, AppConfig.wallMask))
                 {
-                    Debug.Log("Hit wall on right");
                     wall_bounce_velocity = current_speed * wall_bounce_speed_to_bounce_ratio * Vector3.Dot(wallHit.normal, transform.forward);
                     current_speed /= wall_bounce_curr_speed_deccel;
                 } else
@@ -272,7 +266,7 @@ public class RacePlayer : MonoBehaviour {
 
             //when we hit a boost panel
             case "BoostPanel":
-                Debug.Log("Boosting!");
+                Debug.Log("Boost Power");
                 current_speed = fwd_boost_speed;
 
                 //trigger the animation
@@ -286,18 +280,25 @@ public class RacePlayer : MonoBehaviour {
         }
     }
 
+    /*
+     * Needed to pass inputs to the player
+     */
+    public void passPlayerInputs(PlayerInputDTO _player_inputs)
+    {
+        player_inputs = _player_inputs;
+    }
 
     private void turnShip(bool inAir)
     {
         float turn_angle;
         if (inAir)
         {
-            turn_angle = air_turn_speed * Time.deltaTime * Input.GetAxis("Horizontal");
+            turn_angle = air_turn_speed * Time.deltaTime * player_inputs.horizonalAxis;
         }
         else
         {
-            turn_angle = turn_speed * Time.deltaTime * Input.GetAxis("Horizontal");
-            if (Input.GetKey(KeyCode.Space))
+            turn_angle = turn_speed * Time.deltaTime * player_inputs.horizonalAxis;
+            if (player_inputs.spaceBar)
             {
                 turn_angle *= hard_turn_multiplier;
             }
