@@ -4,7 +4,7 @@ using System.Collections;
 public class BannerScroll : MonoBehaviour {
 
     private Renderer banner;
-    private float banner_speed = 0.6f;
+    public float banner_speed = 0.6f;
     private float pause_start = 0f;
 
     /* This is for pausing the game */
