@@ -33,6 +33,10 @@ public class RacePlayer : MonoBehaviour {
     public float wall_bounce_speed_to_bounce_ratio = 0.08f;
     public float wall_bounce_curr_speed_deccel = 10f;//must be > 1!!
 
+    /*parameters for ship animation */
+    public float ship_mesh_tilt = 7f;
+    public float ship_mesh_tilt_hard_turn = 3f;
+
     /*Auto adjust to track surface parameters*/
     public float hover_height = AppConfig.hoverHeight - 0.5f;       //Distance to keep from the ground
     public float height_smooth = 10f;                               //How fast the ship will readjust to "hover_height"
@@ -96,24 +100,39 @@ public class RacePlayer : MonoBehaviour {
 
     private PlayerInputDTO player_inputs { set; get; }
 
+    //renderer of ship
+    private MeshRenderer shipRenderer;
+    private Quaternion base_ship_rotation;
+
     void Awake()
     {
         player_inputs = new PlayerInputDTO();
         //(FindObjectsOfType(typeof(BoostPanel)) as BoostPanel[])[0].boostAnimation();
 
         //TODO: sanity check to assert that the public parameters are within reasonable range (positive or negative)
+
+        //TODO: abstract finding 1 object of type and 1 object of name in general util class with assertion
         Track[] track = FindObjectsOfType(typeof(Track)) as Track[];
         if(track.Length != 1)
         {
             Debug.LogError("Error: only 1 component of type 'Track' allowed in the scene");
         }
 
+        shipRenderer = transform.FindChild("Ship").gameObject.GetComponent<MeshRenderer>();
+        if (shipRenderer == null)
+        {
+            Debug.LogError("Please name the ship prefab 'Ship' in this instance of RacePlayer.cs");
+        }
+        base_ship_rotation = shipRenderer.transform.localRotation;
+
         lastTimeOnGround = -1f;
         lastCheckPoint = track[0].startingCheckPoint;
 
-        //TODO: Fix this to avoid jumping the rotation on start
+        //TODO: Fix this to avoid jumping the rotation on start. Maybe just give current speed on start?
         if (Physics.Raycast(transform.position, -transform.up, out downHit, rayCastDistance, AppConfig.groundMask))
         {
+            
+            transform.position = downHit.point + hover_height * transform.up;
             transform.rotation = Quaternion.FromToRotation(transform.up, downHit.normal) * transform.rotation;
             yaw = transform.rotation.eulerAngles.y;
             previousGravity = -downHit.normal;
@@ -290,7 +309,7 @@ public class RacePlayer : MonoBehaviour {
 
     private void turnShip(bool inAir)
     {
-        float turn_angle;
+        float turn_angle = 0f;
         if (inAir)
         {
             turn_angle = air_turn_speed * Time.deltaTime * player_inputs.horizonalAxis;
@@ -301,6 +320,12 @@ public class RacePlayer : MonoBehaviour {
             if (player_inputs.spaceBar)
             {
                 turn_angle *= hard_turn_multiplier;
+                shipRenderer.transform.localRotation = Quaternion.AngleAxis(ship_mesh_tilt_hard_turn * turn_angle, shipRenderer.transform.forward) * base_ship_rotation;
+            }
+            else
+            {
+                //TODO: on all ships keep the location around the center of gravity (geometry)
+                shipRenderer.transform.localRotation = Quaternion.AngleAxis(ship_mesh_tilt * turn_angle, shipRenderer.transform.forward) * base_ship_rotation;
             }
         }      
 
