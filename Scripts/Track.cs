@@ -23,7 +23,7 @@ public class Track : MonoBehaviour {
 
         readTrackData();
 
-        //drawPath();
+        drawPath();
 	}
 
     /**
@@ -75,11 +75,27 @@ public class Track : MonoBehaviour {
             Vector3 b_point = new Vector3();
             b_point.x = System.Convert.ToSingle(point.ChildNodes.Item(0).InnerText);
             b_point.y = System.Convert.ToSingle(point.ChildNodes.Item(1).InnerText);
-            b_point.z = System.Convert.ToSingle(point.ChildNodes.Item(2).InnerText);
+            b_point.z = -System.Convert.ToSingle(point.ChildNodes.Item(2).InnerText);
 
-            //try with a reset track prefab to figure out parent first
-            //try again with a fresh track prefab
-            bezierPoints[i] = trackPrefab.transform.InverseTransformVector(transform.InverseTransformVector(b_point));
+            /*
+             * Reset rotation and scale in blender. For some reason 
+             * importing from blender to unity is flawed and we need to: 
+             *  1) Negate z
+             *  2) Rotate the point 180 on the y axis          
+             */
+            b_point = Quaternion.AngleAxis(180,Vector3.up) * b_point;
+
+            /*
+             * This will transform the bezier points into the real track's 
+             * coordinates. It makes 2 assumptions:
+             *  1) No parents of this object are scaled
+             *  2) The rotation and scale of the prefab were reset in blender
+             */
+            b_point = Vector3.Scale(trackPrefab.transform.localScale, b_point);
+            b_point = trackPrefab.transform.rotation * b_point;
+            b_point += trackPrefab.transform.position;
+            bezierPoints[i] = b_point;
+            
             i++;
         }
 
