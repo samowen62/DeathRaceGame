@@ -201,9 +201,13 @@ public class RacePlayer : MonoBehaviour {
             smooth_y = Mathf.Max(downHit.distance / -3, smooth_y);
 
             transform.localPosition += prev_up * smooth_y;
-            disired_position = transform.position + transform.forward * (current_speed * Time.deltaTime);
 
+            transform.position += transform.forward * (current_speed * Time.deltaTime);
+
+            /*
             //TODO: fix glitch where bouncing and falling under the track. 
+            //this breaks falling off the track though (may not need this)
+            //disired_position = transform.position + transform.forward * (current_speed * Time.deltaTime);
             //Fix this by adding a ray cast with height adjustment
             if (Physics.Raycast(disired_position + height_correction * transform.up, -transform.up, out downHit, rayCastDistance, AppConfig.groundMask))
             {
@@ -218,6 +222,7 @@ public class RacePlayer : MonoBehaviour {
                 }
                 
             }
+            */
         }
         else
         {

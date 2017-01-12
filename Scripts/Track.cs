@@ -9,7 +9,7 @@ public class Track : MonoBehaviour {
 
     public string trackName;
 
-    public Vector3 [] bezierPoints { private set; get; }
+    public Vector3 [] trackPoints { private set; get; }
 
     //prefab of track
     private GameObject trackPrefab;
@@ -22,8 +22,6 @@ public class Track : MonoBehaviour {
         validateTrack();
 
         readTrackData();
-
-        drawPath();
 	}
 
     /**
@@ -66,7 +64,7 @@ public class Track : MonoBehaviour {
             Debug.LogError("Need to have point data in xml file!");
         }
 
-        bezierPoints = new Vector3[pointList.Count];
+        trackPoints = new Vector3[pointList.Count + 1];
         int i = 0;
 
         Vector3 trackScale = trackPrefab.transform.localScale;
@@ -94,34 +92,37 @@ public class Track : MonoBehaviour {
             b_point = Vector3.Scale(trackPrefab.transform.localScale, b_point);
             b_point = trackPrefab.transform.rotation * b_point;
             b_point += trackPrefab.transform.position;
-            bezierPoints[i] = b_point;
+            trackPoints[i] = b_point;
             
             i++;
         }
 
+        trackPoints[trackPoints.Length - 1] = trackPoints[0];
+        drawPath();
     }
 
-    //debug method
-    private void drawPath()
+    /*
+     * This method is used for debuging the curve
+     * https://en.wikipedia.org/wiki/B%C3%A9zier_curve
+     */
+    public void drawPath()
     {
-        //https://en.wikipedia.org/wiki/B%C3%A9zier_curve
-        
-        for (int i = 0; i < bezierPoints.Length - 1; i ++)
+        for (int i = 0; i < trackPoints.Length - 1; i++)
         {
-            DrawLine(bezierPoints[i], bezierPoints[i + 1], Color.red);
-            //Debug.Log(bezierPoints[i]);
+            DrawLine(trackPoints[i], trackPoints[i + 1], Color.red);
         }
     }
 
-    void DrawLine(Vector3 start, Vector3 end, Color color)
+    private void DrawLine(Vector3 start, Vector3 end, Color color)
     {
         GameObject myLine = new GameObject();
+        myLine.name = "Bezier Line";
         myLine.transform.position = start;
         myLine.AddComponent<LineRenderer>();
         LineRenderer lr = myLine.GetComponent<LineRenderer>();
         lr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
         lr.SetColors(color, color);
-        lr.SetWidth(0.1f, 0.1f);
+        lr.SetWidth(2f, 2f);
         lr.SetPosition(0, start);
         lr.SetPosition(1, end);
     }

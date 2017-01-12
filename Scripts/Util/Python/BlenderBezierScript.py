@@ -1,3 +1,11 @@
+'''
+OBSOLETE: NOT USING BEZIER CURVES
+
+This is a script used to print a bezier curve's points in xml format
+to be read in by the game. To use the bezier curve must be selected in
+object mode and this script can be ran.
+'''
+
 import bpy
 
 def ftos(fl):
