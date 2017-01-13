@@ -15,6 +15,7 @@ public class RacePlayer : MonoBehaviour {
     public float returningToTrackSpeed = 0.001f;
     public float timeAllowedNotOnTrack = 2.5f;
     public float timeSpentReturning = 3f;
+    private float height_above_cast = 5f;
 
     /*Ship handling parameters, must be multiples of 5!! */
     public float fwd_accel = 10f;
@@ -171,7 +172,7 @@ public class RacePlayer : MonoBehaviour {
         prev_up = transform.up;
 
         /* Adjust the position and rotation of the ship to the track */
-        if (Physics.Raycast(transform.position, -prev_up, out downHit, rayCastDistance, AppConfig.groundMask))
+        if (Physics.Raycast(transform.position + height_above_cast * prev_up, -prev_up, out downHit, rayCastDistance, AppConfig.groundMask))
         {
 
             if (player_inputs.w_key)
@@ -195,10 +196,11 @@ public class RacePlayer : MonoBehaviour {
             transform.rotation = tilt * transform.rotation;
 
             //Smoothly adjust our height
-            smooth_y = Mathf.Lerp(smooth_y, hover_height - downHit.distance, Time.deltaTime * height_smooth);
+            float distance = downHit.distance - height_above_cast;
+            smooth_y = Mathf.Lerp(smooth_y, hover_height - distance, Time.deltaTime * height_smooth);
 
             //sanity check on smooth_y
-            smooth_y = Mathf.Max(downHit.distance / -3, smooth_y);
+            smooth_y = Mathf.Max(distance / -3, smooth_y);
 
             transform.localPosition += prev_up * smooth_y;
 

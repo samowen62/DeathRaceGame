@@ -9,7 +9,7 @@ public class Track : MonoBehaviour {
 
     public string trackName;
 
-    public Vector3 [] trackPoints { private set; get; }
+    private TrackPoint[] points;
 
     //prefab of track
     private GameObject trackPrefab;
@@ -64,7 +64,7 @@ public class Track : MonoBehaviour {
             Debug.LogError("Need to have point data in xml file!");
         }
 
-        trackPoints = new Vector3[pointList.Count + 1];
+        points = new TrackPoint[pointList.Count + 1];
         int i = 0;
 
         Vector3 trackScale = trackPrefab.transform.localScale;
@@ -92,24 +92,80 @@ public class Track : MonoBehaviour {
             b_point = Vector3.Scale(trackPrefab.transform.localScale, b_point);
             b_point = trackPrefab.transform.rotation * b_point;
             b_point += trackPrefab.transform.position;
-            trackPoints[i] = b_point;
-            
+            points[i] = new TrackPoint();
+            points[i].point = b_point;
             i++;
         }
 
-        trackPoints[trackPoints.Length - 1] = trackPoints[0];
-        drawPath();
+        points[points.Length - 1] = points[0];
+
+        calculateTangents();
+
+        //drawPath();
+
+        //drawTangents();
+    }
+
+    private void calculateTangents()
+    {
+        int len = points.Length;
+        for (int i = 0; i < len; i++)
+        {
+            points[i].tangent = (points[(i + 1) % len].point - points[(i - 1 + len) % len].point).normalized;
+        }
     }
 
     /*
-     * This method is used for debuging the curve
-     * https://en.wikipedia.org/wiki/B%C3%A9zier_curve
+     * TODO: elaborate more on AI plan to determine if we even need normals to be saved
+     * if we do:
+     *  1) Raycast from point a guess at the normal direction 
+     *      b = (point + tangent) X (point + nextPoint)
+     *      n_guess = b X tangent
+     *  2) cast up and down
+     *  3) whichever hits use 
+     *      mesh = (hit.collider as MeshCollider).sharedMesh
+     *      triangles = mesh.triangles
+     *      verticies = mesh.verticies
+     *      Vector3 p0 = vertices[triangles[hit.triangleIndex * 3 + 0]];
+     *      Vector3 p1 = vertices[triangles[hit.triangleIndex * 3 + 1]];
+     *      Vector3 p2 = vertices[triangles[hit.triangleIndex * 3 + 2]];
+     *  4) use the points to find the track normal (wonder if we can)
+     * 
      */
-    public void drawPath()
+    /*
+    private void calculateNormals()
     {
-        for (int i = 0; i < trackPoints.Length - 1; i++)
+        RaycastHit hit;
+
+        foreach(var point in points)
         {
-            DrawLine(trackPoints[i], trackPoints[i + 1], Color.red);
+            if (Physics.Raycast(point.point,))
+            {
+
+            } else if ()
+            {
+
+            }
+            else
+            {
+                Debug.LogError("Could not find a track normal for point " + point.point + " !!");
+            }
+        }     
+    }*/
+
+    private void drawPath()
+    {
+        for (int i = 0; i < points.Length - 1; i++)
+        {
+            DrawLine(points[i].point, points[i + 1].point, Color.red);
+        }
+    }
+
+    private void drawTangents()
+    {
+        foreach(var point in points)
+        {
+            DrawLine(point.point, point.point + point.tangent, Color.blue);
         }
     }
 
