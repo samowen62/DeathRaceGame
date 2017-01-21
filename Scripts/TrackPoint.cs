@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 
-struct TrackPoint
-{
-    public Vector3 point;
-    public Vector3 tangent;
-    public Vector3 normal;
-    public float trackWidth;
+//TODO: refactor checkPoint class with this so there is a boolean
+//whether this is a checkPoint. (Maybe every 6 of these is one?)
+public class TrackPoint : MonoBehaviour {
+
+    public Vector3 tangent { set; get; }
+    public Vector3 normal { set; get; }
+    public TrackPoint next { set; get; }
+
 }

@@ -7,6 +7,8 @@ public class Track : MonoBehaviour {
 
     public CheckPoint startingCheckPoint;
 
+    public TrackPoint initialTrackPoint;
+
     public string trackName;
 
     private TrackPoint[] points;
@@ -68,6 +70,10 @@ public class Track : MonoBehaviour {
         int i = 0;
 
         Vector3 trackScale = trackPrefab.transform.localScale;
+        GameObject TrackPointParent = new GameObject();
+        TrackPointParent.name = "TrackPointParent";
+        TrackPointParent.transform.position = Vector3.zero;
+
         foreach (XmlNode point in pointList)
         {
             Vector3 b_point = new Vector3();
@@ -92,8 +98,14 @@ public class Track : MonoBehaviour {
             b_point = Vector3.Scale(trackPrefab.transform.localScale, b_point);
             b_point = trackPrefab.transform.rotation * b_point;
             b_point += trackPrefab.transform.position;
-            points[i] = new TrackPoint();
-            points[i].point = b_point;
+
+            TrackPoint new_point = (TrackPoint) Instantiate(initialTrackPoint, b_point, Quaternion.identity, TrackPointParent.transform);
+            new_point.name = "TrackPoint " + i;
+            new_point.tag = "TrackPoint";
+            new_point.gameObject.AddComponent<SphereCollider>();
+            new_point.gameObject.GetComponent<SphereCollider>().isTrigger = true;
+
+            points[i] = new_point;
             i++;
         }
 
@@ -111,7 +123,10 @@ public class Track : MonoBehaviour {
         int len = points.Length;
         for (int i = 0; i < len; i++)
         {
-            points[i].tangent = (points[(i + 1) % len].point - points[(i - 1 + len) % len].point).normalized;
+            Vector3 tangent = (points[(i + 1) % len].transform.position - points[(i - 1 + len) % len].transform.position);
+            points[i].GetComponent<SphereCollider>().radius = tangent.magnitude / 2;
+            points[i].tangent = tangent.normalized;
+            points[i].next = points[(i + 1) % len];
         }
     }
 
@@ -157,7 +172,7 @@ public class Track : MonoBehaviour {
     {
         for (int i = 0; i < points.Length - 1; i++)
         {
-            DrawLine(points[i].point, points[i + 1].point, Color.red);
+            DrawLine(points[i].transform.position, points[i + 1].transform.position, Color.red);
         }
     }
 
@@ -165,7 +180,7 @@ public class Track : MonoBehaviour {
     {
         foreach(var point in points)
         {
-            DrawLine(point.point, point.point + point.tangent, Color.blue);
+            DrawLine(point.transform.position, point.transform.position + point.tangent, Color.blue);
         }
     }
 

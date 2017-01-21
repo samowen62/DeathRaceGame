@@ -59,6 +59,7 @@ public class RacePlayer : MonoBehaviour {
 
     /* Last checkpoint of the player */
     private CheckPoint lastCheckPoint;
+    private TrackPoint current_TrackPoint;
 
     /* This is for pausing the game */
     private bool _behaviorBlocked;
@@ -299,6 +300,11 @@ public class RacePlayer : MonoBehaviour {
                 coll.gameObject.GetComponent<BoostPanel>().boostAnimation();
                 break;
 
+            //when we hit a trackpoint trigger
+            case "TrackPoint":
+                current_TrackPoint = coll.gameObject.GetComponent<TrackPoint>();
+                break;
+
             //Log warning for unhandled tag
             default:
                 Debug.LogWarning("No behavior for OnTriggerEnter with tag: " + coll.gameObject.tag);
@@ -316,14 +322,36 @@ public class RacePlayer : MonoBehaviour {
 
     private void turnShip(bool inAir)
     {
+
+        //todo refactor for different dev modes
+        float h;
+        if (false)
+            h = player_inputs.horizonalAxis;
+        else
+        {
+            if (current_TrackPoint == null)
+            {
+                h = player_inputs.horizonalAxis;
+            }
+            else
+            {
+                h = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next);
+                h = Mathf.Clamp01(h);
+                int sign = Vector3.Dot(Vector3.Cross(transform.forward, transform.up), current_TrackPoint.tangent) < 0 ? -1 : 1;
+                h *= sign;
+                Debug.Log(player_inputs.horizonalAxis + "   " + h);
+            }
+        }
+   
+
         float turn_angle = 0f;
         if (inAir)
         {
-            turn_angle = air_turn_speed * Time.deltaTime * player_inputs.horizonalAxis;
+            turn_angle = air_turn_speed * Time.deltaTime * h;
         }
         else
         {
-            turn_angle = turn_speed * Time.deltaTime * player_inputs.horizonalAxis;
+            turn_angle = turn_speed * Time.deltaTime * h;
             if (player_inputs.spaceBar)
             {
                 turn_angle *= hard_turn_multiplier;
@@ -340,4 +368,14 @@ public class RacePlayer : MonoBehaviour {
         transform.rotation = Quaternion.Euler(0, yaw, 0);
     }
 
+
+    public void setInputsFromAI()
+    {
+
+        //TODO: set current_TrackPoint initially for all characters AI and players by looping through every one
+        if (current_TrackPoint == null)
+            return;
+        float horizontal = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next);
+        Debug.Log("H = " + horizontal + " input.H = " + player_inputs.horizonalAxis);
+    }
 }
