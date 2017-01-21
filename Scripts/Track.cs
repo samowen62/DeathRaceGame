@@ -74,6 +74,10 @@ public class Track : MonoBehaviour {
         TrackPointParent.name = "TrackPointParent";
         TrackPointParent.transform.position = Vector3.zero;
 
+        //TODO: put in xml file a node if the tangent direction is opposite to 
+        //that of where the car should be pointed
+        bool isTrackReversed = true;
+
         foreach (XmlNode point in pointList)
         {
             Vector3 b_point = new Vector3();
@@ -111,21 +115,21 @@ public class Track : MonoBehaviour {
 
         points[points.Length - 1] = points[0];
 
-        calculateTangents();
+        calculateTangents(isTrackReversed);
 
         //drawPath();
 
         //drawTangents();
     }
 
-    private void calculateTangents()
+    private void calculateTangents(bool _isTrackReversed)
     {
         int len = points.Length;
         for (int i = 0; i < len; i++)
         {
             Vector3 tangent = (points[(i + 1) % len].transform.position - points[(i - 1 + len) % len].transform.position);
             points[i].GetComponent<SphereCollider>().radius = tangent.magnitude / 2;
-            points[i].tangent = tangent.normalized;
+            points[i].tangent = _isTrackReversed ? -tangent.normalized : tangent.normalized;
             points[i].next = points[(i + 1) % len];
         }
     }

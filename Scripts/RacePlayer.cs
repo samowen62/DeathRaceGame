@@ -60,6 +60,8 @@ public class RacePlayer : MonoBehaviour {
     /* Last checkpoint of the player */
     private CheckPoint lastCheckPoint;
     private TrackPoint current_TrackPoint;
+    private float prev_h = 0f;
+    private float max_delta_h = 0.3f;
 
     /* This is for pausing the game */
     private bool _behaviorBlocked;
@@ -323,10 +325,15 @@ public class RacePlayer : MonoBehaviour {
     private void turnShip(bool inAir)
     {
 
-        //todo refactor for different dev modes
+        //TODO: refactor for different dev modes
         float h;
+        bool spaceBar = false;
         if (false)
+        {
             h = player_inputs.horizonalAxis;
+            spaceBar = player_inputs.spaceBar;
+            prev_h = h;
+        }
         else
         {
             if (current_TrackPoint == null)
@@ -335,11 +342,42 @@ public class RacePlayer : MonoBehaviour {
             }
             else
             {
-                h = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next);
+                //TODO: make more presumptive (look N = 3 spots ahead? then see how they compare to 1 and hard_turn_multiplier)
+                //adjust tangent for N spots ahead or calculate h for each. (the former has less calculations and doesn't lose much info)
+
+                //weight the farther away ones more
+                //factor in distance from center of track to nudge car away from edges (need width eventually for TrackPoints)
+                float h3 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next.next.next);
+                float h2 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next.next);
+                float h1 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next);
+
+                h = 0.1f * h1 + 0.15f * h2 + 0.75f * h3;
+
+                Debug.Log(h);
+                if(h > hard_turn_multiplier)
+                {
+                    spaceBar = true;
+                }
                 h = Mathf.Clamp01(h);
-                int sign = Vector3.Dot(Vector3.Cross(transform.forward, transform.up), current_TrackPoint.tangent) < 0 ? -1 : 1;
+                
+                //linearly smooth another way
+                /*
+                if (h - prev_h >= max_delta_h)
+                    h = prev_h + max_delta_h;
+                else if (prev_h - h >= max_delta_h)
+                    h = prev_h - max_delta_h;
+                    */
+
+                //TODO may have to factor in isTrackReversed here as well (Track.cs property)
+                //keeps switching signs
+                int sign = Vector3.Dot(Vector3.Cross(transform.forward, transform.up), current_TrackPoint.tangent) > 0 ? -1 : 1;
+
                 h *= sign;
-                Debug.Log(player_inputs.horizonalAxis + "   " + h);
+                prev_h = h;
+
+                Debug.Log(sign + " sign " + h);
+                
+                
             }
         }
    
@@ -352,7 +390,7 @@ public class RacePlayer : MonoBehaviour {
         else
         {
             turn_angle = turn_speed * Time.deltaTime * h;
-            if (player_inputs.spaceBar)
+            if (spaceBar)
             {
                 turn_angle *= hard_turn_multiplier;
                 shipRenderer.transform.localRotation = Quaternion.AngleAxis(ship_mesh_tilt_hard_turn * turn_angle, shipRenderer.transform.forward) * base_ship_rotation;
