@@ -361,6 +361,7 @@ public class RacePlayer : MonoBehaviour {
                 h = Mathf.Clamp01(h);
                 
                 //linearly smooth another way
+                //maybe threshold??
                 /*
                 if (h - prev_h >= max_delta_h)
                     h = prev_h + max_delta_h;

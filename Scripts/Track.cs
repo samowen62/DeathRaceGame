@@ -108,10 +108,15 @@ public class Track : MonoBehaviour {
             new_point.tag = "TrackPoint";
             new_point.gameObject.AddComponent<SphereCollider>();
             new_point.gameObject.GetComponent<SphereCollider>().isTrigger = true;
+            //new_point.width = System.Convert.ToSingle(point.ChildNodes.Item(3).InnerText);
 
             points[i] = new_point;
             i++;
         }
+
+        //TODO read in function that will read in the entire array of widths and then correctly 
+        //linearly interpolate through all the points[] to set the correct width multiplier for
+        //each point. This should be multiplied by the scale of the track to get the proper width
 
         points[points.Length - 1] = points[0];
 
@@ -133,44 +138,6 @@ public class Track : MonoBehaviour {
             points[i].next = points[(i + 1) % len];
         }
     }
-
-    /*
-     * TODO: elaborate more on AI plan to determine if we even need normals to be saved
-     * if we do:
-     *  1) Raycast from point a guess at the normal direction 
-     *      b = (point + tangent) X (point + nextPoint)
-     *      n_guess = b X tangent
-     *  2) cast up and down
-     *  3) whichever hits use 
-     *      mesh = (hit.collider as MeshCollider).sharedMesh
-     *      triangles = mesh.triangles
-     *      verticies = mesh.verticies
-     *      Vector3 p0 = vertices[triangles[hit.triangleIndex * 3 + 0]];
-     *      Vector3 p1 = vertices[triangles[hit.triangleIndex * 3 + 1]];
-     *      Vector3 p2 = vertices[triangles[hit.triangleIndex * 3 + 2]];
-     *  4) use the points to find the track normal (wonder if we can)
-     * 
-     */
-    /*
-    private void calculateNormals()
-    {
-        RaycastHit hit;
-
-        foreach(var point in points)
-        {
-            if (Physics.Raycast(point.point,))
-            {
-
-            } else if ()
-            {
-
-            }
-            else
-            {
-                Debug.LogError("Could not find a track normal for point " + point.point + " !!");
-            }
-        }     
-    }*/
 
     private void drawPath()
     {

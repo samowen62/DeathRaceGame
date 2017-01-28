@@ -12,7 +12,7 @@ import bpy
 def ftos(fl):
     return "{:.4f}".format(fl)
 
-def createBezierXML(curve):
+def createPointsXML(curve):
     xmlString = ""
     
     xmlString += "<BezierPoints>\n"
@@ -24,8 +24,23 @@ def createBezierXML(curve):
         xmlString += "</Point>\n"
 
     xmlString += "</BezierPoints>"
+	
+	
     #note: vert.normal is normal of the mesh not the track so we can't use it    
 
     print(xmlString)
 
+def createWidthXML(curve)
+	xmlString = ""
+    
+    xmlString += "<Widths>\n"			
+	for vert in curve.splines[0].bezier_points:
+		xmlString += "<width>" + ftos(vert.radius) + "</width>\n"
+		
+	xmlString += "</BezierPoints>"
+
+	print(xmlString)
+	
 createBezierXML(bpy.context.active_object.data)
+
+
