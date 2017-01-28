@@ -12,10 +12,12 @@ Showcasing the racing machine with some other primitive assets.
 In game thrid person screenshot of the machine on the anti-grav track.
 
 ##TODO:
-* Add AI
+* Add AI (in progress)
 * Fog in the distance
 * Add enum class for RacePlayer status
-* Fix issue with car clipping through track, hard to recreate. Alternatively just don't have too hardly sloped tracks.
+* Fix issue with car clipping through track. -> Instead just have taller walls that go under the track a little and not as harshly sloped tracks. Create a developers guide for standards like these!
+* Orient boost panels with nearest trackPoint's tangent
+* signal when all boostPanels/Track are done initializing to start the game
 
 
 

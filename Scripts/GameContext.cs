@@ -57,12 +57,9 @@ public class GameContext : MonoBehaviour {
             unpauseGame();
         }
 
-        //if the player is in fact playing
-        if (true)
-        {
-            playerInput.setFromUser();
-            player.passPlayerInputs(playerInput);
-        }
+ 
+        playerInput.setFromUser();
+        player.passPlayerInputs(playerInput);
     }
 
     private void pauseGame()

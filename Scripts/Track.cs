@@ -11,6 +11,8 @@ public class Track : MonoBehaviour {
 
     public string trackName;
 
+    public float baseWidth;
+
     private TrackPoint[] points;
 
     //prefab of track
@@ -52,7 +54,7 @@ public class Track : MonoBehaviour {
      */
     private void readTrackData()
     {
-        if(trackName == "" || trackName == null)
+        if (trackName == "" || trackName == null)
         {
             Debug.LogError("Must add trackName to track!");
         }
@@ -61,12 +63,20 @@ public class Track : MonoBehaviour {
         doc.Load(Application.dataPath + TRACK_DATA_ROOT + trackName + TRACK_DATA_FILE_NAME);
         var pointList = doc.GetElementsByTagName("Point");
 
-        if(pointList.Count == 0)
+        if (pointList.Count == 0)
         {
             Debug.LogError("Need to have point data in xml file!");
         }
 
+        var bezierPointList = doc.GetElementsByTagName("BezierPoint");
+
+        if (bezierPointList.Count == 0)
+        {
+            Debug.LogError("Need to have bezier point data in xml file!");
+        }
+
         points = new TrackPoint[pointList.Count + 1];
+        Vector3[] bezierPoints = new Vector3[pointList.Count];
         int i = 0;
 
         Vector3 trackScale = trackPrefab.transform.localScale;
@@ -109,6 +119,7 @@ public class Track : MonoBehaviour {
             new_point.gameObject.AddComponent<SphereCollider>();
             new_point.gameObject.GetComponent<SphereCollider>().isTrigger = true;
             //new_point.width = System.Convert.ToSingle(point.ChildNodes.Item(3).InnerText);
+            new_point.width = baseWidth;
 
             points[i] = new_point;
             i++;

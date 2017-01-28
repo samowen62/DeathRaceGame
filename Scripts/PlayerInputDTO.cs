@@ -27,10 +27,5 @@ public class PlayerInputDTO  {
         w_key = Input.GetKey(KeyCode.W);
     }
 
-    //TODO: ALOT!!!!!!!
-    public void setFromAI()
-    {
-
-    }
 
 }
