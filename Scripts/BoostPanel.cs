@@ -25,6 +25,10 @@ public class BoostPanel : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
+        //TODO: wait for trackpoints to be updated a better concurrent way
+        if (innerCone == null || outerCone == null)
+            return;
+
         if (spin_animation_running)
         {
             float time_in_seq = Time.realtimeSinceStartup - spin_animation_start_time;//TODO: factor in pause here
@@ -32,8 +36,8 @@ public class BoostPanel : MonoBehaviour {
 
             transform.localScale = Vector3.Lerp(spin_animation_scale, Vector3.one, time_in_seq);
 
-            innerCone.transform.RotateAround(transform.position, transform.forward, 6 * movement_spin_speed * Time.deltaTime);
-            outerCone.transform.RotateAround(transform.position, transform.forward, -6 * movement_spin_speed * Time.deltaTime);
+            innerCone.transform.RotateAround(transform.position, transform.up, 6 * movement_spin_speed * Time.deltaTime);
+            outerCone.transform.RotateAround(transform.position, transform.up, -6 * movement_spin_speed * Time.deltaTime);
 
             if (time_in_seq > spin_animation_time)
             {
@@ -45,10 +49,10 @@ public class BoostPanel : MonoBehaviour {
         {
             float relativeHeight = movement_amplitude * Mathf.Sin((Time.realtimeSinceStartup - spin_animation_cumulative_time) * movement_period);
 
-            transform.position = starting_center + transform.up * relativeHeight;
+            transform.position = starting_center + transform.forward * relativeHeight;
 
-            innerCone.transform.RotateAround(transform.position, transform.forward, movement_spin_speed * Time.deltaTime);
-            outerCone.transform.RotateAround(transform.position, transform.forward, -movement_spin_speed * Time.deltaTime);
+            innerCone.transform.RotateAround(transform.position, transform.up, movement_spin_speed * Time.deltaTime);
+            outerCone.transform.RotateAround(transform.position, transform.up, -movement_spin_speed * Time.deltaTime);
         }
     }
 
@@ -64,8 +68,6 @@ public class BoostPanel : MonoBehaviour {
     void Awake()
     {
         orientPanel();
-
-        findCones();
     }
 
     /**
@@ -99,21 +101,37 @@ public class BoostPanel : MonoBehaviour {
     /**
      * Sets the panel to be level with the track
      * 
-     * MAKE SURE Y-AXIS OF PANEL IS MANUALLY ORIENTED RELATIVELY CLOSE TO DESIRED Y-AXIS
+     * MAKE SURE Z-AXIS OF PANEL IS MANUALLY ORIENTED RELATIVELY CLOSE TO DESIRED Y-AXIS
      */
     private void orientPanel()
     {
-        RaycastHit downHit;
+        StartCoroutine(setOrientiationWhenTrackLoaded());       
+    }
 
-        if (Physics.Raycast(gameObject.transform.position, -gameObject.transform.up, out downHit, 30f, AppConfig.groundMask))
+    IEnumerator setOrientiationWhenTrackLoaded()
+    {
+        Track track = FindObjectOfType(typeof(Track)) as Track;
+        while (!track.loaded)
         {
-            transform.rotation = Quaternion.LookRotation(transform.forward, downHit.normal);
-            transform.position += transform.up * (trackHeight - downHit.distance);
+            yield return null;
+        }
+
+        RaycastHit downHit;
+        TrackPoint closestPosition = track.findClosestTrackPointTo(transform.position);
+
+        if (Physics.Raycast(transform.position, -transform.forward, out downHit, 30f, AppConfig.groundMask))
+        {
+            transform.rotation = Quaternion.LookRotation(downHit.normal , closestPosition.tangent);
+            transform.position -= transform.forward * (trackHeight - downHit.distance);
         }
         else
         {
-            Debug.LogError("Error: cannot find track to BoostPanel (" + this.name + "). Please orient this boost panel's y-axis up relative to the track and place the center above the track");
+            Debug.LogError("Error: cannot find track to BoostPanel (" + this.name + "). Please orient this boost panel's z-axis up relative to the track and place the center above the track");
         }
+
+        findCones();
+
+        yield return 0;
     }
 
 }

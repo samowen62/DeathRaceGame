@@ -311,24 +311,24 @@ public class RacePlayer : MonoBehaviour {
     {
 
         //TODO: refactor for different dev modes
-        float h;
+        float horizontal_input;
         bool spaceBar = false;
         if (!isAI)
         {
-            h = player_inputs.horizonalAxis;
+            horizontal_input = player_inputs.horizonalAxis;
             spaceBar = player_inputs.spaceBar;
-            prev_h = h;
+            prev_h = horizontal_input;
         }
         else
         {
             
             if (current_TrackPoint == null)
             {
-                h = player_inputs.horizonalAxis;
+                horizontal_input = player_inputs.horizonalAxis;
             }
             else
             {
-                setInputsFromAI(out h, out spaceBar);
+                setInputsFromAI(out horizontal_input, out spaceBar);
             }
         }
    
@@ -336,11 +336,11 @@ public class RacePlayer : MonoBehaviour {
         float turn_angle = 0f;
         if (inAir)
         {
-            turn_angle = air_turn_speed * Time.deltaTime * h;
+            turn_angle = air_turn_speed * Time.deltaTime * horizontal_input;
         }
         else
         {
-            turn_angle = turn_speed * Time.deltaTime * h;
+            turn_angle = turn_speed * Time.deltaTime * horizontal_input;
             if (spaceBar)
             {
                 turn_angle *= hard_turn_multiplier;
@@ -356,7 +356,7 @@ public class RacePlayer : MonoBehaviour {
         transform.rotation = Quaternion.Euler(0, yaw, 0);
     }
 
-    private void setInputsFromAI(out float h, out bool spaceBar)
+    private void setInputsFromAI(out float horizontal_input, out bool spaceBar)
     {
         //for h - is turning left and + is right!
         spaceBar = false;
@@ -368,21 +368,23 @@ public class RacePlayer : MonoBehaviour {
             spaceBar = true;
             if(nearEdge > 0)
             {
-                h = prev_h + max_delta_h;
+                horizontal_input = prev_h + max_delta_h;
             }
             else
             {
-                h = prev_h - max_delta_h;
+                horizontal_input = prev_h - max_delta_h;
             }
-            h = h > 1 ? 1 : h;
-            h = h < -1 ? -1 : h;
+            horizontal_input = horizontal_input > 1 ? 1 : horizontal_input;
+            horizontal_input = horizontal_input < -1 ? -1 : horizontal_input;
 
-            prev_h = h;
+            prev_h = horizontal_input;
             return;
         }
 
         //TODO: make more presumptive (look N = 3 spots ahead? then see how they compare to 1 and hard_turn_multiplier)
         //adjust tangent for N spots ahead or calculate h for each. (the former has less calculations and doesn't lose much info)
+
+        //first check tangents of next and next.next? trackpoint. If their dot is small enough, don't do anything
 
         //weight the farther away ones more
         float h3 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next.next.next);
@@ -390,31 +392,32 @@ public class RacePlayer : MonoBehaviour {
         float h1 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next);
 
         //TODO: play with these weight factors until we get it right!
-        h = 0.25f * h1 + 0.25f * h2 + 0.5f * h3;
+        horizontal_input = 0.25f * h1 + 0.25f * h2 + 0.5f * h3;
 
-        Debug.Log(h + "  " + h1 + " " + h2 + " " + h3);
-        if (h > hard_turn_multiplier)
+        //Debug.Log(h + "  " + h1 + " " + h2 + " " + h3);
+        if (horizontal_input > hard_turn_multiplier)
         {
             spaceBar = true;
         }
-        h = Mathf.Clamp01(h);
+        horizontal_input = Mathf.Clamp01(horizontal_input);
 
         //TODO may have to factor in isTrackReversed here as well (Track.cs property) for the > sign
         int sign = Vector3.Dot(Vector3.Cross(transform.forward, transform.up), current_TrackPoint.tangent) > 0 ? -1 : 1;
 
-        h *= sign;
+        horizontal_input *= sign;
 
-        Debug.Log("sign:" + sign + " h:" + h + " prev_h:" + prev_h);
+        //Debug.Log("sign:" + sign + " h:" + h + " prev_h:" + prev_h);
 
-        if (h - prev_h >= max_delta_h)
-            h = prev_h + max_delta_h;
-        else if (prev_h - h >= max_delta_h)
-            h = prev_h - max_delta_h;
+        if (horizontal_input - prev_h >= max_delta_h)
+            horizontal_input = prev_h + max_delta_h;
+        else if (prev_h - horizontal_input >= max_delta_h)
+            horizontal_input = prev_h - max_delta_h;
 
-        h = h > 1 ? 1 : h;
-        h = h < -1 ? -1 : h;
+        //TODO inline function for clamping between +/- 1
+        horizontal_input = horizontal_input > 1 ? 1 : horizontal_input;
+        horizontal_input = horizontal_input < -1 ? -1 : horizontal_input;
 
-        prev_h = h;
+        prev_h = horizontal_input;
 
     }
 }

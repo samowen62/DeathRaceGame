@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Xml;
+using System.Linq;
 
 //TODO: use this class to store AI data
 public class Track : MonoBehaviour {
@@ -21,12 +22,22 @@ public class Track : MonoBehaviour {
     private const string TRACK_DATA_ROOT = "/Prefabs/Tracks/";
     private const string TRACK_DATA_FILE_NAME = "/TrackData.xml";
 
+    public bool loaded { get; set; }
+
     // Use this for initialization
     void Awake () {
+        loaded = false;
         validateTrack();
 
         readTrackData();
 	}
+
+    public TrackPoint findClosestTrackPointTo(Vector3 target)
+    {
+        //TODO maybe avoid Linq if too much linking overhead
+        return points.OrderByDescending(e => (e.transform.position - target).magnitude).Last();
+    }
+
 
     /**
      * Validates assumptions about track used later, namely:
@@ -136,6 +147,8 @@ public class Track : MonoBehaviour {
         //drawPath();
 
         //drawTangents();
+
+        loaded = true;
     }
 
     private void calculateTangents(bool _isTrackReversed)
