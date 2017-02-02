@@ -13,39 +13,39 @@ public class RacePlayer : MonoBehaviour {
     public bool isAI = true;
 
     //below are various parameters used to fine-tune game mechanics
-    public float gravity = 10f;
-    public float rayCastDistance = 30f;
-    public float returningToTrackSpeed = 0.001f;
-    public float timeAllowedNotOnTrack = 2.5f;
-    public float timeSpentReturning = 3f;
+    public float gravity = 1700f;
+    public float rayCastDistance = 40f;
+    public float returningToTrackSpeed = 0.8f;
+    public float timeAllowedNotOnTrack = 2f;
+    public float timeSpentReturning = 1.5f;
     private float height_above_cast = 5f;
 
     /*Ship handling parameters, must be multiples of 5!! */
-    public float fwd_accel = 10f;
-    public float fwd_max_speed = 20f;
+    public float fwd_accel = 80f;
+    public float fwd_max_speed = 130f;
     public float fwd_boost_speed = 170f;
-    public float fwd_boost_decel = 5f;
+    public float fwd_boost_decel = 2.5f;
 
-    public float brake_speed = 20f;
-    public float turn_speed = 5f;
+    public float brake_speed = 200f;
+    public float turn_speed = 80f;
     public float hard_turn_multiplier = 2.2f;
     public float air_turn_speed = 15f;
 
     /*parameters for bouncing against the wall */
     public float wall_bounce_deccel = 10f;//must be > 1!!
-    public float wall_bounce_threshold = 3f;
-    public float wall_bounce_speed_to_bounce_ratio = 0.08f;
-    public float wall_bounce_curr_speed_deccel = 10f;//must be > 1!!
+    public float wall_bounce_threshold = 5f;
+    public float wall_bounce_speed_to_bounce_ratio = 0.1f;
+    public float wall_bounce_curr_speed_deccel = 2f;//must be > 1!!
 
     /*parameters for ship animation */
-    public float ship_mesh_tilt = 7f;
+    public float ship_mesh_tilt = 5f;
     public float ship_mesh_tilt_hard_turn = 3f;
 
     /*Auto adjust to track surface parameters*/
     public float hover_height = AppConfig.hoverHeight - 0.5f;       //Distance to keep from the ground
-    public float height_smooth = 10f;                               //How fast the ship will readjust to "hover_height"
+    public float height_smooth = 7f;                               //How fast the ship will readjust to "hover_height"
     public float pitch_smooth = 5f;                                 //How fast the ship will adjust its rotation to match track normal
-    public float height_correction = 3f;
+    public float height_correction = 2.2f;
 
     /*We will use all this stuff later*/
     private Vector3 disired_position;
@@ -125,6 +125,7 @@ public class RacePlayer : MonoBehaviour {
             Debug.LogError("Error: only 1 component of type 'Track' allowed in the scene");
         }
 
+        //TODO: Just put MeshRenderer as direct component of this gameobject
         shipRenderer = transform.FindChild("Ship").gameObject.GetComponent<MeshRenderer>();
         if (shipRenderer == null)
         {
@@ -143,6 +144,9 @@ public class RacePlayer : MonoBehaviour {
             transform.rotation = Quaternion.FromToRotation(transform.up, downHit.normal) * transform.rotation;
             yaw = transform.rotation.eulerAngles.y;
             previousGravity = -downHit.normal;
+        } else
+        {
+            Debug.LogError(name + " not above track!");
         }
     }
 

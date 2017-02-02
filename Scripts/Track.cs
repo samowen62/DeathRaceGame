@@ -144,10 +144,6 @@ public class Track : MonoBehaviour {
 
         calculateTangents(isTrackReversed);
 
-        //drawPath();
-
-        //drawTangents();
-
         loaded = true;
     }
 
@@ -161,35 +157,5 @@ public class Track : MonoBehaviour {
             points[i].tangent = _isTrackReversed ? -tangent.normalized : tangent.normalized;
             points[i].next = points[(i + 1) % len];
         }
-    }
-
-    private void drawPath()
-    {
-        for (int i = 0; i < points.Length - 1; i++)
-        {
-            DrawLine(points[i].transform.position, points[i + 1].transform.position, Color.red);
-        }
-    }
-
-    private void drawTangents()
-    {
-        foreach(var point in points)
-        {
-            DrawLine(point.transform.position, point.transform.position + point.tangent, Color.blue);
-        }
-    }
-
-    private void DrawLine(Vector3 start, Vector3 end, Color color)
-    {
-        GameObject myLine = new GameObject();
-        myLine.name = "Bezier Line";
-        myLine.transform.position = start;
-        myLine.AddComponent<LineRenderer>();
-        LineRenderer lr = myLine.GetComponent<LineRenderer>();
-        lr.material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
-        lr.SetColors(color, color);
-        lr.SetWidth(2f, 2f);
-        lr.SetPosition(0, start);
-        lr.SetPosition(1, end);
     }
 }
