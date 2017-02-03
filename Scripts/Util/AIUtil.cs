@@ -11,7 +11,6 @@ public static class AIUtil {
 
 	public static float getHorizontal(Vector3 curr_pos, Vector3 curr_tangent, float current_speed, TrackPoint next)
     {
-        //Debug.Log((curr_pos - next.transform.position).magnitude) don't want this. Goes awkwardly from ~22 down to 1;
         return Vector3.Angle(curr_tangent, next.tangent) * current_speed * degToRad / speedFactor;
     }
 
@@ -21,7 +20,6 @@ public static class AIUtil {
         float distance_from_center = Vector3.Dot(curr_pos - curr_point.transform.position, Vector3.Cross(curr_normal, curr_point.tangent));
         if(Mathf.Abs(distance_from_center) >= curr_point.width * halfWidthToComfortableWidth)
         {
-            // Debug.Log("turn: " + (distance_from_center > 0 ? -1 : 1));
             return distance_from_center > 0 ? -1 : 1;
         }
 

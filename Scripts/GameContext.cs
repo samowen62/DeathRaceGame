@@ -7,31 +7,30 @@ public class GameContext : MonoBehaviour {
 
     public RacePlayer player;
 
+    public RacePlayer[] allPlayers;
+
     public BackgroundScript pauseMenu;
 
     //will only read button once every second
     private const float buttonPressTime = 0.25f;
 
-    private float spaceBarLastPressed;
-
-    //used for controlling player input
-    private PlayerInputDTO playerInput;
+    private float pauseLastPressed;
 
     void Awake () {
 
-        playerInput = new PlayerInputDTO();
-
-        spaceBarLastPressed = 0f;
+        pauseLastPressed = 0f;
 
         /**
          * set player.behaviorBlocked/staringSequence.behaviorBlocked to true/false 
          * in an actual game and false/true when testing to skip sequence
          */
-        player.behaviorBlocked = false;
 
         staringSequence.behaviorBlocked = true;
 
         pauseMenu.paused = false;
+
+        allPlayers = FindObjectsOfType<RacePlayer>();
+        Debug.Log(allPlayers.Length);
     }
 	
 	// TODO: Handle inputs through this class only
@@ -40,34 +39,39 @@ public class GameContext : MonoBehaviour {
 
         if (staringSequence.finished && player.behaviorBlocked && !pauseMenu.paused)//Only change if player blocked (only should call once)
         {
-            player.behaviorBlocked = false;
+            foreach (RacePlayer p in allPlayers)
+            {
+                p.behaviorBlocked = false;
+            }
         }
 	}
 
     private void handleInputs()
     {
         //pause game
-        if (!pauseMenu.paused && Input.GetKey(KeyCode.Q) && (Time.fixedTime - spaceBarLastPressed > buttonPressTime))
+        if (!pauseMenu.paused && Input.GetKey(KeyCode.Q) && (Time.fixedTime - pauseLastPressed > buttonPressTime))
         {
             pauseGame();
         }
         //un pause game
-        else if(pauseMenu.paused && Input.GetKey(KeyCode.Q) && (Time.fixedTime - spaceBarLastPressed > buttonPressTime))
+        else if(pauseMenu.paused && Input.GetKey(KeyCode.Q) && (Time.fixedTime - pauseLastPressed > buttonPressTime))
         {
             unpauseGame();
         }
 
- 
-        playerInput.setFromUser();
-        player.passPlayerInputs(playerInput);
     }
 
     private void pauseGame()
     {
         Debug.Log("paused game");
-        spaceBarLastPressed = Time.fixedTime;
+        pauseLastPressed = Time.fixedTime;
         pauseMenu.paused = true;
-        player.behaviorBlocked = true;
+
+        foreach(RacePlayer p in allPlayers)
+        {
+            p.behaviorBlocked = true;
+        }
+
         staringSequence.behaviorBlocked = true;
 
         blockPrefabBehavior();
@@ -76,7 +80,7 @@ public class GameContext : MonoBehaviour {
     private void unpauseGame()
     {
         Debug.Log("un-paused game");
-        spaceBarLastPressed = Time.fixedTime;
+        pauseLastPressed = Time.fixedTime;
         pauseMenu.paused = false;
 
         unblockPrefabBehavior();
@@ -84,7 +88,10 @@ public class GameContext : MonoBehaviour {
         staringSequence.behaviorBlocked = false;
         if (staringSequence.finished)
         {
-            player.behaviorBlocked = false;
+            foreach (RacePlayer p in allPlayers)
+            {
+                p.behaviorBlocked = false;
+            }
         }
     }
 

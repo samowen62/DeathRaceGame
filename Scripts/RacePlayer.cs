@@ -7,7 +7,8 @@ using System.Collections;
  *  1) To set the initial position and rotation of this object in unity let this player start for
  *     just a second or two and use the resulting orientation so that we take rigidBody motion into account
  */
-public class RacePlayer : MonoBehaviour {
+public class RacePlayer : PausableBehaviour
+{
 
     //AI
     public bool isAI = true;
@@ -80,6 +81,8 @@ public class RacePlayer : MonoBehaviour {
             {
                 //this is to ensure that pausing the game does not mess with timing
                 //TODO: freeze the trail behind the engine
+                //TODO: don't use this as a flag
+                //add these to an array that will be updated on unpause instead
                 if (lastTimeOnGround != -1)
                 {
                     lastTimeOnGround += (Time.fixedTime - timePaused);
@@ -105,13 +108,13 @@ public class RacePlayer : MonoBehaviour {
     private Quaternion returningToTrackRotationEnd;
     private Vector3 returningToTrackPositionEnd;
 
-    private PlayerInputDTO player_inputs { set; get; }
+    private PlayerInputDTO player_inputs;
 
     //renderer of ship
     private MeshRenderer shipRenderer;
     private Quaternion base_ship_rotation;
 
-    void Awake()
+    protected override void _awake()
     {
         player_inputs = new PlayerInputDTO();
         //(FindObjectsOfType(typeof(BoostPanel)) as BoostPanel[])[0].boostAnimation();
@@ -125,7 +128,6 @@ public class RacePlayer : MonoBehaviour {
             Debug.LogError("Error: only 1 component of type 'Track' allowed in the scene");
         }
 
-        //TODO: Just put MeshRenderer as direct component of this gameobject
         shipRenderer = transform.FindChild("Ship").gameObject.GetComponent<MeshRenderer>();
         if (shipRenderer == null)
         {
@@ -138,8 +140,7 @@ public class RacePlayer : MonoBehaviour {
 
         //TODO: Fix this to avoid jumping the rotation on start. Maybe just give current speed on start?
         if (Physics.Raycast(transform.position, -transform.up, out downHit, rayCastDistance, AppConfig.groundMask))
-        {
-            
+        { 
             transform.position = downHit.point + hover_height * transform.up;
             transform.rotation = Quaternion.FromToRotation(transform.up, downHit.normal) * transform.rotation;
             yaw = transform.rotation.eulerAngles.y;
@@ -150,8 +151,13 @@ public class RacePlayer : MonoBehaviour {
         }
     }
 
-    void FixedUpdate()
+    protected override void _update()
     {
+        if (!isAI)
+        {
+            player_inputs.setFromUser();
+        }
+
         if (_behaviorBlocked)
         {
             return;
@@ -185,6 +191,8 @@ public class RacePlayer : MonoBehaviour {
         /* Adjust the position and rotation of the ship to the track */
         if (Physics.Raycast(transform.position + height_above_cast * prev_up, -prev_up, out downHit, rayCastDistance, AppConfig.groundMask))
         {
+            if(current_TrackPoint != null)
+                Debug.Log(name + " in " + current_TrackPoint.distanceTraversed(transform.position));
 
             if (accelerating)
             {
@@ -296,6 +304,12 @@ public class RacePlayer : MonoBehaviour {
                 current_TrackPoint = coll.gameObject.GetComponent<TrackPoint>();
                 break;
 
+            case "Player":
+                float angle = Vector3.Dot(coll.ClosestPointOnBounds(transform.position) - transform.position, transform.forward);
+                //don'tn't think we want to use ClosestPointOnBounds
+                Debug.Log(coll.name + " and " + name + ": " + angle);
+                break;
+
             //Log warning for unhandled tag
             default:
                 Debug.LogWarning("No behavior for OnTriggerEnter with tag: " + coll.gameObject.tag);
@@ -317,7 +331,7 @@ public class RacePlayer : MonoBehaviour {
         //TODO: refactor for different dev modes
         float horizontal_input;
         bool spaceBar = false;
-        if (!isAI)
+        if (isAI != true)
         {
             horizontal_input = player_inputs.horizonalAxis;
             spaceBar = player_inputs.spaceBar;

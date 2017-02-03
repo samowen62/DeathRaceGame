@@ -131,6 +131,7 @@ public class Track : MonoBehaviour {
             new_point.gameObject.GetComponent<SphereCollider>().isTrigger = true;
             //new_point.width = System.Convert.ToSingle(point.ChildNodes.Item(3).InnerText);
             new_point.width = baseWidth;
+            new_point.num_in_seq = i;
 
             points[i] = new_point;
             i++;
