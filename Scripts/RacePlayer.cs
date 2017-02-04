@@ -10,10 +10,10 @@ using System.Collections;
 public class RacePlayer : PausableBehaviour
 {
 
-    //AI
+    /* indicator */
     public bool isAI = true;
 
-    //below are various parameters used to fine-tune game mechanics
+    /* below are various parameters used to fine-tune game mechanics */
     public float gravity = 1700f;
     public float rayCastDistance = 40f;
     public float returningToTrackSpeed = 0.8f;
@@ -60,6 +60,7 @@ public class RacePlayer : PausableBehaviour
     private RaycastHit wallHit;
 
     private float wall_bounce_velocity = 0f;
+    private PlayerStatus status = PlayerStatus.ONTRACK;
 
     /* Last checkpoint of the player */
     private CheckPoint lastCheckPoint;
@@ -67,42 +68,10 @@ public class RacePlayer : PausableBehaviour
     private float prev_h = 0f;
     private float max_delta_h = 0.2f;
 
-    /* This is for pausing the game */
-    private bool _behaviorBlocked;
-    public bool behaviorBlocked {
-        get {
-            return _behaviorBlocked;
-        }
-        set {
-            if (value) {
-                timePaused = Time.fixedTime;
-            }
-            else
-            {
-                //this is to ensure that pausing the game does not mess with timing
-                //TODO: freeze the trail behind the engine
-                //TODO: don't use this as a flag
-                //add these to an array that will be updated on unpause instead
-                if (lastTimeOnGround != -1)
-                {
-                    lastTimeOnGround += (Time.fixedTime - timePaused);
-                }             
-                timeStartReturning += (Time.fixedTime - timePaused);
-            }
-            
-            _behaviorBlocked = value;
-        }
-    }
-
-
     //this values will be effected by pausing the game
-    private float timePaused;
-    private float lastTimeOnGround;
-    private float timeStartReturning;
+    private const string LAST_TIME_ON_GROUND = "lastTimeOnGround";
+    private const string TIME_START_RETURNING = "timeStartReturning";
 
-    //TODO:stop using clumsy booleans and use an enum for the state of the player
-    private bool returningToTrack = false;
-    private bool falling = false;
     private Quaternion returningToTrackRotationBegin;
     private Vector3 returningToTrackPositionBegin;
     private Quaternion returningToTrackRotationEnd;
@@ -117,10 +86,10 @@ public class RacePlayer : PausableBehaviour
     protected override void _awake()
     {
         player_inputs = new PlayerInputDTO();
-        //(FindObjectsOfType(typeof(BoostPanel)) as BoostPanel[])[0].boostAnimation();
+        pauseInvariantTimestamps.Add(LAST_TIME_ON_GROUND, 0f);
+        pauseInvariantTimestamps.Add(TIME_START_RETURNING, 0f);
 
         //TODO: sanity check to assert that the public parameters are within reasonable range (positive or negative)
-
         //TODO: abstract finding 1 object of type and 1 object of name in general util class with assertion
         Track[] track = FindObjectsOfType(typeof(Track)) as Track[];
         if(track.Length != 1)
@@ -135,7 +104,6 @@ public class RacePlayer : PausableBehaviour
         }
         base_ship_rotation = shipRenderer.transform.localRotation;
 
-        lastTimeOnGround = -1f;
         lastCheckPoint = track[0].startingCheckPoint;
 
         //TODO: Fix this to avoid jumping the rotation on start. Maybe just give current speed on start?
@@ -157,19 +125,16 @@ public class RacePlayer : PausableBehaviour
         {
             player_inputs.setFromUser();
         }
-
-        if (_behaviorBlocked)
-        {
-            return;
-        }
-
     
-        if (returningToTrack)
+        if (status == PlayerStatus.RETURNINGTOTRACK)
         {
-            float deltaTime = (Time.fixedTime - timeStartReturning) * returningToTrackSpeed;
+            float deltaTime = (Time.fixedTime - pauseInvariantTimestamps[TIME_START_RETURNING]) * returningToTrackSpeed;
             transform.position = Vector3.Lerp(returningToTrackPositionBegin, returningToTrackPositionEnd, deltaTime);
             transform.rotation = Quaternion.Lerp(returningToTrackRotationBegin, returningToTrackRotationEnd, deltaTime);
-            returningToTrack = (Time.fixedTime - timeStartReturning) < timeSpentReturning;
+            if((Time.fixedTime - pauseInvariantTimestamps[TIME_START_RETURNING]) >= timeSpentReturning)
+            {
+                status = PlayerStatus.ONTRACK;
+            }
             return;
         }
 
@@ -191,8 +156,9 @@ public class RacePlayer : PausableBehaviour
         /* Adjust the position and rotation of the ship to the track */
         if (Physics.Raycast(transform.position + height_above_cast * prev_up, -prev_up, out downHit, rayCastDistance, AppConfig.groundMask))
         {
-            if(current_TrackPoint != null)
-                Debug.Log(name + " in " + current_TrackPoint.distanceTraversed(transform.position));
+            status = PlayerStatus.ONTRACK;
+            //if(current_TrackPoint != null)
+            //    Debug.Log(name + " in " + current_TrackPoint.distanceTraversed(transform.position));
 
             if (accelerating)
             {
@@ -216,36 +182,27 @@ public class RacePlayer : PausableBehaviour
 
             //Smoothly adjust our height
             float distance = downHit.distance - height_above_cast;
-            smooth_y = Mathf.Lerp(smooth_y, hover_height - distance, Time.deltaTime * height_smooth);
-
-            //sanity check on smooth_y
-            smooth_y = Mathf.Max(distance / -3, smooth_y);
+            smooth_y = Mathf.Lerp(smooth_y, hover_height - distance, Time.deltaTime * height_smooth);           
+            smooth_y = Mathf.Max(distance / -3, smooth_y); //sanity check on smooth_y
 
             transform.localPosition += prev_up * smooth_y;
-
             transform.position += transform.forward * (current_speed * Time.deltaTime);
 
         }
         else
         {
             /* only set this on the first frame that there is a miss */
-            if (lastTimeOnGround == -1f)
+            if (status == PlayerStatus.ONTRACK)
             {
-                Debug.Log("Player left contact with track");
-                falling = true;
-                lastTimeOnGround = Time.fixedTime;
+                status = PlayerStatus.INAIR;
+                pauseInvariantTimestamps[LAST_TIME_ON_GROUND] = Time.fixedTime;
                 wall_bounce_velocity = 0;
             }
             /* called once to return player to the track*/
-            else if ((Time.fixedTime - lastTimeOnGround) > timeAllowedNotOnTrack)
+            else if ((Time.fixedTime - pauseInvariantTimestamps[LAST_TIME_ON_GROUND]) > timeAllowedNotOnTrack)
             {
-                Debug.Log("Player returning to track");
-
-                //set to -1 as a flag
-                lastTimeOnGround = -1f;
-                timeStartReturning = Time.fixedTime;
-                returningToTrack = true;
-                falling = false;
+                status = PlayerStatus.RETURNINGTOTRACK;
+                pauseInvariantTimestamps[TIME_START_RETURNING] = Time.fixedTime;
                 current_speed = 0f;
                 yaw = lastCheckPoint.yaw;
 
