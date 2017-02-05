@@ -8,6 +8,7 @@ public class GameContext : MonoBehaviour {
     public RacePlayer player;
 
     public RacePlayer[] allPlayers;
+    private BannerScroll[] bannerPrefabs;
 
     public BackgroundScript pauseMenu;
 
@@ -20,20 +21,25 @@ public class GameContext : MonoBehaviour {
 
         pauseLastPressed = 0f;
 
+        allPlayers = FindObjectsOfType<RacePlayer>();
+        bannerPrefabs = FindObjectsOfType<BannerScroll>();
+
         /**
-         * set player.behaviorBlocked/staringSequence.behaviorBlocked to true/false 
+         * set allPlayers.behaviorBlocked/staringSequence.behaviorBlocked to true/false 
          * in an actual game and false/true when testing to skip sequence
          */
 
-        staringSequence.behaviorBlocked = true;
+        foreach (RacePlayer p in allPlayers)
+        {
+            p.behaviorBlocked = true;
+        }
+
+        staringSequence.behaviorBlocked = false;
 
         pauseMenu.paused = false;
 
-        allPlayers = FindObjectsOfType<RacePlayer>();
-        Debug.Log(allPlayers.Length);
     }
 	
-	// TODO: Handle inputs through this class only
 	void Update () {
         handleInputs();
 
@@ -97,8 +103,6 @@ public class GameContext : MonoBehaviour {
 
     private void blockPrefabBehavior()
     {
-        var bannerPrefabs = FindObjectsOfType<BannerScroll>();
-
         foreach(var banner in bannerPrefabs)
         {
             banner.behaviorBlocked = true;
@@ -107,8 +111,6 @@ public class GameContext : MonoBehaviour {
 
     private void unblockPrefabBehavior()
     {
-        var bannerPrefabs = FindObjectsOfType<BannerScroll>();
-
         foreach (var banner in bannerPrefabs)
         {
             banner.behaviorBlocked = false;

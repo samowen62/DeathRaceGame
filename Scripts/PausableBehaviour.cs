@@ -5,6 +5,24 @@ using System.Collections;
 public abstract class PausableBehaviour : MonoBehaviour {
 
     private float timePaused;
+    private float totalTimePaused = 0f;
+
+    protected float pauseInvariantTime {
+        get
+        {
+            if (_behaviorBlocked)
+            {
+                return timePaused;
+            }
+            else
+            {
+                return Time.fixedTime - totalTimePaused;
+            }
+        }
+        set
+        {
+        }
+    }
 
     /* 
      * This is a dictionary of timestamps an inheriting class may want to increment when the game
@@ -28,6 +46,8 @@ public abstract class PausableBehaviour : MonoBehaviour {
             }
             else
             {
+                totalTimePaused += Time.fixedTime - timePaused;
+
                 //Must gather keys first to avoid out of sync exception
                 List<string> keys = new List<string>();
                 foreach (var entry in pauseInvariantTimestamps)
