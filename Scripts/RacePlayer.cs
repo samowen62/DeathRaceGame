@@ -10,6 +10,8 @@ using System.Collections;
 public class RacePlayer : PausableBehaviour
 {
 
+    //TODO: slowdown when turning 
+
     /* indicator */
     public bool isAI = true;
 
@@ -54,6 +56,13 @@ public class RacePlayer : PausableBehaviour
     private float yaw;
     private float smooth_y;
     private float current_speed;
+    public float speed
+    {
+        get
+        {
+            return current_speed;
+        }
+    }
   
     private Vector3 previousGravity;
     private RaycastHit downHit;

@@ -87,7 +87,6 @@ public class Track : MonoBehaviour {
         }
 
         points = new TrackPoint[pointList.Count + 1];
-        Vector3[] bezierPoints = new Vector3[pointList.Count];
         int i = 0;
 
         Vector3 trackScale = trackPrefab.transform.localScale;

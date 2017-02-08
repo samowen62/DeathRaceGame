@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class BoostPanel : MonoBehaviour {
+public class BoostPanel : PausableBehaviour
+{
 
     public float movement_period = 1f;
     public float movement_amplitude = 3f;
@@ -15,7 +16,6 @@ public class BoostPanel : MonoBehaviour {
     private Vector3 starting_center;
 
     //constants relating to the boost animation
-    //TODO: fix this and the Update() function for a paused game
     private float spin_animation_start_time = 0f;
     private float spin_animation_cumulative_time = 0f;
     private float spin_animation_time = 1.2f;
@@ -23,15 +23,16 @@ public class BoostPanel : MonoBehaviour {
     private Vector3 spin_animation_scale = 1.4f * Vector3.one;
 
     // Update is called once per frame
-    void Update()
+    protected override void _update()
     {
         //TODO: wait for trackpoints to be updated a better concurrent way
+        //Extend an AfterTrackLoaded class
         if (innerCone == null || outerCone == null)
             return;
 
         if (spin_animation_running)
         {
-            float time_in_seq = Time.realtimeSinceStartup - spin_animation_start_time;//TODO: factor in pause here
+            float time_in_seq = pauseInvariantTime - spin_animation_start_time;
             time_in_seq /= spin_animation_time;
 
             transform.localScale = Vector3.Lerp(spin_animation_scale, Vector3.one, time_in_seq);
@@ -42,12 +43,12 @@ public class BoostPanel : MonoBehaviour {
             if (time_in_seq > spin_animation_time)
             {
                 spin_animation_running = false;
-                spin_animation_cumulative_time += Time.realtimeSinceStartup - spin_animation_start_time;
+                spin_animation_cumulative_time += pauseInvariantTime - spin_animation_start_time;
             }
         }
         else
         {
-            float relativeHeight = movement_amplitude * Mathf.Sin((Time.realtimeSinceStartup - spin_animation_cumulative_time) * movement_period);
+            float relativeHeight = movement_amplitude * Mathf.Sin((pauseInvariantTime - spin_animation_cumulative_time) * movement_period);
 
             transform.position = starting_center + transform.forward * relativeHeight;
 
@@ -62,10 +63,10 @@ public class BoostPanel : MonoBehaviour {
     public void boostAnimation()
     {
         spin_animation_running = true;
-        spin_animation_start_time = Time.realtimeSinceStartup;
+        spin_animation_start_time = pauseInvariantTime;
     }
 
-    void Awake()
+    protected override void _awake()
     {
         orientPanel();
     }
