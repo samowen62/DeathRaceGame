@@ -14,6 +14,8 @@ public class Track : MonoBehaviour {
 
     public float baseWidth;
 
+    public Vector3 starting_point;
+
     private TrackPoint[] points;
 
     //prefab of track
@@ -86,10 +88,9 @@ public class Track : MonoBehaviour {
             Debug.LogError("Need to have bezier point data in xml file!");
         }
 
-        points = new TrackPoint[pointList.Count + 1];
+        points = new TrackPoint[pointList.Count];
         int i = 0;
 
-        Vector3 trackScale = trackPrefab.transform.localScale;
         GameObject TrackPointParent = new GameObject();
         TrackPointParent.name = "TrackPointParent";
         TrackPointParent.transform.position = Vector3.zero;
@@ -124,13 +125,12 @@ public class Track : MonoBehaviour {
             b_point += trackPrefab.transform.position;
 
             TrackPoint new_point = (TrackPoint) Instantiate(initialTrackPoint, b_point, Quaternion.identity, TrackPointParent.transform);
-            new_point.name = "TrackPoint " + i;
+            
             new_point.tag = "TrackPoint";
             new_point.gameObject.AddComponent<SphereCollider>();
             new_point.gameObject.GetComponent<SphereCollider>().isTrigger = true;
             //new_point.width = System.Convert.ToSingle(point.ChildNodes.Item(3).InnerText);
             new_point.width = baseWidth;
-            new_point.num_in_seq = i;
 
             points[i] = new_point;
             i++;
@@ -140,9 +140,19 @@ public class Track : MonoBehaviour {
         //linearly interpolate through all the points[] to set the correct width multiplier for
         //each point. This should be multiplied by the scale of the track to get the proper width
 
-        points[points.Length - 1] = points[0];
 
         calculateTangents(isTrackReversed);
+
+        TrackPoint track_point = findClosestTrackPointTo(starting_point);
+        int point_num = 1;
+
+        while (track_point.num_in_seq == -1)
+        {
+            track_point.num_in_seq = point_num;
+            track_point.name = "TrackPoint " + point_num;
+            track_point = track_point.next;
+            point_num++;
+        }
 
         loaded = true;
     }

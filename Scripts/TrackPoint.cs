@@ -4,13 +4,16 @@
 //whether this is a checkPoint. (Maybe every 6 of these is one?)
 public class TrackPoint : MonoBehaviour {
 
-    public Vector3 tangent { set; get; }
-    public TrackPoint next { set; get; }
-    public float width { set; get; }
+    public Vector3 tangent;
+    public TrackPoint next;
+    public float width;
 
-    //0..Track.points.length - 1 
-    //used for keeping track of placement
-    public int num_in_seq { set; get; }
+    public int num_in_seq;
+
+    private void Awake()
+    {
+        num_in_seq = -1;
+    }
 
     /**
      * returns the length of the distance traversed in this track point

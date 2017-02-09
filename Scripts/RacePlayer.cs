@@ -14,6 +14,7 @@ public class RacePlayer : PausableBehaviour
 
     /* indicator */
     public bool isAI = true;
+    public int placement { get; set; }
 
     /* below are various parameters used to fine-tune game mechanics */
     public float gravity = 1700f;
@@ -74,6 +75,25 @@ public class RacePlayer : PausableBehaviour
     /* Last checkpoint of the player */
     private CheckPoint lastCheckPoint;
     private TrackPoint current_TrackPoint;
+    public TrackPoint player_TrackPoint
+    {
+        get
+        {
+            return current_TrackPoint;
+        }
+        set{}
+    }
+
+    private int _lap = 0;
+    public int lap
+    {
+        get
+        {
+            return _lap;
+        }
+        set { }
+    }
+
     private float prev_h = 0f;
     private float max_delta_h = 0.2f;
 
@@ -289,6 +309,14 @@ public class RacePlayer : PausableBehaviour
     public void passPlayerInputs(PlayerInputDTO _player_inputs)
     {
         player_inputs = _player_inputs;
+    }
+
+    /**
+     * returns how deep into the trackpoint this player is
+     */
+    public float depthInTrackPoint()
+    {
+        return current_TrackPoint.distanceTraversed(transform.position);
     }
 
     private void turnShip(bool inAir)

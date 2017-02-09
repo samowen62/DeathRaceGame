@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class RacingUI : PausableBehaviour
+public class MPHUI : PausableBehaviour
 {
     private const string _MPH = " MPH";
 

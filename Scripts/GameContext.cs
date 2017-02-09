@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 public class GameContext : MonoBehaviour {
 
@@ -43,6 +44,8 @@ public class GameContext : MonoBehaviour {
 	void Update () {
         handleInputs();
 
+        findPlacement();
+
         if (staringSequence.finished && player.behaviorBlocked && !pauseMenu.paused)//Only change if player blocked (only should call once)
         {
             foreach (RacePlayer p in allPlayers)
@@ -65,6 +68,37 @@ public class GameContext : MonoBehaviour {
             unpauseGame();
         }
 
+    }
+
+    /**
+     * Determines order of player placement. (i.e. first through last place)
+     */
+    private void findPlacement()
+    {
+        //add laps to OrderBy
+        int i = 1;
+        allPlayers
+            .GroupBy(e => e.player_TrackPoint.num_in_seq)
+            .OrderBy(e => e.First().player_TrackPoint.num_in_seq)
+            .ToList().ForEach(racers =>
+        {
+            if(racers.Count() > 1)
+            {
+                racers
+                    .OrderBy(e => e.depthInTrackPoint())
+                    .ToList()
+                    .ForEach(racer =>
+                        {
+                            racer.placement = i;
+                            i++;
+                        });
+            }else
+            {
+                racers.First().placement = i;
+                i++;
+            }
+            
+        });     
     }
 
     private void pauseGame()

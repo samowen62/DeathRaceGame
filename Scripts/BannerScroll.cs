@@ -10,6 +10,7 @@ public class BannerScroll : PausableBehaviour
 
     protected override void _awake () {
         banner = GetComponent<MeshRenderer>();
+        //Debug.Log(transform.position);
     }
 
     protected override void _update () {
