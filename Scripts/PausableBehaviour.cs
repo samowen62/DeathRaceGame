@@ -46,6 +46,12 @@ public abstract class PausableBehaviour : MonoBehaviour {
             }
             else
             {
+                //if before awake() is called
+                if (pauseInvariantTimestamps == null)
+                {
+                    return;
+                }
+
                 totalTimePaused += Time.fixedTime - timePaused;
 
                 //Must gather keys first to avoid out of sync exception

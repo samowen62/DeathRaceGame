@@ -8,6 +8,8 @@ public class GameContext : MonoBehaviour {
 
     public RacePlayer player;
 
+    public Track track;
+
     public RacePlayer[] allPlayers;
     private BannerScroll[] bannerPrefabs;
 
@@ -32,10 +34,10 @@ public class GameContext : MonoBehaviour {
 
         foreach (RacePlayer p in allPlayers)
         {
-            p.behaviorBlocked = true;
+            p.behaviorBlocked = false;
         }
 
-        staringSequence.behaviorBlocked = false;
+        staringSequence.behaviorBlocked = true;
 
         pauseMenu.paused = false;
 
@@ -75,11 +77,15 @@ public class GameContext : MonoBehaviour {
      */
     private void findPlacement()
     {
+        if (!track.loaded) { 
+            return;
+        }
+
         //add laps to OrderBy
         int i = 1;
         allPlayers
-            .GroupBy(e => e.player_TrackPoint.num_in_seq)
-            .OrderBy(e => e.First().player_TrackPoint.num_in_seq)
+            .GroupBy(e => e.trackPointNumInSeq)
+            .OrderBy(e => e.First().trackPointNumInSeq)
             .ToList().ForEach(racers =>
         {
             if(racers.Count() > 1)

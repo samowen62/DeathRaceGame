@@ -44,7 +44,8 @@ def createWidthXML(curve):
     xmlString += "</BezierPoints>"
 
     print(xmlString)
-	
+
+createPointsXML(bpy.context.active_object.data)	
 createWidthXML(bpy.context.active_object.data)
 
 

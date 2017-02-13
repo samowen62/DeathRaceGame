@@ -20,7 +20,7 @@ public class BackgroundScript : MonoBehaviour {
             Debug.LogError("Must attach a font to this background script");
         }
 
-        guiBoxRect = new Rect(0, 0, 1000, 1000);
+        guiBoxRect = new Rect(0, 0, Screen.width, Screen.height);
         guiBoxColor = new Color(0.9f, 0.9f, 0.9f);
 
         float w = 0.35f;
