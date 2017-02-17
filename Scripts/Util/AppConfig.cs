@@ -5,9 +5,15 @@ public static class AppConfig {
 
     public static int groundMask = 1 << 8;
     public static int wallMask = 1 << 11;
-
     //delete??
     public static int trackPointMask = 1 << 12;
+
+    public static string MENU_MAIN = "MainMenu";
+    public static string MENU_TRACK = "TrackMenu";
+
+    public static string TRACK_PAPER_ENGINE = "paperEngine";
+    public static string TRACK_STAIRS = "StairsTrack";
+
 
     public static float hoverHeight = 1.8f;
 

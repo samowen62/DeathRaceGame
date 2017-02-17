@@ -5,10 +5,13 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour {
 
+    //use array of buttons with enum class specifying string
     private Button startGameButton;
+    private Button optionsGameButton;
     private Button exitGameButton;
 
-    private const string START_GAME_NAME = "StartGame";
+    private const string START_GAME_BUTTON = "StartGame";
+    private const string OPTIONS_NAME = "Options";
     private const string END_GAME_BUTTON = "EndGame";
 
     private bool startBlocked = false;
@@ -21,15 +24,20 @@ public class MainMenu : MonoBehaviour {
 
         foreach(var button in buttons)
         {
+            Debug.Log(button.name);
             switch (button.name)
             {
-                case START_GAME_NAME:
+                case START_GAME_BUTTON:
                     startGameButton = button;
-                    startGameButton.onClick.AddListener(delegate () { this.startButtonClicked(); });
+                    startGameButton.onClick.AddListener(delegate () { startButtonClicked(); });
+                    break;
+                case OPTIONS_NAME:
+                    optionsGameButton = button;
+                    optionsGameButton.onClick.AddListener(delegate () { optionsButtonClicked(); });
                     break;
                 case END_GAME_BUTTON:
                     exitGameButton = button;
-                    exitGameButton.onClick.AddListener(delegate () { this.endGameButtonClicked(); });
+                    exitGameButton.onClick.AddListener(delegate () { endGameButtonClicked(); });
                     break;
                 default:
                     Debug.LogWarning("unused button component: " + button.name);
@@ -47,8 +55,13 @@ public class MainMenu : MonoBehaviour {
             startBlocked = true;
             Debug.Log("Started Test Track sequence");
 
-            SyncLoadLevel("paperEngine");
+            SyncLoadLevel(AppConfig.MENU_TRACK);
         }
+    }
+
+    private void optionsButtonClicked()
+    {
+        Debug.Log("Options clicked");
     }
 
     public void endGameButtonClicked()
@@ -60,9 +73,10 @@ public class MainMenu : MonoBehaviour {
     private void SyncLoadLevel(string levelName)
     {
         async = SceneManager.LoadSceneAsync(levelName);
-        Load();
+        StartCoroutine(Load());
     }
 
+    //TODO: fix this!! and in TrackMenu.cs
     IEnumerator Load()
     {
         Debug.Log("progress: " + async.progress);

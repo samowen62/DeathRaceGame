@@ -510,7 +510,7 @@ public class RacePlayer : PausableBehaviour
 
         horizontal_input *= sign;
 
-        //Debug.Log("sign:" + sign + " h:" + h + " prev_h:" + prev_h);
+        Debug.Log(" h:" + horizontal_input + " prev_h:" + prev_h + " pitch: " + totalPitch +  " sign:" + sign);
 
         if (horizontal_input - prev_h >= max_delta_h)
             horizontal_input = prev_h + max_delta_h;

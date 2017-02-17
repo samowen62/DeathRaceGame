@@ -3,6 +3,8 @@ Code for various types of player manipulation with a third person camera.
 
 The main focus is recreating the intense, high speed, antigravity physics in the 2003 Gamecube game F Zero GX.
 
+The latest demo can be found here https://www.youtube.com/watch?v=f-HIydeGs6g with more to follow on my channel.
+
 <img src="Screenshots/GameGif02.gif" alt="scrot-01" style="width: 450px;"/><br />
 
 Showcasing the racing machine with some other primitive assets.
@@ -12,12 +14,9 @@ Showcasing the racing machine with some other primitive assets.
 In game thrid person screenshot of the machine on the anti-grav track.
 
 ##TODO:
-* Add AI (in progress)
+* Tweak AI (in progress)
 * Fog in the distance
-* Add enum class for RacePlayer status
-* Fix issue with car clipping through track. -> Instead just have taller walls that go under the track a little and not as harshly sloped tracks. Create a developers guide for standards like these!
-* Orient boost panels with nearest trackPoint's tangent
-* signal when all boostPanels/Track are done initializing to start the game
-
-
-
+* signal when all boostPanels/Track are done initializing to start the game (put this in an abstract class)
+* Add sound effects and music
+* Implement attacking
+* Add health/healing areas & potentially items

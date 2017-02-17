@@ -5,7 +5,7 @@ public static class AIUtil {
 
 
     private const float degToRad = Mathf.PI / 180f;
-    private const float speedFactor = 20f;
+    private const float speedFactor = 20f;//20 for test track 100f for stairs
     //TODO: refactor this into Track class so that the width is just set like this
     private const float halfWidthToComfortableWidth = 0.59f / 2f; //2f is for half width 
 
@@ -20,6 +20,7 @@ public static class AIUtil {
         float distance_from_center = Vector3.Dot(curr_pos - curr_point.transform.position, Vector3.Cross(curr_normal, curr_point.tangent));
         if(Mathf.Abs(distance_from_center) >= curr_point.width * halfWidthToComfortableWidth)
         {
+            //Debug.Log("too close " + distance_from_center + " " + curr_point.width * halfWidthToComfortableWidth);
             return distance_from_center > 0 ? -1 : 1;
         }
 

@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using UnityEngine.UI;
 using System.Linq;
 
 public class GameContext : MonoBehaviour {
@@ -12,13 +12,13 @@ public class GameContext : MonoBehaviour {
 
     public RacePlayer[] allPlayers;
     private BannerScroll[] bannerPrefabs;
-
-    public BackgroundScript pauseMenu;
+    private GameObject[] pauseUIComponents;
 
     //will only read button once every second
     private const float buttonPressTime = 0.25f;
 
     private float pauseLastPressed;
+    private bool paused;
 
     void Awake () {
 
@@ -26,11 +26,18 @@ public class GameContext : MonoBehaviour {
 
         allPlayers = FindObjectsOfType<RacePlayer>();
         bannerPrefabs = FindObjectsOfType<BannerScroll>();
+        pauseUIComponents = GameObject.FindGameObjectsWithTag("PauseUI");
+
 
         /**
          * set allPlayers.behaviorBlocked/staringSequence.behaviorBlocked to true/false 
          * in an actual game and false/true when testing to skip sequence
          */
+
+        foreach (var component in pauseUIComponents)
+        {
+            component.SetActive(false);
+        }
 
         foreach (RacePlayer p in allPlayers)
         {
@@ -39,8 +46,7 @@ public class GameContext : MonoBehaviour {
 
         staringSequence.behaviorBlocked = true;
 
-        pauseMenu.paused = false;
-
+        paused = false;
     }
 	
 	void Update () {
@@ -48,7 +54,7 @@ public class GameContext : MonoBehaviour {
 
         findPlacement();
 
-        if (staringSequence.finished && player.behaviorBlocked && !pauseMenu.paused)//Only change if player blocked (only should call once)
+        if (staringSequence.finished && player.behaviorBlocked && !paused)//Only change if player blocked (only should call once)
         {
             foreach (RacePlayer p in allPlayers)
             {
@@ -60,12 +66,12 @@ public class GameContext : MonoBehaviour {
     private void handleInputs()
     {
         //pause game
-        if (!pauseMenu.paused && Input.GetKey(KeyCode.Q) && (Time.fixedTime - pauseLastPressed > buttonPressTime))
+        if (!paused && Input.GetKey(KeyCode.Q) && (Time.fixedTime - pauseLastPressed > buttonPressTime))
         {
             pauseGame();
         }
         //un pause game
-        else if(pauseMenu.paused && Input.GetKey(KeyCode.Q) && (Time.fixedTime - pauseLastPressed > buttonPressTime))
+        else if(paused && Input.GetKey(KeyCode.Q) && (Time.fixedTime - pauseLastPressed > buttonPressTime))
         {
             unpauseGame();
         }
@@ -107,13 +113,18 @@ public class GameContext : MonoBehaviour {
         });     
     }
 
-    private void pauseGame()
+    public void pauseGame()
     {
         Debug.Log("paused game");
         pauseLastPressed = Time.fixedTime;
-        pauseMenu.paused = true;
+        paused = true;
 
-        foreach(RacePlayer p in allPlayers)
+        foreach (var component in pauseUIComponents)
+        {
+            component.SetActive(true);
+        }
+
+        foreach (RacePlayer p in allPlayers)
         {
             p.behaviorBlocked = true;
         }
@@ -123,11 +134,16 @@ public class GameContext : MonoBehaviour {
         blockPrefabBehavior();
     }
 
-    private void unpauseGame()
+    public void unpauseGame()
     {
         Debug.Log("un-paused game");
         pauseLastPressed = Time.fixedTime;
-        pauseMenu.paused = false;
+        paused = false;
+
+        foreach (var component in pauseUIComponents)
+        {
+            component.SetActive(false);
+        }
 
         unblockPrefabBehavior();
 
