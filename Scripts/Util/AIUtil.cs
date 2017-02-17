@@ -5,7 +5,7 @@ public static class AIUtil {
 
 
     private const float degToRad = Mathf.PI / 180f;
-    private const float speedFactor = 20f;//20 for test track 100f for stairs
+    private const float speedFactor = 20f;
     //TODO: refactor this into Track class so that the width is just set like this
     private const float halfWidthToComfortableWidth = 0.59f / 2f; //2f is for half width 
 

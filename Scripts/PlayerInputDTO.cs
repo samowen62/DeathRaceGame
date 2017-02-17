@@ -8,6 +8,7 @@ public class PlayerInputDTO  {
     public bool spaceBar { private set; get; }
     public bool pauseButton { private set; get; }
     public bool w_key { private set; get; }
+    public bool e_key { private set; get; }
 
     public PlayerInputDTO()
     {
@@ -16,6 +17,7 @@ public class PlayerInputDTO  {
         spaceBar = false;
         pauseButton = false;
         w_key = false;
+        e_key = false;
     }
 
     /*
@@ -28,6 +30,7 @@ public class PlayerInputDTO  {
         spaceBar = Input.GetKey(KeyCode.Space);
         pauseButton = Input.GetKey(KeyCode.Q);
         w_key = Input.GetKey(KeyCode.W);
+        e_key = Input.GetKey(KeyCode.E);
     }
 
 

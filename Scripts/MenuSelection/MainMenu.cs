@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour {
 
-    //use array of buttons with enum class specifying string
     private Button startGameButton;
     private Button optionsGameButton;
     private Button exitGameButton;

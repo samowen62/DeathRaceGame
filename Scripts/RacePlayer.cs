@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 /**
  * NOTES:
@@ -10,9 +10,7 @@ using System.Collections;
 public class RacePlayer : PausableBehaviour
 {
 
-    //TODO: slowdown when turning 
-
-    /* indicator */
+    /* AI indicator */
     public bool isAI = true;
     public int placement { get; set; }
 
@@ -81,6 +79,9 @@ public class RacePlayer : PausableBehaviour
     public float air_speed_damping = 0.6f;
     public float pitch_decel = 10f;
 
+    /* Related to player attacking */
+    private Dictionary<string, RacePlayer> playersToAttack;
+
     /* Last checkpoint of the player */
     private CheckPoint lastCheckPoint;
     private TrackPoint current_TrackPoint;
@@ -130,6 +131,7 @@ public class RacePlayer : PausableBehaviour
     protected override void _awake()
     {
         player_inputs = new PlayerInputDTO();
+        playersToAttack = new Dictionary<string, RacePlayer>();
         pauseInvariantTimestamps.Add(LAST_TIME_ON_GROUND, 0f);
         pauseInvariantTimestamps.Add(TIME_START_RETURNING, 0f);
 
@@ -238,6 +240,11 @@ public class RacePlayer : PausableBehaviour
                 transform.localRotation *= Quaternion.AngleAxis(totalPitch, transform.forward);
             }
 
+            //Attack the opponent racer
+            if (player_inputs.e_key && playersToAttack.Count > 0)
+            {
+                attack_player();
+            }
 
             //Smoothly adjust our height
             float distance = downHit.distance - height_above_cast;
@@ -338,9 +345,7 @@ public class RacePlayer : PausableBehaviour
 
             //TODO: implement attacking
             case "Player":
-                float angle = Vector3.Dot(coll.ClosestPointOnBounds(transform.position) - transform.position, transform.forward);
-                //don'tn't think we want to use ClosestPointOnBounds
-                Debug.Log(coll.name + " and " + name + ": " + angle);
+                playersToAttack.Add(coll.name, coll.gameObject.GetComponent<RacePlayer>());
                 break;
 
             //Log warning for unhandled tag
@@ -374,6 +379,9 @@ public class RacePlayer : PausableBehaviour
                 {
                     pauseInvariantTimestamps[LAST_TIME_ON_GROUND] = Time.fixedTime;
                 }
+                break;
+            case "Player":
+                playersToAttack.Remove(coll.name);
                 break;
 
             //don't do anything for most tags
@@ -510,7 +518,7 @@ public class RacePlayer : PausableBehaviour
 
         horizontal_input *= sign;
 
-        Debug.Log(" h:" + horizontal_input + " prev_h:" + prev_h + " pitch: " + totalPitch +  " sign:" + sign);
+        //Debug.Log(" h:" + horizontal_input + " prev_h:" + prev_h + " pitch: " + totalPitch +  " sign:" + sign);
 
         if (horizontal_input - prev_h >= max_delta_h)
             horizontal_input = prev_h + max_delta_h;
@@ -523,5 +531,12 @@ public class RacePlayer : PausableBehaviour
 
         prev_h = horizontal_input;
 
+    }
+
+    private void attack_player()
+    {
+        var opponent = playersToAttack.GetEnumerator();
+        opponent.MoveNext();
+        Debug.Log(opponent.Current.Key);
     }
 }
