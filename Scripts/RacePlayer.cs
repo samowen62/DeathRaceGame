@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 /**
  * NOTES:
@@ -81,6 +82,7 @@ public class RacePlayer : PausableBehaviour
 
     /* Related to player attacking */
     private Dictionary<string, RacePlayer> playersToAttack;
+    public float attack_time_window = 0.4f;
 
     /* Last checkpoint of the player */
     private CheckPoint lastCheckPoint;
@@ -115,6 +117,7 @@ public class RacePlayer : PausableBehaviour
 
     //this values will be effected by pausing the game
     private const string LAST_TIME_ON_GROUND = "lastTimeOnGround";
+    private const string LAST_TIME_ATTACKED = "lastTimeAttacked";
     private const string TIME_START_RETURNING = "timeStartReturning";
 
     private Quaternion returningToTrackRotationBegin;
@@ -133,6 +136,7 @@ public class RacePlayer : PausableBehaviour
         player_inputs = new PlayerInputDTO();
         playersToAttack = new Dictionary<string, RacePlayer>();
         pauseInvariantTimestamps.Add(LAST_TIME_ON_GROUND, 0f);
+        pauseInvariantTimestamps.Add(LAST_TIME_ATTACKED, 0f);
         pauseInvariantTimestamps.Add(TIME_START_RETURNING, 0f);
 
         //TODO: sanity check to assert that the public parameters are within reasonable range (positive or negative)
@@ -535,8 +539,16 @@ public class RacePlayer : PausableBehaviour
 
     private void attack_player()
     {
-        var opponent = playersToAttack.GetEnumerator();
-        opponent.MoveNext();
-        Debug.Log(opponent.Current.Key);
+        if(Time.fixedTime - pauseInvariantTimestamps[LAST_TIME_ATTACKED] > attack_time_window)
+        {
+            pauseInvariantTimestamps[LAST_TIME_ATTACKED] = Time.fixedTime;
+
+            var enumerator = playersToAttack.GetEnumerator();
+            enumerator.MoveNext();
+            RacePlayer opponent = playersToAttack[enumerator.Current.Key];
+
+            Debug.Log(opponent);
+        }
+        
     }
 }

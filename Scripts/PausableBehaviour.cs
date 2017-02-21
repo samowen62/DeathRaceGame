@@ -42,6 +42,7 @@ public abstract class PausableBehaviour : MonoBehaviour {
         {
             if (value)
             {
+                onPause();
                 timePaused = Time.fixedTime;
             }
             else
@@ -65,8 +66,9 @@ public abstract class PausableBehaviour : MonoBehaviour {
                 {
                     pauseInvariantTimestamps[key] += Time.fixedTime - timePaused;
                 }
-            }
 
+                onUnPause();
+            }
             _behaviorBlocked = value;
         }
     }
@@ -89,5 +91,15 @@ public abstract class PausableBehaviour : MonoBehaviour {
         }
 
         _update();
+    }
+
+    protected virtual void onPause()
+    {
+
+    }
+
+    protected virtual void onUnPause()
+    {
+
     }
 }

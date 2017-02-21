@@ -12,6 +12,7 @@ public class GameContext : MonoBehaviour {
 
     public RacePlayer[] allPlayers;
     private BannerScroll[] bannerPrefabs;
+    private BoostPanel[] boostPanelPrefabs;
     private GameObject[] pauseUIComponents;
 
     //will only read button once every second
@@ -26,6 +27,7 @@ public class GameContext : MonoBehaviour {
 
         allPlayers = FindObjectsOfType<RacePlayer>();
         bannerPrefabs = FindObjectsOfType<BannerScroll>();
+        boostPanelPrefabs = FindObjectsOfType<BoostPanel>();
         pauseUIComponents = GameObject.FindGameObjectsWithTag("PauseUI");
 
 
@@ -40,6 +42,11 @@ public class GameContext : MonoBehaviour {
         }
 
         foreach (RacePlayer p in allPlayers)
+        {
+            p.behaviorBlocked = false;
+        }
+
+        foreach (BoostPanel p in boostPanelPrefabs)
         {
             p.behaviorBlocked = false;
         }
@@ -129,6 +136,12 @@ public class GameContext : MonoBehaviour {
             p.behaviorBlocked = true;
         }
 
+        foreach (BoostPanel p in boostPanelPrefabs)
+        {
+            p.behaviorBlocked = true;
+        }
+
+
         staringSequence.behaviorBlocked = true;
 
         blockPrefabBehavior();
@@ -145,7 +158,12 @@ public class GameContext : MonoBehaviour {
             component.SetActive(false);
         }
 
-        unblockPrefabBehavior();
+        foreach (BoostPanel p in boostPanelPrefabs)
+        {
+            p.behaviorBlocked = false;
+        }
+
+            unblockPrefabBehavior();
 
         staringSequence.behaviorBlocked = false;
         if (staringSequence.finished)

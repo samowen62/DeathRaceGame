@@ -16,7 +16,6 @@ public class MPHUI : PausableBehaviour
     protected override void _awake()
     {
         textComponent = GetComponent<Text>();
-        transform.position = new Vector3(70f, 20f, Camera.main.nearClipPlane);
     }
 
     protected override void _update()

@@ -15,6 +15,9 @@ public class BoostPanel : PausableBehaviour
     private MeshRenderer outerCone;
     private Vector3 starting_center;
 
+    private AudioSource audio;
+    private bool isPlaying;
+
     //constants relating to the boost animation
     private float spin_animation_start_time = 0f;
     private float spin_animation_cumulative_time = 0f;
@@ -62,12 +65,16 @@ public class BoostPanel : PausableBehaviour
      */
     public void boostAnimation()
     {
+        audio.Play();
+        audio.time = 0.4f;
+
         spin_animation_running = true;
         spin_animation_start_time = pauseInvariantTime;
     }
 
     protected override void _awake()
     {
+        audio = GetComponent<AudioSource>();
         orientPanel();
     }
 
@@ -135,4 +142,20 @@ public class BoostPanel : PausableBehaviour
         yield return 0;
     }
 
+    protected override void onPause()
+    {
+        isPlaying = audio.isPlaying;
+        if (isPlaying)
+        {
+            audio.Pause();
+        }
+    }
+
+    protected override void onUnPause()
+    {
+        if (isPlaying)
+        {
+            audio.Play();
+        }
+    }
 }
