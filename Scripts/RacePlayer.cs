@@ -15,13 +15,12 @@ public class RacePlayer : PausableBehaviour
     public bool isAI = true;
     public int placement { get; set; }
 
-    /* below are various parameters used to fine-tune game mechanics */
-    public float gravity = 1700f;
-    public float rayCastDistance = 40f;
+    /* Related to air and returning mechanics */
+    public float gravity = 1700f; 
     public float returningToTrackSpeed = 0.8f;
     public float timeAllowedNotOnTrack = 2f;
     public float timeSpentReturning = 1.5f;
-    private float height_above_cast = 5f;
+   
 
     /*Ship handling parameters, must be multiples of 5!! */
     public float fwd_accel = 80f;
@@ -34,27 +33,27 @@ public class RacePlayer : PausableBehaviour
     public float hard_turn_multiplier = 2.2f;
     public float air_turn_speed = 15f;
 
-    /*parameters for bouncing against the wall */
+    /* Related to for bouncing against the wall */
     public float wall_bounce_deccel = 10f;//must be > 1!!
     public float wall_bounce_threshold = 5f;
     public float wall_bounce_speed_to_bounce_ratio = 0.1f;
     public float wall_bounce_curr_speed_deccel = 2f;//must be > 1!!
 
-    /*parameters for ship animation */
+    /* Related to for ship animation */
     public float ship_mesh_tilt = 5f;
     public float ship_mesh_tilt_hard_turn = 3f;
 
-    /*Auto adjust to track surface parameters*/
-    public float hover_height = AppConfig.hoverHeight - 0.5f;       //Distance to keep from the ground
+    /* Related to ship orientation and sticking to the track*/
+    public float hover_height = AppConfig.hoverHeight - 0.5f;       
     public float height_smooth = 7f;                               //How fast the ship will readjust to "hover_height"
-    public float pitch_smooth = 5f;                                 //How fast the ship will adjust its rotation to match track normal
+    public float pitch_smooth = 5f;                                //How fast the ship will adjust its rotation to match track normal
     public float height_correction = 2.2f;
-
-    /*We will use all this stuff later*/
+    public float rayCastDistance = 40f;
     private Vector3 disired_position;
     private Vector3 prev_up;
     private float yaw;
     private float smooth_y;
+    private float height_above_cast = 5f;
     private float current_speed;
     public float speed
     {
@@ -82,7 +81,29 @@ public class RacePlayer : PausableBehaviour
 
     /* Related to player attacking */
     private Dictionary<string, RacePlayer> playersToAttack;
+    private Vector3 attack_velocity = Vector3.zero;
+    private Vector3 attacked_velocity = Vector3.zero;
     public float attack_time_window = 0.4f;
+    public float attack_deccel = 10;
+    public float attack_threshold = 5;
+    public float attack_magnitude = 5;
+    public float attacked_magnitude = 2;
+    public float attack_damage_multiplier = 0.3f;
+    private float attack_bump_damage = 1f;
+    private float attack_bump_magnitude = 0.1f;
+    private float attack_damage_transfer_factor = -0.8f;
+
+    /* Related to player health */
+    public float starting_health = 100f;
+    public float max_bonus_health = 150f;
+    private float player_health;
+    public float health
+    {
+        get
+        {
+            return player_health;
+        }
+    }
 
     /* Last checkpoint of the player */
     private CheckPoint lastCheckPoint;
@@ -133,6 +154,7 @@ public class RacePlayer : PausableBehaviour
 
     protected override void _awake()
     {
+        player_health = starting_health;
         player_inputs = new PlayerInputDTO();
         playersToAttack = new Dictionary<string, RacePlayer>();
         pauseInvariantTimestamps.Add(LAST_TIME_ON_GROUND, 0f);
@@ -176,6 +198,7 @@ public class RacePlayer : PausableBehaviour
             player_inputs.setFromUser();
         }
     
+        //Player is returning to the track. Block other behavior by returning
         if (status == PlayerStatus.RETURNINGTOTRACK)
         {
             float deltaTime = (Time.fixedTime - pauseInvariantTimestamps[TIME_START_RETURNING]) * returningToTrackSpeed;
@@ -188,7 +211,7 @@ public class RacePlayer : PausableBehaviour
             return;
         }
 
-        
+        //Player is ricocheting of the wall
         if(wall_bounce_velocity != 0)
         {
             transform.position += wall_bounce_velocity * transform.right;
@@ -197,6 +220,31 @@ public class RacePlayer : PausableBehaviour
             if(Mathf.Abs(wall_bounce_velocity) < wall_bounce_threshold)
             {
                 wall_bounce_velocity = 0;
+            }
+        }
+
+        //Player is attacking another
+        if (!Vector3.zero.Equals(attack_velocity))
+        {
+            transform.position += attack_velocity;
+            attack_velocity /= attack_deccel;
+
+            if (Mathf.Abs(attack_velocity.sqrMagnitude) < attack_threshold)
+            {
+                attack_velocity = Vector3.zero;
+            }
+        }
+
+        //Player was attacked
+        if (!Vector3.zero.Equals(attacked_velocity))
+        {
+            //Debug.Log("attacked :" + attacked_velocity);
+            transform.position += attacked_velocity;
+            attacked_velocity /= attack_deccel;
+
+            if (Mathf.Abs(attacked_velocity.sqrMagnitude) < attack_threshold)
+            {
+                attacked_velocity = Vector3.zero;
             }
         }
 
@@ -223,6 +271,7 @@ public class RacePlayer : PausableBehaviour
             else if (current_speed > 0)
             {
                 current_speed -= brake_speed * Time.deltaTime;
+                current_speed = Math.Max(current_speed, 0f);
             }
             else
             {
@@ -259,6 +308,7 @@ public class RacePlayer : PausableBehaviour
             transform.position += transform.forward * (current_speed * Time.deltaTime);
 
         }
+        /* Player is not above the track. Handle possibilities here*/
         else
         {
             /* only set this on the first frame that there is a miss */
@@ -298,9 +348,6 @@ public class RacePlayer : PausableBehaviour
                     totalPitch = Mathf.Max(totalPitch - pitch_per_vert, min_pitch);                   
                 }
 
-                //transform.localRotation *= Quaternion.AngleAxis(totalPitch, transform.forward);
-
-                //Debug.Log(transform.localRotation.eulerAngles.y);
                 transform.position += (gravity * Time.deltaTime * Time.deltaTime) * previousGravity + 
                     (transform.forward * (current_speed * air_speed_damping * Time.deltaTime));
             }
@@ -322,11 +369,13 @@ public class RacePlayer : PausableBehaviour
 
                 if (Physics.Raycast(transform.position, -transform.right, out wallHit, rayCastDistance, AppConfig.wallMask))
                 {
+                    damage(attack_bump_damage);
                     wall_bounce_velocity = -wall_bounce_speed_to_bounce_ratio * current_speed * Vector3.Dot(wallHit.normal, transform.forward);
                     current_speed /= wall_bounce_curr_speed_deccel;
                 }
                 else if (Physics.Raycast(transform.position, transform.right, out wallHit, rayCastDistance, AppConfig.wallMask))
                 {
+                    damage(attack_bump_damage);
                     wall_bounce_velocity = current_speed * wall_bounce_speed_to_bounce_ratio * Vector3.Dot(wallHit.normal, transform.forward);
                     current_speed /= wall_bounce_curr_speed_deccel;
                 } else
@@ -350,6 +399,7 @@ public class RacePlayer : PausableBehaviour
             //TODO: implement attacking
             case "Player":
                 playersToAttack.Add(coll.name, coll.gameObject.GetComponent<RacePlayer>());
+                bump(coll.gameObject.GetComponent<RacePlayer>(), false);
                 break;
 
             //Log warning for unhandled tag
@@ -414,8 +464,6 @@ public class RacePlayer : PausableBehaviour
 
     private void turnShip(bool inAir)
     {
-        //TODO: if there is a total pitch slowly adjust it back when landed
-
         //Find horizonal input 
         float horizontal_input;
         bool spaceBar = false;
@@ -537,6 +585,9 @@ public class RacePlayer : PausableBehaviour
 
     }
 
+    /**
+     * this player decides to attack an opponent. The opponent is chosen here from those possible
+     */
     private void attack_player()
     {
         if(Time.fixedTime - pauseInvariantTimestamps[LAST_TIME_ATTACKED] > attack_time_window)
@@ -547,8 +598,52 @@ public class RacePlayer : PausableBehaviour
             enumerator.MoveNext();
             RacePlayer opponent = playersToAttack[enumerator.Current.Key];
 
-            Debug.Log(opponent);
+            Debug.Log(name + " Attacked " + opponent);
+
+            bump(opponent, true);
+        }       
+    }
+
+    /**
+     * Bumps opponent raceplayer out of way. attacking is true when this player is attacking
+     * and false when this is only meant to represent 2 players colliding
+     */
+    private void bump(RacePlayer opponent, bool attacking)
+    {
+        float _damage = attacking ? attack_damage_multiplier * current_speed : attack_bump_damage;
+
+        if (attacking)
+        {
+            damage(attack_damage_transfer_factor * _damage);
         }
-        
+
+        Vector3 playerToOpponent = (opponent.transform.position - transform.position).normalized;
+        attack_velocity = playerToOpponent * (attacking ? attacked_magnitude : attack_bump_magnitude);
+        opponent.attack(playerToOpponent, _damage);
+    }
+
+    /**
+     * called when one player attacks another from _dir direction with _damage
+     */
+    public void attack(Vector3 _dir, float _damage)
+    {
+        attacked_velocity = _dir;
+        damage(_damage);
+    }
+
+    /**
+     * called to damage the current player by _damage amount
+     */
+    public void damage(float _damage)
+    {
+        player_health -= _damage;
+        player_health = Math.Max(player_health, 0f);
+        player_health = Math.Min(player_health, max_bonus_health);
+
+        //DEATH!!
+        if (player_health <= 0)
+        {
+            Debug.Log(name + " DIED!");
+        }
     }
 }
