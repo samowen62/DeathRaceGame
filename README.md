@@ -18,5 +18,4 @@ In game thrid person screenshot of the machine on the anti-grav track.
 * Fog in the distance
 * signal when all boostPanels/Track are done initializing to start the game (put this in an abstract class)
 * Add sound effects and music
-* Implement attacking
-* Add health/healing areas & potentially items
+* Add items

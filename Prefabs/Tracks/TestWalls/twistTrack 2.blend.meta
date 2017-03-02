@@ -1,0 +1,145 @@
+fileFormatVersion: 2
+guid: a62b5b0fb81d65c41a33c833da6e6768
+timeCreated: 1488430953
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: BezierCurve
+    100002: BezierCurve_001
+    100004: CurvePoints
+    100006: Healing
+    100008: HealingArea
+    100010: Plane_000
+    100012: Plane_001
+    100014: Plane_002
+    100016: Plane_003
+    100018: Plane_004
+    100020: Plane_006
+    100022: Plane_007
+    100024: Track
+    100026: //RootNode
+    100028: Wall
+    400000: BezierCurve
+    400002: BezierCurve_001
+    400004: CurvePoints
+    400006: Healing
+    400008: HealingArea
+    400010: Plane_000
+    400012: Plane_001
+    400014: Plane_002
+    400016: Plane_003
+    400018: Plane_004
+    400020: Plane_006
+    400022: Plane_007
+    400024: Track
+    400026: //RootNode
+    400028: Wall
+    2300000: BezierCurve
+    2300002: BezierCurve_001
+    2300004: CurvePoints
+    2300006: Healing
+    2300008: HealingArea
+    2300010: Plane_000
+    2300012: Plane_001
+    2300014: Plane_002
+    2300016: Plane_003
+    2300018: Plane_004
+    2300020: Plane_006
+    2300022: Plane_007
+    2300024: Track
+    2300026: Wall
+    3300000: BezierCurve
+    3300002: BezierCurve_001
+    3300004: CurvePoints
+    3300006: Healing
+    3300008: HealingArea
+    3300010: Plane_000
+    3300012: Plane_001
+    3300014: Plane_002
+    3300016: Plane_003
+    3300018: Plane_004
+    3300020: Plane_006
+    3300022: Plane_007
+    3300024: Track
+    3300026: Wall
+    4300000: Plane_004
+    4300002: CurvePoints
+    4300004: BezierCurve_001
+    4300006: Healing
+    4300008: Plane_007
+    4300010: Plane_006
+    4300012: Plane_003
+    4300014: Plane_000
+    4300016: Plane_002
+    4300018: BezierCurve
+    4300020: HealingArea
+    4300022: Track
+    4300024: Wall
+    4300026: Plane_001
+    7400000: Default Take
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

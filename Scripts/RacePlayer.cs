@@ -27,6 +27,7 @@ public class RacePlayer : PausableBehaviour
     public float fwd_max_speed = 130f;
     public float fwd_boost_speed = 170f;
     public float fwd_boost_decel = 2.5f;
+    public AudioObject boostSound;
 
     public float brake_speed = 200f;
     public float turn_speed = 80f;
@@ -83,6 +84,7 @@ public class RacePlayer : PausableBehaviour
     private Dictionary<string, RacePlayer> playersToAttack;
     private Vector3 attack_velocity = Vector3.zero;
     private Vector3 attacked_velocity = Vector3.zero;
+    public AudioObject bumpSound;
     public float attack_time_window = 0.4f;
     public float attack_deccel = 10;
     public float attack_threshold = 5;
@@ -92,10 +94,14 @@ public class RacePlayer : PausableBehaviour
     private float attack_bump_damage = 1f;
     private float attack_bump_magnitude = 0.1f;
     private float attack_damage_transfer_factor = -0.8f;
+    private float totalRoll;
+    private float roll_decel = 1.4f;
+    private float attack_roll = 25f;
 
     /* Related to player health */
     public float starting_health = 100f;
     public float max_bonus_health = 150f;
+    public float health_per_frame_healing = 0.2f;
     private float player_health;
     public float health
     {
@@ -229,6 +235,9 @@ public class RacePlayer : PausableBehaviour
             transform.position += attack_velocity;
             attack_velocity /= attack_deccel;
 
+            shipRenderer.transform.localRotation = Quaternion.AngleAxis(50f, shipRenderer.transform.forward) * base_ship_rotation;
+
+
             if (Mathf.Abs(attack_velocity.sqrMagnitude) < attack_threshold)
             {
                 attack_velocity = Vector3.zero;
@@ -264,6 +273,12 @@ public class RacePlayer : PausableBehaviour
         {
             status = PlayerStatus.ONTRACK;
 
+            if (downHit.collider.gameObject.tag == "HealingArea")
+            {
+                player_health += health_per_frame_healing;
+                player_health = Mathf.Min(starting_health, player_health);
+            }
+
             if (accelerating)
             {
                 current_speed += (current_speed >= fwd_max_speed) ? ((current_speed == fwd_max_speed) ? 0 : -fwd_boost_decel) : fwd_accel * Time.deltaTime;
@@ -291,6 +306,18 @@ public class RacePlayer : PausableBehaviour
                 totalPitch -= pitch_decel;
                 totalPitch = Mathf.Max(totalPitch, 0);
                 transform.localRotation *= Quaternion.AngleAxis(totalPitch, transform.forward);
+            }
+
+            //if there is a roll slowly change it back to normal
+            if (totalRoll > 0f)
+            {
+                totalRoll -= roll_decel;
+                totalRoll = Mathf.Max(totalRoll, 0);
+            }
+            else if (totalRoll < 0f)
+            {
+                totalRoll += roll_decel;
+                totalRoll = Mathf.Min(totalRoll, 0);
             }
 
             //Attack the opponent racer
@@ -370,12 +397,16 @@ public class RacePlayer : PausableBehaviour
                 if (Physics.Raycast(transform.position, -transform.right, out wallHit, rayCastDistance, AppConfig.wallMask))
                 {
                     damage(attack_bump_damage);
+                    bumpSound.Play();
+
                     wall_bounce_velocity = -wall_bounce_speed_to_bounce_ratio * current_speed * Vector3.Dot(wallHit.normal, transform.forward);
                     current_speed /= wall_bounce_curr_speed_deccel;
                 }
                 else if (Physics.Raycast(transform.position, transform.right, out wallHit, rayCastDistance, AppConfig.wallMask))
                 {
                     damage(attack_bump_damage);
+                    bumpSound.Play();
+
                     wall_bounce_velocity = current_speed * wall_bounce_speed_to_bounce_ratio * Vector3.Dot(wallHit.normal, transform.forward);
                     current_speed /= wall_bounce_curr_speed_deccel;
                 } else
@@ -388,6 +419,7 @@ public class RacePlayer : PausableBehaviour
             case "BoostPanel":
                 Debug.Log("Boost Power");
                 current_speed = fwd_boost_speed;
+                boostSound.Play();
                 coll.gameObject.GetComponent<BoostPanel>().boostAnimation();
                 break;
 
@@ -495,14 +527,19 @@ public class RacePlayer : PausableBehaviour
         else
         {
             turn_angle = turn_speed * Time.deltaTime * horizontal_input;
+
             if (spaceBar)
             {
                 turn_angle *= hard_turn_multiplier;
-                shipRenderer.transform.localRotation = Quaternion.AngleAxis(ship_mesh_tilt_hard_turn * turn_angle, shipRenderer.transform.forward) * base_ship_rotation;
+            }
+
+            if(totalRoll != 0)
+            {
+                shipRenderer.transform.localRotation = Quaternion.AngleAxis(totalRoll, shipRenderer.transform.up) * base_ship_rotation;
             }
             else
             {
-                shipRenderer.transform.localRotation = Quaternion.AngleAxis(ship_mesh_tilt * turn_angle, shipRenderer.transform.forward) * base_ship_rotation;
+                shipRenderer.transform.localRotation = Quaternion.AngleAxis((spaceBar ? ship_mesh_tilt_hard_turn : ship_mesh_tilt) * turn_angle, shipRenderer.transform.forward) * base_ship_rotation;
             }
         }
 
@@ -511,7 +548,6 @@ public class RacePlayer : PausableBehaviour
         if(totalPitch != 0)
         {
             transform.localRotation = Quaternion.Euler(0f, yaw, 0f);
-            //TODO: not smooth on ground
             transform.localRotation *= Quaternion.AngleAxis(totalPitch, transform.forward);
         }
         else
@@ -610,24 +646,33 @@ public class RacePlayer : PausableBehaviour
      */
     private void bump(RacePlayer opponent, bool attacking)
     {
+        Vector3 playerToOpponent = (opponent.transform.position - transform.position).normalized;
+        attack_velocity = playerToOpponent * (attacking ? attacked_magnitude : attack_bump_magnitude);
         float _damage = attacking ? attack_damage_multiplier * current_speed : attack_bump_damage;
 
         if (attacking)
         {
             damage(attack_damage_transfer_factor * _damage);
+            totalRoll = Vector3.Dot(playerToOpponent, transform.right) > 0 ? attack_roll : -attack_roll;
+        }
+        else
+        {
+            bumpSound.Play();
         }
 
-        Vector3 playerToOpponent = (opponent.transform.position - transform.position).normalized;
-        attack_velocity = playerToOpponent * (attacking ? attacked_magnitude : attack_bump_magnitude);
-        opponent.attack(playerToOpponent, _damage);
+        opponent.attack(playerToOpponent, _damage, attacking);
     }
 
     /**
      * called when one player attacks another from _dir direction with _damage
      */
-    public void attack(Vector3 _dir, float _damage)
+    public void attack(Vector3 _dir, float _damage, bool _attacking)
     {
         attacked_velocity = _dir;
+        if (_attacking)
+        {
+            totalRoll = Vector3.Dot(_dir, transform.right) < 0 ? attack_roll : -attack_roll;
+        }
         damage(_damage);
     }
 
