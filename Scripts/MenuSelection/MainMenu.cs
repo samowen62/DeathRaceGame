@@ -2,8 +2,13 @@
 using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 public class MainMenu : MonoBehaviour {
+
+    public AudioObject selectSound;
+
+    public AudioObject hoverSound;
 
     private Button startGameButton;
     private Button optionsGameButton;
@@ -29,14 +34,17 @@ public class MainMenu : MonoBehaviour {
                 case START_GAME_BUTTON:
                     startGameButton = button;
                     startGameButton.onClick.AddListener(delegate () { startButtonClicked(); });
+                    UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, startGameButton, gameObject);
                     break;
                 case OPTIONS_NAME:
                     optionsGameButton = button;
                     optionsGameButton.onClick.AddListener(delegate () { optionsButtonClicked(); });
+                    UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, optionsGameButton, gameObject);
                     break;
                 case END_GAME_BUTTON:
                     exitGameButton = button;
                     exitGameButton.onClick.AddListener(delegate () { endGameButtonClicked(); });
+                    UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, exitGameButton, gameObject);
                     break;
                 default:
                     Debug.LogWarning("unused button component: " + button.name);
@@ -51,6 +59,7 @@ public class MainMenu : MonoBehaviour {
     {
         if (!startBlocked)
         {
+            selectSound.Play();
             startBlocked = true;
             Debug.Log("Started Test Track sequence");
 

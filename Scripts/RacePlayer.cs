@@ -99,9 +99,13 @@ public class RacePlayer : PausableBehaviour
     private float attack_roll = 25f;
 
     /* Related to player health */
+    private Material shipMaterial;
+    private Material redMaterial;
     public float starting_health = 100f;
     public float max_bonus_health = 150f;
     public float health_per_frame_healing = 0.2f;
+    public float health_blink_speed = 20f;
+    private float health_warning_thresh = 25f;
     private float player_health;
     public float health
     {
@@ -141,6 +145,8 @@ public class RacePlayer : PausableBehaviour
 
     private float prev_h = 0f;
     private float max_delta_h = 0.2f;
+    private float prev_v = 0f;
+    private float max_delta_v = 0.001f;
 
     //this values will be effected by pausing the game
     private const string LAST_TIME_ON_GROUND = "lastTimeOnGround";
@@ -181,6 +187,9 @@ public class RacePlayer : PausableBehaviour
             Debug.LogError("Please name the ship prefab 'Ship' in this instance of RacePlayer.cs");
         }
         base_ship_rotation = shipRenderer.transform.localRotation;
+        shipMaterial = shipRenderer.material;
+        redMaterial = new Material(Shader.Find("Transparent/Diffuse"));
+        redMaterial.color = new Color32(1, 0, 0, 1);
 
         lastCheckPoint = track[0].startingCheckPoint;
 
@@ -203,6 +212,8 @@ public class RacePlayer : PausableBehaviour
         {
             player_inputs.setFromUser();
         }
+
+        setColorForHealth();
     
         //Player is returning to the track. Block other behavior by returning
         if (status == PlayerStatus.RETURNINGTOTRACK)
@@ -271,12 +282,22 @@ public class RacePlayer : PausableBehaviour
         /* Adjust the position and rotation of the ship to the track */
         if (Physics.Raycast(transform.position + height_above_cast * prev_up, -prev_up, out downHit, rayCastDistance, AppConfig.groundMask))
         {
+            if(status == PlayerStatus.INAIR)
+            {
+                bumpSound.Play();
+            }
+
             status = PlayerStatus.ONTRACK;
 
             if (downHit.collider.gameObject.tag == "HealingArea")
             {
                 player_health += health_per_frame_healing;
                 player_health = Mathf.Min(starting_health, player_health);
+
+                if(player_health > health_warning_thresh)
+                {
+                    shipRenderer.material.SetFloat("_Blend", 0);
+                }
             }
 
             if (accelerating)
@@ -367,17 +388,19 @@ public class RacePlayer : PausableBehaviour
             {
                 turnShip(true);
 
-                if(player_inputs.verticalAxis > 0)
-                {
-                    totalPitch = Mathf.Min(totalPitch + pitch_per_vert, max_pitch);
-                } else if(player_inputs.verticalAxis < 0)
-                {
-                    totalPitch = Mathf.Max(totalPitch - pitch_per_vert, min_pitch);                   
-                }
-
                 transform.position += (gravity * Time.deltaTime * Time.deltaTime) * previousGravity + 
                     (transform.forward * (current_speed * air_speed_damping * Time.deltaTime));
             }
+        }
+    }
+
+    private void setColorForHealth()
+    {
+        //add beeping too?
+        if (player_health < health_warning_thresh)
+        {
+            float t = Mathf.PingPong(Time.time * health_blink_speed / player_health, 0.4f);
+            shipRenderer.material.SetFloat("_Blend", t);
         }
     }
 
@@ -498,10 +521,12 @@ public class RacePlayer : PausableBehaviour
     {
         //Find horizonal input 
         float horizontal_input;
+        float vertical_input;
         bool spaceBar = false;
         if (isAI != true)
         {
             horizontal_input = player_inputs.horizonalAxis;
+            vertical_input = player_inputs.verticalAxis;
             spaceBar = player_inputs.spaceBar;
             prev_h = horizontal_input;
         }
@@ -511,10 +536,11 @@ public class RacePlayer : PausableBehaviour
             if (current_TrackPoint == null)
             {
                 horizontal_input = player_inputs.horizonalAxis;
+                vertical_input = player_inputs.verticalAxis;
             }
             else
             {
-                setInputsFromAI(out horizontal_input, out spaceBar);
+                setInputsFromAI(out horizontal_input, out vertical_input, out spaceBar);
             }
         }
    
@@ -543,9 +569,19 @@ public class RacePlayer : PausableBehaviour
             }
         }
 
-        yaw += turn_angle;   
+        yaw += turn_angle;
 
-        if(totalPitch != 0)
+        //calculate vertical axis for nose diving
+        if (vertical_input > 0)
+        {
+            totalPitch = Mathf.Min(totalPitch + pitch_per_vert, max_pitch);
+        }
+        else if (vertical_input < 0)
+        {
+            totalPitch = Mathf.Max(totalPitch - pitch_per_vert, min_pitch);
+        }
+
+        if (totalPitch != 0)
         {
             transform.localRotation = Quaternion.Euler(0f, yaw, 0f);
             transform.localRotation *= Quaternion.AngleAxis(totalPitch, transform.forward);
@@ -556,10 +592,11 @@ public class RacePlayer : PausableBehaviour
         }
     }
 
-    private void setInputsFromAI(out float horizontal_input, out bool spaceBar)
+    private void setInputsFromAI(out float horizontal_input, out float vertical_input, out bool spaceBar)
     {
         //for h - is turning left and + is right!
         spaceBar = false;
+        vertical_input = 0f;
         int nearEdge = AIUtil.checkIfNearEdge(transform.position, transform.up, current_TrackPoint);
 
         //Need to turn the ship away from the edge
@@ -608,6 +645,16 @@ public class RacePlayer : PausableBehaviour
 
         //Debug.Log(" h:" + horizontal_input + " prev_h:" + prev_h + " pitch: " + totalPitch +  " sign:" + sign);
 
+        if(status == PlayerStatus.INAIR)
+        {
+            vertical_input = prev_v + max_delta_v;
+            vertical_input = vertical_input > 1 ? 1 : vertical_input;
+        }else if(prev_v != 0)
+        {
+            vertical_input = prev_v - max_delta_v;
+            vertical_input = vertical_input < 0 ? 0 : vertical_input;
+        }
+
         if (horizontal_input - prev_h >= max_delta_h)
             horizontal_input = prev_h + max_delta_h;
         else if (prev_h - horizontal_input >= max_delta_h)
@@ -618,6 +665,7 @@ public class RacePlayer : PausableBehaviour
         horizontal_input = horizontal_input < -1 ? -1 : horizontal_input;
 
         prev_h = horizontal_input;
+        prev_v = vertical_input;
 
     }
 

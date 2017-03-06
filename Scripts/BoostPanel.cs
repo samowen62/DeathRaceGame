@@ -124,7 +124,7 @@ public class BoostPanel : PausableBehaviour
         if (Physics.Raycast(transform.position, -transform.forward, out downHit, 30f, AppConfig.groundMask))
         {
             transform.rotation = Quaternion.LookRotation(downHit.normal , closestPosition.tangent);
-            transform.position -= transform.forward * (trackHeight - downHit.distance);
+            transform.position = trackHeight * downHit.normal + downHit.point;
         }
         else
         {

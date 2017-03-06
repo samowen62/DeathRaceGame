@@ -2,11 +2,16 @@
 using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 public class PauseMenu : MonoBehaviour
 {
 
     public GameContext context;
+
+    public AudioObject selectSound;
+
+    public AudioObject hoverSound;
 
     //TODO: use array of buttons with enum class specifying string
     private Button resumeButton;
@@ -35,10 +40,13 @@ public class PauseMenu : MonoBehaviour
                 case RESUME_GAME:
                     resumeButton = button;
                     resumeButton.onClick.AddListener(delegate () { resumeGame(); });
+                    UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, resumeButton, gameObject);
                     break;
                 case EXIT_GAME:
                     exitGameButton = button;
                     exitGameButton.onClick.AddListener(delegate () { exitGame(); });
+                    UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, exitGameButton, gameObject);
+
                     break;
                 default:
                     Debug.LogWarning("unused button component: " + button.name);
@@ -56,6 +64,7 @@ public class PauseMenu : MonoBehaviour
 
     private void exitGame()
     {
+        selectSound.Play();
         if (!loadingBlocked)
         {
             loadingBlocked = true;

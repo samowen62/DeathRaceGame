@@ -23,11 +23,6 @@ public class AudioObject : PausableBehaviour
         Assert.IsTrue(duplicates > 0);
     }
 
-    // Update is called once per frame
-    protected override void _update () {
-	
-	}
-
     public void Play()
     {
         audio.Play();

@@ -73,10 +73,6 @@ public abstract class PausableBehaviour : MonoBehaviour {
         }
     }
 
-    protected abstract void _awake();
-
-    protected abstract void _update();
-
     void Awake () {
         pauseInvariantTimestamps = new Dictionary<string, float>();
 
@@ -93,13 +89,20 @@ public abstract class PausableBehaviour : MonoBehaviour {
         _update();
     }
 
+
+    protected virtual void _awake()
+    {
+    }
+
+    protected virtual void _update()
+    {
+    }
+
     protected virtual void onPause()
     {
-
     }
 
     protected virtual void onUnPause()
     {
-
     }
 }

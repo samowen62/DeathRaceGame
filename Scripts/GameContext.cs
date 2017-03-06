@@ -43,7 +43,7 @@ public class GameContext : MonoBehaviour {
 
         foreach (RacePlayer p in allPlayers)
         {
-            p.behaviorBlocked = false;
+            p.behaviorBlocked = true;
         }
 
         foreach (BoostPanel p in boostPanelPrefabs)
@@ -51,7 +51,7 @@ public class GameContext : MonoBehaviour {
             p.behaviorBlocked = false;
         }
 
-        staringSequence.behaviorBlocked = true;
+        staringSequence.behaviorBlocked = false;
 
         paused = false;
     }
