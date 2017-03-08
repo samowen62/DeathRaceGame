@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class PlayerInputDTO  {
 
@@ -12,12 +11,7 @@ public class PlayerInputDTO  {
 
     public PlayerInputDTO()
     {
-        horizonalAxis = 0f;
-        verticalAxis = 0f;
-        spaceBar = false;
-        pauseButton = false;
-        w_key = false;
-        e_key = false;
+        setToZero();
     }
 
     /*
@@ -33,5 +27,14 @@ public class PlayerInputDTO  {
         e_key = Input.GetKey(KeyCode.E);
     }
 
+    public void setToZero()
+    {
+        horizonalAxis = 0f;
+        verticalAxis = 0f;
+        spaceBar = false;
+        pauseButton = false;
+        w_key = false;
+        e_key = false;
+    }
 
 }

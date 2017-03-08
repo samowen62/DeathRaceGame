@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
+using System;
 using System.Collections;
 
 public abstract class PausableBehaviour : MonoBehaviour {
@@ -12,7 +12,7 @@ public abstract class PausableBehaviour : MonoBehaviour {
         {
             if (_behaviorBlocked)
             {
-                return timePaused;
+                return timePaused - totalTimePaused;
             }
             else
             {
@@ -24,11 +24,6 @@ public abstract class PausableBehaviour : MonoBehaviour {
         }
     }
 
-    /* 
-     * This is a dictionary of timestamps an inheriting class may want to increment when the game
-     * is paused in order to make sure they are the same amount in the past 
-     */
-    protected Dictionary<string, float> pauseInvariantTimestamps;
 
     /* This is for pausing the game */
     protected bool _behaviorBlocked;
@@ -47,26 +42,7 @@ public abstract class PausableBehaviour : MonoBehaviour {
             }
             else
             {
-                //if before awake() is called
-                if (pauseInvariantTimestamps == null)
-                {
-                    return;
-                }
-
                 totalTimePaused += Time.fixedTime - timePaused;
-
-                //Must gather keys first to avoid out of sync exception
-                List<string> keys = new List<string>();
-                foreach (var entry in pauseInvariantTimestamps)
-                {
-                    keys.Add(entry.Key);
-                }
-
-                foreach (var key in keys)
-                {
-                    pauseInvariantTimestamps[key] += Time.fixedTime - timePaused;
-                }
-
                 onUnPause();
             }
             _behaviorBlocked = value;
@@ -74,8 +50,6 @@ public abstract class PausableBehaviour : MonoBehaviour {
     }
 
     void Awake () {
-        pauseInvariantTimestamps = new Dictionary<string, float>();
-
         _awake();
     }
 	
@@ -88,6 +62,23 @@ public abstract class PausableBehaviour : MonoBehaviour {
 
         _update();
     }
+
+    /**
+     * Utility function used to call a function after a specified amount 
+     * of time. The time is made to be pause invariant additionally
+     */
+    protected void callAfterSeconds(float seconds, Action func)
+    {
+        StartCoroutine(callFunc(seconds, func));
+    }
+
+    private IEnumerator callFunc(float seconds, Action func)
+    {
+        float timeToStop = pauseInvariantTime + seconds;
+        yield return new WaitUntil(() => timeToStop <= pauseInvariantTime);
+        func();
+    }
+
 
 
     protected virtual void _awake()

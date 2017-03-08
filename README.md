@@ -6,6 +6,8 @@ The main focus is recreating the intense, high speed, antigravity physics in the
 The latest demo can be found here https://youtu.be/dnxTFggXW90 with more to follow on my channel.
 
 ##TODO:
+* Make more tracks/props
+* Make death animation
 * Tweak AI (in progress)
 * Fog in the distance
 * signal when all boostPanels/Track are done initializing to start the game (put this in an abstract class)

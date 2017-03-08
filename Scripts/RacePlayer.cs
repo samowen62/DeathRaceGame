@@ -97,6 +97,8 @@ public class RacePlayer : PausableBehaviour
     private float totalRoll;
     private float roll_decel = 1.4f;
     private float attack_roll = 25f;
+    private bool dead = false;
+    private float timeAllowedDead = 2f;
 
     /* Related to player health */
     private Material shipMaterial;
@@ -148,10 +150,10 @@ public class RacePlayer : PausableBehaviour
     private float prev_v = 0f;
     private float max_delta_v = 0.001f;
 
-    //this values will be effected by pausing the game
-    private const string LAST_TIME_ON_GROUND = "lastTimeOnGround";
-    private const string LAST_TIME_ATTACKED = "lastTimeAttacked";
-    private const string TIME_START_RETURNING = "timeStartReturning";
+    private float lastTimeOnGround = 0f;
+    private float lastTimeAttacked = 0f;
+    private float timeStartReturning = 0f;
+    private float timeStartDeath = 0f;
 
     private Quaternion returningToTrackRotationBegin;
     private Vector3 returningToTrackPositionBegin;
@@ -169,9 +171,6 @@ public class RacePlayer : PausableBehaviour
         player_health = starting_health;
         player_inputs = new PlayerInputDTO();
         playersToAttack = new Dictionary<string, RacePlayer>();
-        pauseInvariantTimestamps.Add(LAST_TIME_ON_GROUND, 0f);
-        pauseInvariantTimestamps.Add(LAST_TIME_ATTACKED, 0f);
-        pauseInvariantTimestamps.Add(TIME_START_RETURNING, 0f);
 
         //TODO: sanity check to assert that the public parameters are within reasonable range (positive or negative)
         //TODO: abstract finding 1 object of type and 1 object of name in general util class with assertion
@@ -208,7 +207,22 @@ public class RacePlayer : PausableBehaviour
 
     protected override void _update()
     {
-        if (!isAI)
+        if (dead)
+        {
+            if (pauseInvariantTime - timeStartDeath >= timeAllowedDead)
+            {
+                dead = false;
+                player_health = starting_health;
+                shipRenderer.material.SetFloat("_Blend", 0);
+
+                return_to_track();
+            }
+            else
+            {
+                player_inputs.setToZero();
+            }
+        }
+        else if (!isAI)
         {
             player_inputs.setFromUser();
         }
@@ -218,10 +232,10 @@ public class RacePlayer : PausableBehaviour
         //Player is returning to the track. Block other behavior by returning
         if (status == PlayerStatus.RETURNINGTOTRACK)
         {
-            float deltaTime = (Time.fixedTime - pauseInvariantTimestamps[TIME_START_RETURNING]) * returningToTrackSpeed;
+            float deltaTime = (pauseInvariantTime - timeStartReturning) * returningToTrackSpeed;
             transform.position = Vector3.Lerp(returningToTrackPositionBegin, returningToTrackPositionEnd, deltaTime);
             transform.rotation = Quaternion.Lerp(returningToTrackRotationBegin, returningToTrackRotationEnd, deltaTime);
-            if((Time.fixedTime - pauseInvariantTimestamps[TIME_START_RETURNING]) >= timeSpentReturning)
+            if((pauseInvariantTime - timeStartReturning) >= timeSpentReturning)
             {
                 status = PlayerStatus.ONTRACK;
             }
@@ -291,8 +305,11 @@ public class RacePlayer : PausableBehaviour
 
             if (downHit.collider.gameObject.tag == "HealingArea")
             {
-                player_health += health_per_frame_healing;
-                player_health = Mathf.Min(starting_health, player_health);
+                
+                if(player_health < starting_health)
+                {
+                    player_health = Mathf.Min(starting_health, player_health + health_per_frame_healing);
+                }
 
                 if(player_health > health_warning_thresh)
                 {
@@ -366,22 +383,14 @@ public class RacePlayer : PausableBehaviour
                 //Debug.Log("Player left track");
                 if (!inFreefall)
                 {
-                    pauseInvariantTimestamps[LAST_TIME_ON_GROUND] = Time.fixedTime;
+                    lastTimeOnGround = pauseInvariantTime;
                 }
                 wall_bounce_velocity = 0;
             }
             /* called once to return player to the track*/
-            else if ((Time.fixedTime - pauseInvariantTimestamps[LAST_TIME_ON_GROUND]) > timeAllowedNotOnTrack && !inFreefall)
+            else if ((pauseInvariantTime - lastTimeOnGround) > timeAllowedNotOnTrack && !inFreefall)
             {
-                status = PlayerStatus.RETURNINGTOTRACK;
-                pauseInvariantTimestamps[TIME_START_RETURNING] = Time.fixedTime;
-                current_speed = 0f;
-                yaw = lastCheckPoint.yaw;
-
-                returningToTrackRotationBegin = transform.rotation;
-                returningToTrackPositionBegin = transform.position;
-                returningToTrackRotationEnd = Quaternion.LookRotation(lastCheckPoint.trackForward, lastCheckPoint.trackNormal);
-                returningToTrackPositionEnd = lastCheckPoint.trackPoint;
+                return_to_track();
             }
             /* Player moving in air */
             else
@@ -392,6 +401,19 @@ public class RacePlayer : PausableBehaviour
                     (transform.forward * (current_speed * air_speed_damping * Time.deltaTime));
             }
         }
+    }
+
+    private void return_to_track()
+    {
+        status = PlayerStatus.RETURNINGTOTRACK;
+        timeStartReturning = pauseInvariantTime;
+        current_speed = 0f;
+        yaw = lastCheckPoint.yaw;
+
+        returningToTrackRotationBegin = transform.rotation;
+        returningToTrackPositionBegin = transform.position;
+        returningToTrackRotationEnd = Quaternion.LookRotation(lastCheckPoint.trackForward, lastCheckPoint.trackNormal);
+        returningToTrackPositionEnd = lastCheckPoint.trackPoint;
     }
 
     private void setColorForHealth()
@@ -453,7 +475,10 @@ public class RacePlayer : PausableBehaviour
 
             //TODO: implement attacking
             case "Player":
-                playersToAttack.Add(coll.name, coll.gameObject.GetComponent<RacePlayer>());
+                if (!playersToAttack.ContainsKey(coll.name))
+                {
+                    playersToAttack.Add(coll.name, coll.gameObject.GetComponent<RacePlayer>());
+                }
                 bump(coll.gameObject.GetComponent<RacePlayer>(), false);
                 break;
 
@@ -486,11 +511,14 @@ public class RacePlayer : PausableBehaviour
                 inFreefall = false;
                 if (status == PlayerStatus.INAIR)
                 {
-                    pauseInvariantTimestamps[LAST_TIME_ON_GROUND] = Time.fixedTime;
+                    lastTimeOnGround = pauseInvariantTime;
                 }
                 break;
             case "Player":
-                playersToAttack.Remove(coll.name);
+                callAfterSeconds(0.4f, () => {
+                    if(playersToAttack.ContainsKey(coll.name))
+                        playersToAttack.Remove(coll.name);
+                });
                 break;
 
             //don't do anything for most tags
@@ -523,7 +551,7 @@ public class RacePlayer : PausableBehaviour
         float horizontal_input;
         float vertical_input;
         bool spaceBar = false;
-        if (isAI != true)
+        if (!isAI || dead)
         {
             horizontal_input = player_inputs.horizonalAxis;
             vertical_input = player_inputs.verticalAxis;
@@ -674,13 +702,14 @@ public class RacePlayer : PausableBehaviour
      */
     private void attack_player()
     {
-        if(Time.fixedTime - pauseInvariantTimestamps[LAST_TIME_ATTACKED] > attack_time_window)
+        if(pauseInvariantTime - lastTimeAttacked > attack_time_window)
         {
-            pauseInvariantTimestamps[LAST_TIME_ATTACKED] = Time.fixedTime;
+            lastTimeAttacked = pauseInvariantTime;
 
             var enumerator = playersToAttack.GetEnumerator();
             enumerator.MoveNext();
             RacePlayer opponent = playersToAttack[enumerator.Current.Key];
+            playersToAttack.Remove(enumerator.Current.Key);
 
             Debug.Log(name + " Attacked " + opponent);
 
@@ -733,10 +762,12 @@ public class RacePlayer : PausableBehaviour
         player_health = Math.Max(player_health, 0f);
         player_health = Math.Min(player_health, max_bonus_health);
 
-        //DEATH!!
+        //The Player has died
         if (player_health <= 0)
         {
-            Debug.Log(name + " DIED!");
+            Debug.Log(name + " died!");
+            dead = true;
+            timeStartDeath = pauseInvariantTime;
         }
     }
 }
