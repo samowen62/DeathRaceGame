@@ -10,7 +10,6 @@ public class StartingSequence : PausableBehaviour
     private const float fontSmall = 120f;
     private const float fontLarge = 240f;
 
-    private float timePaused;
     private Text screenText;
 
     public bool finished { get; set; }

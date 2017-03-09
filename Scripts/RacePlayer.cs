@@ -81,6 +81,7 @@ public class RacePlayer : PausableBehaviour
     public float pitch_decel = 10f;
 
     /* Related to player attacking */
+    public Explosion explosion;
     private Dictionary<string, RacePlayer> playersToAttack;
     private Vector3 attack_velocity = Vector3.zero;
     private Vector3 attacked_velocity = Vector3.zero;
@@ -98,7 +99,9 @@ public class RacePlayer : PausableBehaviour
     private float roll_decel = 1.4f;
     private float attack_roll = 25f;
     private bool dead = false;
-    private float timeAllowedDead = 2f;
+    private float timeCameraShake = 1.7f;
+    private float timeAllowedDead = 4f;
+    private float gyrationFactor = 0.2f;
 
     /* Related to player health */
     private Material shipMaterial;
@@ -155,6 +158,8 @@ public class RacePlayer : PausableBehaviour
     private float timeStartReturning = 0f;
     private float timeStartDeath = 0f;
 
+    private Vector3 playerToCamera = new Vector3(0, 10, -20);
+
     private Quaternion returningToTrackRotationBegin;
     private Vector3 returningToTrackPositionBegin;
     private Quaternion returningToTrackRotationEnd;
@@ -209,18 +214,24 @@ public class RacePlayer : PausableBehaviour
     {
         if (dead)
         {
-            if (pauseInvariantTime - timeStartDeath >= timeAllowedDead)
+            if(pauseInvariantTime - timeStartDeath < timeCameraShake && !isAI)
             {
+                shakeCamera();
+            }
+            if (pauseInvariantTime - timeStartDeath > timeAllowedDead && !isAI)
+            {
+                Debug.Log("returning" + (pauseInvariantTime - timeStartDeath));
                 dead = false;
+                shipRenderer.enabled = true;
+
                 player_health = starting_health;
                 shipRenderer.material.SetFloat("_Blend", 0);
 
+                //TODO:this needs to be fixed
+                Camera.main.transform.localPosition = playerToCamera;
                 return_to_track();
             }
-            else
-            {
-                player_inputs.setToZero();
-            }
+            return;
         }
         else if (!isAI)
         {
@@ -401,6 +412,14 @@ public class RacePlayer : PausableBehaviour
                     (transform.forward * (current_speed * air_speed_damping * Time.deltaTime));
             }
         }
+    }
+
+    private void shakeCamera()
+    {
+        float randNrX = UnityEngine.Random.Range(gyrationFactor, -gyrationFactor);
+        float randNrY = UnityEngine.Random.Range(gyrationFactor, -gyrationFactor);
+        float randNrZ = UnityEngine.Random.Range(gyrationFactor, -gyrationFactor);
+        Camera.main.transform.position += new Vector3(randNrX, randNrY, randNrZ);
     }
 
     private void return_to_track()
@@ -768,6 +787,11 @@ public class RacePlayer : PausableBehaviour
             Debug.Log(name + " died!");
             dead = true;
             timeStartDeath = pauseInvariantTime;
+            explosion.Trigger(transform.position, transform.rotation, timeCameraShake);
+            current_speed = 0;
+            shipRenderer.enabled = false;
         }
     }
+
+    
 }
