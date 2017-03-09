@@ -11,9 +11,8 @@ public class GameContext : MonoBehaviour {
     public Track track;
 
     public RacePlayer[] allPlayers;
-    private BannerScroll[] bannerPrefabs;
-    private BoostPanel[] boostPanelPrefabs;
     private GameObject[] pauseUIComponents;
+    private PausableBehaviour[] pausableComponents;
 
     //will only read button once every second
     private const float buttonPressTime = 0.25f;
@@ -26,33 +25,32 @@ public class GameContext : MonoBehaviour {
         pauseLastPressed = 0f;
 
         allPlayers = FindObjectsOfType<RacePlayer>();
-        bannerPrefabs = FindObjectsOfType<BannerScroll>();
-        boostPanelPrefabs = FindObjectsOfType<BoostPanel>();
         pauseUIComponents = GameObject.FindGameObjectsWithTag("PauseUI");
+        pausableComponents = FindObjectsOfType<PausableBehaviour>();
 
 
-        /**
-         * set allPlayers.behaviorBlocked/staringSequence.behaviorBlocked to true/false 
-         * in an actual game and false/true when testing to skip sequence
-         */
+        foreach (var component in pausableComponents)
+        {
+            component.behaviorBlocked = false;
+        }
 
         foreach (var component in pauseUIComponents)
         {
             component.SetActive(false);
         }
 
+
+        /**
+         * set allPlayers.behaviorBlocked/staringSequence.seq_finished to true/false 
+         * in an actual game and false/true when testing to skip sequence
+         */
         foreach (RacePlayer p in allPlayers)
         {
             p.behaviorBlocked = false;
         }
 
-        foreach (BoostPanel p in boostPanelPrefabs)
-        {
-            p.behaviorBlocked = false;
-        }
-
-        staringSequence.behaviorBlocked = true;
         staringSequence.finished = true;
+        staringSequence.seq_finished = true;
         paused = false;
     }
 	
@@ -126,25 +124,16 @@ public class GameContext : MonoBehaviour {
         pauseLastPressed = Time.fixedTime;
         paused = true;
 
+        foreach (var component in pausableComponents)
+        {
+            component.behaviorBlocked = true;
+        }
+
         foreach (var component in pauseUIComponents)
         {
             component.SetActive(true);
         }
 
-        foreach (RacePlayer p in allPlayers)
-        {
-            p.behaviorBlocked = true;
-        }
-
-        foreach (BoostPanel p in boostPanelPrefabs)
-        {
-            p.behaviorBlocked = true;
-        }
-
-
-        staringSequence.behaviorBlocked = true;
-
-        blockPrefabBehavior();
     }
 
     public void unpauseGame()
@@ -158,36 +147,18 @@ public class GameContext : MonoBehaviour {
             component.SetActive(false);
         }
 
-        foreach (BoostPanel p in boostPanelPrefabs)
+        foreach (var component in pausableComponents)
         {
-            p.behaviorBlocked = false;
+            component.behaviorBlocked = false;
         }
 
-            unblockPrefabBehavior();
-
-        staringSequence.behaviorBlocked = false;
-        if (staringSequence.finished)
+        if (!staringSequence.finished)
         {
             foreach (RacePlayer p in allPlayers)
             {
-                p.behaviorBlocked = false;
+                p.behaviorBlocked = true;
             }
         }
     }
 
-    private void blockPrefabBehavior()
-    {
-        foreach(var banner in bannerPrefabs)
-        {
-            banner.behaviorBlocked = true;
-        }
-    }
-
-    private void unblockPrefabBehavior()
-    {
-        foreach (var banner in bannerPrefabs)
-        {
-            banner.behaviorBlocked = false;
-        }
-    }
 }
