@@ -16,14 +16,12 @@ public class StartingSequence : PausableBehaviour
     public bool seq_finished { get; set; }
 
 
-    // Use this for initialization
     protected override void _awake () {
         screenText = GetComponent<Text>();
         finished = false;
         seq_finished = false;
     }
 
-    // Update is called once per frame
     protected override void _update () {
 
         if (seq_finished) return;
