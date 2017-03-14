@@ -7,9 +7,8 @@ The latest demo can be found here https://youtu.be/dnxTFggXW90 with more to foll
 
 ##TODO:
 * Make more tracks/props
-* Make death animation
 * Tweak AI (in progress)
 * Fog in the distance
 * signal when all boostPanels/Track are done initializing to start the game (put this in an abstract class)
 * Add more sound effects and music (in progress)
-* Add items
+* Minimap in bottom left/right based on racers and trackPoints

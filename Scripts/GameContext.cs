@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using System.Linq;
+using System.Collections.Generic;
 
 public class GameContext : MonoBehaviour {
 
@@ -10,12 +10,20 @@ public class GameContext : MonoBehaviour {
 
     public Track track;
 
-    public RacePlayer[] allPlayers;
+    private RacePlayer[] allPlayers;
+
+    public Dictionary<RacePlayer, PlacementDTO> racerPlacement;
+
+    public int laps;
+
     private GameObject[] pauseUIComponents;
     private PausableBehaviour[] pausableComponents;
 
     //will only read button once every second
     private const float buttonPressTime = 0.25f;
+
+    //how many track points at a time the player can skip
+    private const int skipTrackPoints = 10;
 
     private float pauseLastPressed;
     private bool paused;
@@ -28,6 +36,7 @@ public class GameContext : MonoBehaviour {
         pauseUIComponents = GameObject.FindGameObjectsWithTag("PauseUI");
         pausableComponents = FindObjectsOfType<PausableBehaviour>();
 
+        racerPlacement = new Dictionary<RacePlayer, PlacementDTO>();
 
         foreach (var component in pausableComponents)
         {
@@ -47,6 +56,7 @@ public class GameContext : MonoBehaviour {
         foreach (RacePlayer p in allPlayers)
         {
             p.behaviorBlocked = false;
+            racerPlacement.Add(p, new PlacementDTO(laps));
         }
 
         staringSequence.finished = true;
@@ -64,6 +74,7 @@ public class GameContext : MonoBehaviour {
             foreach (RacePlayer p in allPlayers)
             {
                 p.behaviorBlocked = false;
+                racerPlacement[p].lapStart[0] = staringSequence.time;
             }
         }
 	}
@@ -115,7 +126,59 @@ public class GameContext : MonoBehaviour {
                 i++;
             }
             
-        });     
+        });
+
+        foreach(var player in allPlayers)
+        {
+            int playerTrackPoint = racerPlacement[player].latestTrackPoint;
+
+            if(playerTrackPoint == -1) {
+                if (player.trackPointNumInSeq == track.totalTrackPoints)
+                {
+                    playerTrackPoint = racerPlacement[player].latestTrackPoint = player.trackPointNumInSeq;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            //if (player.name == "PlayerRacer")  Debug.Log(playerTrackPoint + " " + player.trackPointNumInSeq);
+            if (playerTrackPoint > player.trackPointNumInSeq)
+            {
+                if(player.trackPointNumInSeq > playerTrackPoint - skipTrackPoints)
+                {
+                    racerPlacement[player].latestTrackPoint--;
+                }
+            }
+            else if (playerTrackPoint < skipTrackPoints)
+            {
+                //player passes the finish line
+                if (playerTrackPoint == 1 && player.passedFinish)
+                {
+                    player.passedFinish = false;
+                    racerPlacement[player].lap++;
+                    int lap = racerPlacement[player].lap;
+
+                    //Be sure this doesn't happen after the race is over
+                    if (lap <= laps)
+                    {
+                        float time = staringSequence.time;
+
+                        racerPlacement[player].lapStart[lap - 1] = time;
+                        racerPlacement[player].lapTimes[lap - 2] = time - racerPlacement[player].lapStart[lap - 2];
+
+                        Debug.Log(player.name + " entered lap " + racerPlacement[player].lap + " total time: " + racerPlacement[player].lapTimes[lap - 2]);
+                        playerTrackPoint = track.totalTrackPoints;
+                    }
+                }
+                else
+                {
+                    //keep false until the finish line is passed in the few track points leading up to the finish
+                    player.passedFinish = false;
+                }
+            }
+        }
     }
 
     public void pauseGame()

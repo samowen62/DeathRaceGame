@@ -14,6 +14,8 @@ public class Track : MonoBehaviour {
 
     public float baseWidth;
 
+    public bool isTrackReversed = true;
+
     public Vector3 starting_point;
 
     private TrackPoint[] points;
@@ -25,6 +27,18 @@ public class Track : MonoBehaviour {
     private const string TRACK_DATA_FILE_NAME = "/TrackData.xml";
 
     public bool loaded { get; set; }
+
+    public int totalTrackPoints
+    {
+        get
+        {
+            return points.Length;
+        }
+        set
+        {
+
+        }
+    }
 
     // Use this for initialization
     void Awake () {
@@ -94,10 +108,6 @@ public class Track : MonoBehaviour {
         GameObject TrackPointParent = new GameObject();
         TrackPointParent.name = "TrackPointParent";
         TrackPointParent.transform.position = Vector3.zero;
-
-        //TODO: put in xml file a node if the tangent direction is opposite to 
-        //that of where the car should be pointed
-        bool isTrackReversed = true;
 
         foreach (XmlNode point in pointList)
         {

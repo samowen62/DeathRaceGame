@@ -56,6 +56,8 @@ public class RacePlayer : PausableBehaviour
     private float smooth_y;
     private float height_above_cast = 5f;
     private float current_speed;
+
+    //TODO: get more accurate reading of actual speed by measuring points
     public float speed
     {
         get
@@ -138,15 +140,8 @@ public class RacePlayer : PausableBehaviour
         }
     }
 
-    private int _lap = 0;
-    public int lap
-    {
-        get
-        {
-            return _lap;
-        }
-        set { }
-    }
+
+    public bool passedFinish = false;
 
     private float prev_h = 0f;
     private float max_delta_h = 0.2f;
@@ -487,12 +482,17 @@ public class RacePlayer : PausableBehaviour
                 coll.gameObject.GetComponent<BoostPanel>().boostAnimation();
                 break;
 
+            //when we cross the finish line
+            case "FinishLine":
+                passedFinish = true;
+                break;
+
             //when we hit a trackpoint trigger
             case "TrackPoint":
                 current_TrackPoint = coll.gameObject.GetComponent<TrackPoint>();
                 break;
 
-            //TODO: implement attacking
+            //attack or bump other player
             case "Player":
                 if (!playersToAttack.ContainsKey(coll.name))
                 {

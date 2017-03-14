@@ -15,6 +15,12 @@ public class StartingSequence : PausableBehaviour
     public bool finished { get; set; }
     public bool seq_finished { get; set; }
 
+    public float time {
+        get {
+            return pauseInvariantTime;
+        }
+        set { }
+    }
 
     protected override void _awake () {
         screenText = GetComponent<Text>();
