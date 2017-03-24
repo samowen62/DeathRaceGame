@@ -561,7 +561,14 @@ public class RacePlayer : PausableBehaviour
      */
     public float depthInTrackPoint()
     {
-        return current_TrackPoint.distanceTraversed(transform.position);
+        if (current_TrackPoint != null)
+        {
+            return current_TrackPoint.distanceTraversed(transform.position);
+        }
+        else
+        {
+            return 0f;
+        }
     }
 
     private void turnShip(bool inAir)

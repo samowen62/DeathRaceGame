@@ -10,12 +10,14 @@ public class TrackMenu : MonoBehaviour
 
     public AudioObject hoverSound;
 
+    public GameData gameData;
+
     //TODO: use array of buttons with enum class specifying string
     private Button track_1_button;
     private Button track_2_button;
     private Button backButton;
 
-    private const string TEST_1 = "Test 1";
+    private const string TEST_1 = "Curcuit 1";
     private const string TEST_2 = "Test 2";
     private const string BACK_BUTTON = "Back";
 
@@ -66,6 +68,7 @@ public class TrackMenu : MonoBehaviour
             loadingBlocked = true;
             Debug.Log("Started Test Track sequence");
 
+            DontDestroyOnLoad(gameData);
             SyncLoadLevel(AppConfig.TRACK_PAPER_ENGINE);
         }
     }

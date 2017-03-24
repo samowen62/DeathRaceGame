@@ -3,9 +3,14 @@ Code for various types of player manipulation with a third person camera.
 
 The main focus is recreating the intense, high speed, antigravity physics in the 2003 Gamecube game F Zero GX.
 
-The latest demo can be found here https://youtu.be/dnxTFggXW90 with more to follow on my channel.
+The latest demos can be found here 
+
+https://www.youtube.com/watch?v=Nj0e4g2M1Dw 
+https://www.youtube.com/watch?v=pzgS6ve_1mU
+with more to follow on my channel.
 
 ##TODO:
+* Use GameData object to pass Data in between scenes on a curcuit using DontDestroyOnLoad()
 * Make more tracks/props
 * Tweak AI (in progress)
 * Fog in the distance
