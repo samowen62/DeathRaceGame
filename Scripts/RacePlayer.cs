@@ -13,7 +13,20 @@ public class RacePlayer : PausableBehaviour
 
     /* AI indicator */
     public bool isAI = true;
-    public int placement { get; set; }
+    private int _placement;
+    public int placement
+    {
+        get
+        {
+            return _placement;
+        }
+        set{
+            if (!finished)
+            {
+                _placement = value;
+            }
+        }
+    }
 
     /* Related to air and returning mechanics */
     public float gravity = 1700f; 
@@ -101,6 +114,12 @@ public class RacePlayer : PausableBehaviour
     private float roll_decel = 1.4f;
     private float attack_roll = 25f;
     private bool dead = false;
+    public bool isDead {
+        get
+        {
+            return dead;
+        }
+    }
     private float timeCameraShake = 1.7f;
     private float timeAllowedDead = 4f;
     private float gyrationFactor = 0.2f;
@@ -142,6 +161,22 @@ public class RacePlayer : PausableBehaviour
 
 
     public bool passedFinish = false;
+    private bool finishedWithRace = false;
+    public bool finished
+    {
+        get
+        {
+            return finishedWithRace;
+        }
+    }
+    private bool isEffectiveAI {
+        get
+        {
+            return finishedWithRace || isAI;
+        }
+    }
+    private Vector3 finishedCameraPosition = new Vector3(-3.75f, 9.15f, 10.45f);
+    private Quaternion finishedCameraRotation = Quaternion.Euler(39.53f, 172.45f, 6.1f);
 
     private float prev_h = 0f;
     private float max_delta_h = 0.2f;
@@ -209,11 +244,11 @@ public class RacePlayer : PausableBehaviour
     {
         if (dead)
         {
-            if(pauseInvariantTime - timeStartDeath < timeCameraShake && !isAI)
+            if(pauseInvariantTime - timeStartDeath < timeCameraShake && !isEffectiveAI)
             {
                 shakeCamera();
             }
-            if (pauseInvariantTime - timeStartDeath > timeAllowedDead && !isAI)
+            if (pauseInvariantTime - timeStartDeath > timeAllowedDead && !isEffectiveAI)
             {
                 Debug.Log("returning" + (pauseInvariantTime - timeStartDeath));
                 dead = false;
@@ -228,7 +263,7 @@ public class RacePlayer : PausableBehaviour
             }
             return;
         }
-        else if (!isAI)
+        else if (!isEffectiveAI)
         {
             player_inputs.setFromUser();
         }
@@ -288,7 +323,7 @@ public class RacePlayer : PausableBehaviour
             }
         }
 
-        bool accelerating = isAI ? true : player_inputs.w_key;
+        bool accelerating = isEffectiveAI || player_inputs.w_key;
 
         if(status == PlayerStatus.INAIR)
         {
@@ -325,7 +360,10 @@ public class RacePlayer : PausableBehaviour
 
             if (accelerating)
             {
-                current_speed += (current_speed >= fwd_max_speed) ? ((current_speed == fwd_max_speed) ? 0 : -fwd_boost_decel) : fwd_accel * Time.deltaTime;
+                current_speed += (current_speed >= fwd_max_speed) ? 
+                    (
+                        ((current_speed == fwd_max_speed) && !finishedWithRace ) ? 0 : -fwd_boost_decel
+                    ) : fwd_accel * Time.deltaTime;
             }
             else if (current_speed > 0)
             {
@@ -577,7 +615,7 @@ public class RacePlayer : PausableBehaviour
         float horizontal_input;
         float vertical_input;
         bool spaceBar = false;
-        if (!isAI || dead)
+        if (!isEffectiveAI || dead)
         {
             horizontal_input = player_inputs.horizonalAxis;
             vertical_input = player_inputs.verticalAxis;
@@ -800,5 +838,16 @@ public class RacePlayer : PausableBehaviour
         }
     }
 
-    
+    /**
+     * called when the player finishes the race. To change it's behavior
+     */
+    public void finishRace()
+    {
+        if (finishedWithRace) return;
+
+        finishedWithRace = true;
+        fwd_max_speed *= 0.6f;
+        Camera.main.transform.localPosition = finishedCameraPosition;
+        Camera.main.transform.localRotation = finishedCameraRotation;
+    }
 }

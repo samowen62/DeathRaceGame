@@ -104,6 +104,7 @@ public class GameContext : MonoBehaviour {
         }
 
         //add laps to OrderBy
+        //TODO:redo this. Save players that have finished
         int i = 1;
         allPlayers
             .GroupBy(e => e.trackPointNumInSeq)
@@ -154,13 +155,12 @@ public class GameContext : MonoBehaviour {
             else if (playerTrackPoint < skipTrackPoints)
             {
                 //player passes the finish line
-                if (playerTrackPoint == 1 && player.passedFinish)
+                if (playerTrackPoint == 1 && player.passedFinish && !player.finished)
                 {
                     player.passedFinish = false;
                     racerPlacement[player].lap++;
                     int lap = racerPlacement[player].lap;
 
-                    //Be sure this doesn't happen after the race is over
                     if (lap <= laps)
                     {
                         float time = staringSequence.time;
@@ -170,6 +170,14 @@ public class GameContext : MonoBehaviour {
 
                         Debug.Log(player.name + " entered lap " + racerPlacement[player].lap + " total time: " + racerPlacement[player].lapTimes[lap - 2]);
                         playerTrackPoint = track.totalTrackPoints;
+                    }
+                    //player finishes the race!!
+                    else if (lap - 1 == laps) 
+                    {
+                        racerPlacement[player].lapTimes[laps - 1] = staringSequence.time - racerPlacement[player].lapStart[laps - 1];
+
+                        Debug.Log(player.name + " Finished!");
+                        player.finishRace();
                     }
                 }
                 else

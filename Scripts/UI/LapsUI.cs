@@ -35,13 +35,17 @@ public class LapsUI : PausableBehaviour {
 
         string text = "";
 
+        int laps = Mathf.Min(context.laps, placement.lap);
         for (int i = 0; i < placement.lap - 1; i++)
         {
             text += LAP + (placement.lap - 1 - i) + COLON +
                 string.Format(FORMAT, placement.lapTimes[placement.lap - 2 - i]) + NEW_LINE; 
         }
 
-        text += CURRENT_LAP + string.Format(FORMAT, pauseInvariantTime - placement.lapStart[placement.lap - 1]);
+        if (!player.finished && placement.lap <= placement.lapStart.Length)
+        {
+            text += CURRENT_LAP + string.Format(FORMAT, pauseInvariantTime - placement.lapStart[placement.lap - 1]);
+        }
         textComponent.text = text;
     }
 }
