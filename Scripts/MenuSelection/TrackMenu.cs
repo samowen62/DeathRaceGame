@@ -63,14 +63,8 @@ public class TrackMenu : MonoBehaviour
 
     private void load_test_1()
     {
-        if (!loadingBlocked)
-        {
-            loadingBlocked = true;
-            Debug.Log("Started Test Track sequence");
-
-            DontDestroyOnLoad(gameData);
-            SyncLoadLevel(AppConfig.TRACK_PAPER_ENGINE);
-        }
+        DontDestroyOnLoad(gameData);
+        gameData.loadSceneAfterSeconds("paperEngine", 0f);
     }
 
     private void load_test_2()

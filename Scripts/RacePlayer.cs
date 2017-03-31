@@ -527,7 +527,10 @@ public class RacePlayer : PausableBehaviour
 
             //when we hit a trackpoint trigger
             case "TrackPoint":
-                current_TrackPoint = coll.gameObject.GetComponent<TrackPoint>();
+                if (status != PlayerStatus.RETURNINGTOTRACK)
+                {
+                    current_TrackPoint = coll.gameObject.GetComponent<TrackPoint>();
+                }
                 break;
 
             //attack or bump other player

@@ -1,11 +1,21 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System;
+using System.Collections;
+using UnityEngine.SceneManagement;
 
-public class GameData : MonoBehaviour {
+public class GameData : PausableBehaviour
+{
 
-    private const int numTracks = 2;
+    /* params to be set by the user */
+    public int numTracks = 2;
+    public string[] sceneSequence;
 
-    private static string[] PlayerNames = new string[]
+
+    private int currentTrack = 0;
+    private int playersFinished = 0;
+
+    private static string[] PlayerNames =
     {
         "Player 1",
         "AI 1"
@@ -13,14 +23,77 @@ public class GameData : MonoBehaviour {
 
 
     //map of player names to Data objects
-    public Dictionary<string, DataDTO> playerData;
+    private Dictionary<string, DataDTO> playerData;
 
-	// Use this for initialization
-	void Awake () {
+    public object async;
+
+    // Use this for initialization
+    protected override void _awake () {
+        if (sceneSequence.Length == 0){
+            Debug.LogError("No valid scenes to turn to!");
+        }
+
         playerData = new Dictionary<string, DataDTO>();
-        foreach(string player in PlayerNames)
+        foreach (string player in PlayerNames)
         {
             playerData.Add(player, new DataDTO(numTracks));
         }
     }
+
+    /*
+     * validates that this playerName is in the static PlayerNames 
+     * array since only those are legal player names.
+     */
+    public bool validatePlayerName(string playerName)
+    {
+        return Array.IndexOf(PlayerNames, playerName) >= 0;
+    }
+
+    /*
+     * Signal a player as finished the race
+     */
+    public void addPlayerFinish(string playerName, int placement, float totalTime)
+    {
+        playerData[playerName].placements[currentTrack] = placement;
+        playerData[playerName].lapTimes[currentTrack] = totalTime;
+        playersFinished++;
+
+        //The game is over
+        if(playersFinished == PlayerNames.Length)
+        {
+            Debug.Log("Race finished!");
+            playersFinished = 0;
+            currentTrack++;
+        }
+    }
+
+    /*
+     * Debugging method to print contents
+     */
+    public void printContents()
+    {
+        Debug.Log("current Track:" + 0);
+        foreach (string player in PlayerNames)
+        {
+            Debug.Log(player + " " + playerData[player].placements);
+        }
+    }
+
+    public void loadSceneAfterSeconds(string sceneName, float seconds)
+    {
+        if(Array.IndexOf(sceneSequence, sceneName) < 0)
+        {
+            Debug.LogError(sceneName + " Not found!");
+        }
+        async = SceneManager.LoadSceneAsync(sceneName);
+        StartCoroutine(Load(seconds));
+    }
+
+    IEnumerator Load(float seconds)
+    {
+        float timeToStop = pauseInvariantTime + seconds;
+        yield return new WaitUntil(() => timeToStop <= pauseInvariantTime);
+        yield return async;
+    }
+
 }

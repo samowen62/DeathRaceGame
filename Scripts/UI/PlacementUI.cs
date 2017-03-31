@@ -16,7 +16,10 @@ public class PlacementUI : PausableBehaviour
 
     protected override void _update()
     {
-        textComponent.text = getPlacementString(player.placement);
+        if (!player.finished)
+        {
+            textComponent.text = getPlacementString(player.placement);
+        }
     }
 
     private string getPlacementString(int placement)

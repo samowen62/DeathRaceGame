@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 
+
 public class GameContext : MonoBehaviour {
 
     public StartingSequence staringSequence;
@@ -10,11 +11,16 @@ public class GameContext : MonoBehaviour {
 
     public Track track;
 
+    public GameData gameData;
+
     private RacePlayer[] allPlayers;
 
     public Dictionary<RacePlayer, PlacementDTO> racerPlacement;
 
     public int laps;
+
+    //Highest placement still attainable
+    private int finishPlacement = 1;
 
     private GameObject[] pauseUIComponents;
     private PausableBehaviour[] pausableComponents;
@@ -33,6 +39,22 @@ public class GameContext : MonoBehaviour {
         pauseLastPressed = 0f;
 
         allPlayers = FindObjectsOfType<RacePlayer>();
+        gameData = FindObjectOfType<GameData>();
+
+        if(gameData == null)
+        {
+            Debug.LogWarning("No GameData object found!!");
+        } else
+        {
+            foreach(var player in allPlayers)
+            {
+                if (!gameData.validatePlayerName(player.name))
+                {
+                    Debug.LogWarning(player.name + " not legal player name");
+                }
+            }
+        }
+
         pauseUIComponents = GameObject.FindGameObjectsWithTag("PauseUI");
         pausableComponents = FindObjectsOfType<PausableBehaviour>();
 
@@ -106,30 +128,18 @@ public class GameContext : MonoBehaviour {
         //add laps to OrderBy
         //TODO:redo this. Save players that have finished
         int i = 1;
-        allPlayers
-            .GroupBy(e => e.trackPointNumInSeq)
-            .OrderBy(e => e.First().trackPointNumInSeq)
-            .ToList().ForEach(racers =>
-        {
-            if(racers.Count() > 1)
-            {
-                racers
-                    .OrderBy(e => e.depthInTrackPoint())
-                    .ToList()
-                    .ForEach(racer =>
-                        {
-                            racer.placement = i;
-                            i++;
-                        });
-            }else
-            {
-                racers.First().placement = i;
-                i++;
-            }
-            
-        });
 
-        foreach(var player in allPlayers)
+        var placement = racerPlacement
+            .OrderByDescending(e => e.Value.lap)
+            .ThenBy(e => e.Key.trackPointNumInSeq);
+
+        foreach(var racer in placement)
+        {
+            racer.Key.placement = i;
+            i++;
+        }
+
+        foreach (var player in allPlayers)
         {
             int playerTrackPoint = racerPlacement[player].latestTrackPoint;
 
@@ -144,7 +154,6 @@ public class GameContext : MonoBehaviour {
                 }
             }
 
-            //if (player.name == "PlayerRacer")  Debug.Log(playerTrackPoint + " " + player.trackPointNumInSeq);
             if (playerTrackPoint > player.trackPointNumInSeq)
             {
                 if(player.trackPointNumInSeq > playerTrackPoint - skipTrackPoints)
@@ -178,6 +187,26 @@ public class GameContext : MonoBehaviour {
 
                         Debug.Log(player.name + " Finished!");
                         player.finishRace();
+
+                        //TODO:null check if debugging on gameData
+                        gameData.addPlayerFinish(player.name, finishPlacement, 0f);//TODO:change 0f to sum of laps
+                        finishPlacement++;
+
+                        //this is the main player. Make other racers finish
+                        if (!player.isAI)
+                        {
+                            var playersOrdered = allPlayers.OrderBy(e => e.placement);
+
+                            foreach(var p in playersOrdered)
+                            {
+                                //TODO: create then call a delayed function to finish players
+                                gameData.addPlayerFinish(p.name, finishPlacement, 0f);
+                                finishPlacement++;
+                            }
+
+                            gameData.printContents();
+                            //TODO: goto next track
+                        }
                     }
                 }
                 else
