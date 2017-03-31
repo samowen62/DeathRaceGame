@@ -204,6 +204,7 @@ public class GameContext : MonoBehaviour {
                                 finishPlacement++;
                             }
 
+                            //TODO:fix this
                             gameData.printContents();
                             //TODO: goto next track
                         }

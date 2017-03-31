@@ -2,6 +2,7 @@
 {
     public int[] placements;
 
+    //TODO:use lapTimes for multiple laps
     public float[] lapTimes;
 
     public DataDTO(int tracks)

@@ -61,9 +61,7 @@ public class GameData : PausableBehaviour
         //The game is over
         if(playersFinished == PlayerNames.Length)
         {
-            Debug.Log("Race finished!");
-            playersFinished = 0;
-            currentTrack++;
+            loadNextTrack();
         }
     }
 
@@ -79,20 +77,29 @@ public class GameData : PausableBehaviour
         }
     }
 
+    private void loadNextTrack()
+    {
+        Debug.Log("Race finished!");
+        playersFinished = 0;
+        currentTrack++;
+        loadSceneAfterSeconds(sceneSequence[currentTrack], 3f);
+    }
+
     public void loadSceneAfterSeconds(string sceneName, float seconds)
     {
         if(Array.IndexOf(sceneSequence, sceneName) < 0)
         {
             Debug.LogError(sceneName + " Not found!");
         }
-        async = SceneManager.LoadSceneAsync(sceneName);
-        StartCoroutine(Load(seconds));
+        callAfterSeconds(seconds, () =>
+        {
+            async = SceneManager.LoadSceneAsync(sceneName);
+            StartCoroutine(Load(seconds));
+        });
     }
 
     IEnumerator Load(float seconds)
     {
-        float timeToStop = pauseInvariantTime + seconds;
-        yield return new WaitUntil(() => timeToStop <= pauseInvariantTime);
         yield return async;
     }
 
