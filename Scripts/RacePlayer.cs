@@ -492,7 +492,6 @@ public class RacePlayer : PausableBehaviour
 
                 if (Physics.Raycast(transform.position, -transform.right, out wallHit, rayCastDistance, AppConfig.wallMask))
                 {
-                    Debug.Log(wallHit.transform.gameObject.name + " 1");
                     damage(attack_bump_damage);
                     bumpSound.Play();
 
@@ -501,8 +500,6 @@ public class RacePlayer : PausableBehaviour
                 }
                 else if (Physics.Raycast(transform.position, transform.right, out wallHit, rayCastDistance, AppConfig.wallMask))
                 {
-                    Debug.Log(wallHit.transform.gameObject.name + " 2");
-
                     damage(attack_bump_damage);
                     bumpSound.Play();
 

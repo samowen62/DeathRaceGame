@@ -195,7 +195,7 @@ public class GameContext : MonoBehaviour {
                         //this is the main player. Make other racers finish
                         if (!player.isAI)
                         {
-                            var playersOrdered = allPlayers.OrderBy(e => e.placement);
+                            var playersOrdered = allPlayers.Where(e => !e.finished).OrderBy(e => e.placement);
 
                             foreach(var p in playersOrdered)
                             {
@@ -204,9 +204,7 @@ public class GameContext : MonoBehaviour {
                                 finishPlacement++;
                             }
 
-                            //TODO:fix this
                             gameData.printContents();
-                            //TODO: goto next track
                         }
                     }
                 }

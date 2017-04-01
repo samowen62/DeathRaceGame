@@ -73,7 +73,12 @@ public class GameData : PausableBehaviour
         Debug.Log("current Track:" + 0);
         foreach (string player in PlayerNames)
         {
-            Debug.Log(player + " " + playerData[player].placements);
+            string plac = "";
+            foreach(int p in playerData[player].placements)
+            {
+                plac += p + ", ";
+            }
+            Debug.Log(player + ": " + plac);
         }
     }
 
