@@ -21,7 +21,8 @@ public class PathDebug : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-        Debug.DrawLine(target.transform.position, previousSpot, Color.red, 60);
+        Debug.DrawLine(target.transform.position, previousSpot, Color.red, 60f);
+
         previousSpot = target.transform.position;
     }
 

@@ -62,13 +62,15 @@ public class RacePlayer : PausableBehaviour
     public float height_smooth = 7f;                               //How fast the ship will readjust to "hover_height"
     public float pitch_smooth = 5f;                                //How fast the ship will adjust its rotation to match track normal
     public float height_correction = 2.2f;
-    public float rayCastDistance = 40f;
+    private float rayCastDistance = 10f;
+    private float freeFallRayCastDistance = 50f;//50 is good!
     private Vector3 disired_position;
     private Vector3 prev_up;
     private float yaw;
     private float smooth_y;
     private float height_above_cast = 5f;
     private float current_speed;
+    private float downward_speed = 0f;
 
     //TODO: get more accurate reading of actual speed by measuring points
     public float speed
@@ -240,6 +242,7 @@ public class RacePlayer : PausableBehaviour
         }
     }
 
+    //TODO: refactor this into a few private functions
     protected override void _update()
     {
         if (dead)
@@ -325,17 +328,11 @@ public class RacePlayer : PausableBehaviour
 
         bool accelerating = isEffectiveAI || player_inputs.w_key;
 
-        if(status == PlayerStatus.INAIR)
-        {
-            prev_up = -previousGravity;
-        }
-        else
-        {
-            prev_up = transform.up;
-        }
+        prev_up = transform.up;
 
         /* Adjust the position and rotation of the ship to the track */
-        if (Physics.Raycast(transform.position + height_above_cast * prev_up, -prev_up, out downHit, rayCastDistance, AppConfig.groundMask))
+        if (Physics.Raycast(transform.position + height_above_cast * prev_up, -prev_up, out downHit, 
+            inFreefall ? freeFallRayCastDistance : rayCastDistance, AppConfig.groundMask))
         {
             if(status == PlayerStatus.INAIR)
             {
@@ -343,6 +340,7 @@ public class RacePlayer : PausableBehaviour
             }
 
             status = PlayerStatus.ONTRACK;
+            downward_speed = 0f;
 
             if (downHit.collider.gameObject.tag == "HealingArea")
             {
@@ -440,9 +438,10 @@ public class RacePlayer : PausableBehaviour
             else
             {
                 turnShip(true);
-
-                transform.position += (gravity * Time.deltaTime * Time.deltaTime) * previousGravity + 
+                transform.position += (gravity * Time.deltaTime * Time.deltaTime + downward_speed) * previousGravity +
                     (transform.forward * (current_speed * air_speed_damping * Time.deltaTime));
+                downward_speed += 0.03f;
+                downward_speed = Mathf.Min(10f, downward_speed);
             }
         }
     }
@@ -493,6 +492,7 @@ public class RacePlayer : PausableBehaviour
 
                 if (Physics.Raycast(transform.position, -transform.right, out wallHit, rayCastDistance, AppConfig.wallMask))
                 {
+                    Debug.Log(wallHit.transform.gameObject.name + " 1");
                     damage(attack_bump_damage);
                     bumpSound.Play();
 
@@ -501,6 +501,8 @@ public class RacePlayer : PausableBehaviour
                 }
                 else if (Physics.Raycast(transform.position, transform.right, out wallHit, rayCastDistance, AppConfig.wallMask))
                 {
+                    Debug.Log(wallHit.transform.gameObject.name + " 2");
+
                     damage(attack_bump_damage);
                     bumpSound.Play();
 
@@ -654,7 +656,7 @@ public class RacePlayer : PausableBehaviour
                 turn_angle *= hard_turn_multiplier;
             }
 
-            if(totalRoll != 0)
+            if (totalRoll != 0)
             {
                 shipRenderer.transform.localRotation = Quaternion.AngleAxis(totalRoll, shipRenderer.transform.up) * base_ship_rotation;
             }
@@ -683,6 +685,7 @@ public class RacePlayer : PausableBehaviour
         }
         else
         {
+            
             transform.rotation = Quaternion.Euler(0f, yaw, 0f);
         }
     }
