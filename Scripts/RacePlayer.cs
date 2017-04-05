@@ -45,7 +45,7 @@ public class RacePlayer : PausableBehaviour
     public float brake_speed = 200f;
     public float turn_speed = 80f;
     public float hard_turn_multiplier = 2.2f;
-    public float air_turn_speed = 15f;
+    private float air_turn_speed = 10f;
 
     /* Related to for bouncing against the wall */
     public float wall_bounce_deccel = 10f;//must be > 1!!
@@ -66,6 +66,8 @@ public class RacePlayer : PausableBehaviour
     private float freeFallRayCastDistance = 50f;//50 is good!
     private Vector3 disired_position;
     private Vector3 prev_up;
+    private Quaternion global_orientation;
+    private Quaternion tilt;
     private float yaw;
     private float smooth_y;
     private float height_above_cast = 5f;
@@ -226,6 +228,7 @@ public class RacePlayer : PausableBehaviour
         shipMaterial = shipRenderer.material;
         redMaterial = new Material(Shader.Find("Transparent/Diffuse"));
         redMaterial.color = new Color32(1, 0, 0, 1);
+        tilt = Quaternion.identity;
 
         lastCheckPoint = track[0].startingCheckPoint;
 
@@ -234,6 +237,7 @@ public class RacePlayer : PausableBehaviour
         { 
             transform.position = downHit.point + hover_height * transform.up;
             transform.rotation = Quaternion.FromToRotation(transform.up, downHit.normal) * transform.rotation;
+            global_orientation = transform.rotation;
             yaw = transform.rotation.eulerAngles.y;
             previousGravity = -downHit.normal;
         } else
@@ -331,6 +335,8 @@ public class RacePlayer : PausableBehaviour
         prev_up = transform.up;
 
         /* Adjust the position and rotation of the ship to the track */
+        //Debug.DrawRay(transform.position + height_above_cast * prev_up, -prev_up, Color.red, 120);
+
         if (Physics.Raycast(transform.position + height_above_cast * prev_up, -prev_up, out downHit, 
             inFreefall ? freeFallRayCastDistance : rayCastDistance, AppConfig.groundMask))
         {
@@ -373,12 +379,13 @@ public class RacePlayer : PausableBehaviour
                 current_speed = 0f;
             }
 
-            turnShip(false);
-            previousGravity = -downHit.normal;
+            turnShip(false);         
 
             Vector3 desired_up = Vector3.Lerp(prev_up, downHit.normal, Time.deltaTime * pitch_smooth);
-            Quaternion tilt = Quaternion.FromToRotation(transform.up, desired_up);
-            transform.rotation = tilt * transform.rotation;
+            tilt.SetLookRotation(transform.forward - Vector3.Project(transform.forward, desired_up), desired_up);
+            transform.rotation =  tilt * global_orientation;
+
+            previousGravity = -downHit.normal;
 
             //if there is a pitch slowly change it back to normal
             if (totalPitch != 0f)
@@ -408,7 +415,7 @@ public class RacePlayer : PausableBehaviour
 
             //Smoothly adjust our height
             float distance = downHit.distance - height_above_cast;
-            smooth_y = Mathf.Lerp(smooth_y, hover_height - distance, Time.deltaTime * height_smooth);           
+            smooth_y = Mathf.Lerp(smooth_y, hover_height - distance, Time.deltaTime * height_smooth);
             smooth_y = Mathf.Max(distance / -3, smooth_y); //sanity check on smooth_y
 
             transform.localPosition += prev_up * smooth_y;
@@ -422,7 +429,6 @@ public class RacePlayer : PausableBehaviour
             if (status == PlayerStatus.ONTRACK)
             {
                 status = PlayerStatus.INAIR;
-                //Debug.Log("Player left track");
                 if (!inFreefall)
                 {
                     lastTimeOnGround = pauseInvariantTime;
@@ -438,6 +444,12 @@ public class RacePlayer : PausableBehaviour
             else
             {
                 turnShip(true);
+
+                transform.rotation = tilt * global_orientation ;
+                if (totalPitch != 0f)
+                {
+                    transform.localRotation *= Quaternion.AngleAxis(totalPitch, transform.forward);
+                }
                 transform.position += (gravity * Time.deltaTime * Time.deltaTime + downward_speed) * previousGravity +
                     (transform.forward * (current_speed * air_speed_damping * Time.deltaTime));
                 downward_speed += 0.03f;
@@ -541,6 +553,22 @@ public class RacePlayer : PausableBehaviour
                 bump(coll.gameObject.GetComponent<RacePlayer>(), false);
                 break;
 
+            //Make sure falling player doesn't fall through ground
+            case "Ground":
+                if(status == PlayerStatus.INAIR || inFreefall)
+                {
+                    Debug.DrawLine(transform.position - 5 * transform.forward, transform.position + 15 * transform.forward, Color.red);
+                    if (Physics.Raycast(transform.position -5 * transform.forward, transform.forward, out downHit, 15, AppConfig.groundMask))
+                    {
+                        Debug.Log("hit ground " + downHit.distance);
+                        //TODO:fix this!!
+                        Debug.Log(transform.position -( downHit.normal * hover_height));
+                        //transform.position = downHit.normal * hover_height;
+                        //totalPitch = 0;
+                    }
+                }
+                break;
+
             //Log warning for unhandled tag
             default:
                 Debug.LogWarning("No behavior for OnTriggerEnter with tag: " + coll.gameObject.tag);
@@ -642,7 +670,7 @@ public class RacePlayer : PausableBehaviour
         float turn_angle = 0f;
         if (inAir)
         {
-            turn_angle = air_turn_speed * Time.deltaTime * horizontal_input;
+            turn_angle = air_turn_speed * horizontal_input;
         }
         else
         {
@@ -666,25 +694,19 @@ public class RacePlayer : PausableBehaviour
         yaw += turn_angle;
 
         //calculate vertical axis for nose diving
-        if (vertical_input > 0)
+        if (status == PlayerStatus.INAIR)
         {
-            totalPitch = Mathf.Min(totalPitch + pitch_per_vert, max_pitch);
-        }
-        else if (vertical_input < 0)
-        {
-            totalPitch = Mathf.Max(totalPitch - pitch_per_vert, min_pitch);
+            if (vertical_input > 0)
+            {
+                totalPitch = Mathf.Min(totalPitch + pitch_per_vert, max_pitch);
+            }
+            else if (vertical_input < 0)
+            {
+                totalPitch = Mathf.Max(totalPitch - pitch_per_vert, min_pitch);
+            }
         }
 
-        if (totalPitch != 0)
-        {
-            transform.localRotation = Quaternion.Euler(0f, yaw, 0f);
-            transform.localRotation *= Quaternion.AngleAxis(totalPitch, transform.forward);
-        }
-        else
-        {
-            
-            transform.rotation = Quaternion.Euler(0f, yaw, 0f);
-        }
+        global_orientation = Quaternion.Euler(0, turn_angle, 0);
     }
 
     private void setInputsFromAI(out float horizontal_input, out float vertical_input, out bool spaceBar)

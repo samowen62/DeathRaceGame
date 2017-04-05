@@ -173,7 +173,7 @@ public class Track : MonoBehaviour {
         for (int i = 0; i < len; i++)
         {
             Vector3 tangent = (points[(i + 1) % len].transform.position - points[(i - 1 + len) % len].transform.position);
-            points[i].GetComponent<SphereCollider>().radius = tangent.magnitude / 2;
+            points[i].GetComponent<SphereCollider>().radius = baseWidth / 2;// tangent.magnitude / 2;//TODO:This needs to extend the width of the track as well
             points[i].tangent = _isTrackReversed ? -tangent.normalized : tangent.normalized;
             points[i].next = points[(i + 1) % len];
         }
