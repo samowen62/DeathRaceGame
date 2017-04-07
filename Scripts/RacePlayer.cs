@@ -555,16 +555,19 @@ public class RacePlayer : PausableBehaviour
 
             //Make sure falling player doesn't fall through ground
             case "Ground":
+                //Debug.Log(Time.fixedTime + "ggg" + (status == PlayerStatus.INAIR || inFreefall) + " ggg");
+            
                 if(status == PlayerStatus.INAIR || inFreefall)
                 {
-                    Debug.DrawLine(transform.position - 5 * transform.forward, transform.position + 15 * transform.forward, Color.red);
+                    Debug.DrawLine(transform.position - 5 * transform.forward, transform.position + 15 * transform.forward, Color.red, 30f, true);
                     if (Physics.Raycast(transform.position -5 * transform.forward, transform.forward, out downHit, 15, AppConfig.groundMask))
                     {
-                        Debug.Log("hit ground " + downHit.distance);
-                        //TODO:fix this!!
-                        Debug.Log(transform.position -( downHit.normal * hover_height));
-                        //transform.position = downHit.normal * hover_height;
-                        //totalPitch = 0;
+                        //TODO:test more, but pretty good!
+                        float rho = Vector3.Dot(transform.forward, downHit.normal);
+                        status = PlayerStatus.ONTRACK;
+                        transform.position = downHit.point + downHit.normal * hover_height;
+                        current_speed *= 1f / (1 + 3 * rho * rho);
+                        downward_speed = 0f;
                     }
                 }
                 break;
