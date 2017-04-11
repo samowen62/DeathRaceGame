@@ -554,12 +554,9 @@ public class RacePlayer : PausableBehaviour
                 break;
 
             //Make sure falling player doesn't fall through ground
-            case "Ground":
-                //Debug.Log(Time.fixedTime + "ggg" + (status == PlayerStatus.INAIR || inFreefall) + " ggg");
-            
+            case "Ground":            
                 if(status == PlayerStatus.INAIR || inFreefall)
                 {
-                    Debug.DrawLine(transform.position - 5 * transform.forward, transform.position + 15 * transform.forward, Color.red, 30f, true);
                     if (Physics.Raycast(transform.position -5 * transform.forward, transform.forward, out downHit, 15, AppConfig.groundMask))
                     {
                         //TODO:test more, but pretty good!

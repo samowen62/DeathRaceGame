@@ -1,5 +1,4 @@
 ﻿using UnityEngine.UI;
-using System.Collections;
 using UnityEngine;
 
 public class CenterTextUI : PausableBehaviour

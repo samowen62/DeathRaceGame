@@ -15,7 +15,7 @@ public class GameData : PausableBehaviour
     private int currentTrack = 0;
     private int playersFinished = 0;
 
-    private static string[] PlayerNames =
+    public string[] PlayerNames =
     {
         "Player 1",
         "AI 1"
@@ -49,6 +49,26 @@ public class GameData : PausableBehaviour
         return Array.IndexOf(PlayerNames, playerName) >= 0;
     }
 
+    public string getPlacement(string playerName)
+    {
+        if(validatePlayerName(playerName))
+        {
+            return playerData[playerName].placements[currentTrack] + "";
+        }
+
+        return null;
+    }
+
+    public string getTotalTime(string playerName)
+    {
+        if (validatePlayerName(playerName))
+        {
+            return playerData[playerName].lapTimes[currentTrack] + "";
+        }
+
+        return null;
+    }
+
     /*
      * Signal a player as finished the race
      */
@@ -61,7 +81,8 @@ public class GameData : PausableBehaviour
         //The game is over
         if(playersFinished == PlayerNames.Length)
         {
-            loadNextTrack();
+            //loadNextTrack();
+            Debug.Log("GAMWE IS OVER");
         }
     }
 
@@ -82,7 +103,7 @@ public class GameData : PausableBehaviour
         }
     }
 
-    private void loadNextTrack()
+    public void loadNextTrack()
     {
         Debug.Log("Race finished!");
         playersFinished = 0;

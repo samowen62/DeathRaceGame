@@ -17,6 +17,11 @@ public class GameContext : MonoBehaviour {
 
     public Dictionary<RacePlayer, PlacementDTO> racerPlacement;
 
+    //TODO:Resources.Load doesn't work so I'm doing this instead in the meantime
+    public PlacementFinishUI initialPlacementFinishUI;
+
+    public Canvas canvas;
+
     public int laps;
 
     //Highest placement still attainable
@@ -33,6 +38,7 @@ public class GameContext : MonoBehaviour {
 
     private float pauseLastPressed;
     private bool paused;
+    public bool debugging = false;
 
     void Awake () {
 
@@ -84,6 +90,7 @@ public class GameContext : MonoBehaviour {
         staringSequence.finished = true;
         staringSequence.seq_finished = true;
         paused = false;
+
     }
 	
 	void Update () {
@@ -158,7 +165,7 @@ public class GameContext : MonoBehaviour {
             {
                 if(player.trackPointNumInSeq > playerTrackPoint - skipTrackPoints)
                 {
-                    racerPlacement[player].latestTrackPoint--;
+                    racerPlacement[player].latestTrackPoint = player.trackPointNumInSeq;
                 }
             }
             else if (playerTrackPoint < skipTrackPoints)
@@ -166,47 +173,7 @@ public class GameContext : MonoBehaviour {
                 //player passes the finish line
                 if (playerTrackPoint == 1 && player.passedFinish && !player.finished)
                 {
-                    player.passedFinish = false;
-                    racerPlacement[player].lap++;
-                    int lap = racerPlacement[player].lap;
-
-                    if (lap <= laps)
-                    {
-                        float time = staringSequence.time;
-
-                        racerPlacement[player].lapStart[lap - 1] = time;
-                        racerPlacement[player].lapTimes[lap - 2] = time - racerPlacement[player].lapStart[lap - 2];
-
-                        Debug.Log(player.name + " entered lap " + racerPlacement[player].lap + " total time: " + racerPlacement[player].lapTimes[lap - 2]);
-                        playerTrackPoint = track.totalTrackPoints;
-                    }
-                    //player finishes the race!!
-                    else if (lap - 1 == laps) 
-                    {
-                        racerPlacement[player].lapTimes[laps - 1] = staringSequence.time - racerPlacement[player].lapStart[laps - 1];
-
-                        Debug.Log(player.name + " Finished!");
-                        player.finishRace();
-
-                        //TODO:null check if debugging on gameData
-                        gameData.addPlayerFinish(player.name, finishPlacement, 0f);//TODO:change 0f to sum of laps
-                        finishPlacement++;
-
-                        //this is the main player. Make other racers finish
-                        if (!player.isAI)
-                        {
-                            var playersOrdered = allPlayers.Where(e => !e.finished).OrderBy(e => e.placement);
-
-                            foreach(var p in playersOrdered)
-                            {
-                                //TODO: create then call a delayed function to finish players
-                                gameData.addPlayerFinish(p.name, finishPlacement, 0f);
-                                finishPlacement++;
-                            }
-
-                            gameData.printContents();
-                        }
-                    }
+                    finishPlayer(playerTrackPoint);
                 }
                 else
                 {
@@ -258,6 +225,77 @@ public class GameContext : MonoBehaviour {
                 p.behaviorBlocked = true;
             }
         }
+    }
+
+    private void finishPlayer(int playerTrackPoint)
+    {
+        player.passedFinish = false;
+        racerPlacement[player].lap++;
+        int lap = racerPlacement[player].lap;
+
+        if (lap <= laps)
+        {
+            float time = staringSequence.time;
+
+            racerPlacement[player].lapStart[lap - 1] = time;
+            racerPlacement[player].lapTimes[lap - 2] = time - racerPlacement[player].lapStart[lap - 2];
+
+            Debug.Log(player.name + " entered lap " + racerPlacement[player].lap + " total time: " + racerPlacement[player].lapTimes[lap - 2]);
+            playerTrackPoint = track.totalTrackPoints;
+        }
+        //player finishes the race!!
+        else if (lap - 1 == laps)
+        {
+            racerPlacement[player].lapTimes[laps - 1] = staringSequence.time - racerPlacement[player].lapStart[laps - 1];
+
+            Debug.Log(player.name + " Finished!");
+            player.finishRace();
+
+            //TODO:null check if debugging on gameData
+            if (!debugging)
+            {
+                gameData.addPlayerFinish(player.name, finishPlacement, 0f);//TODO:change 0f to sum of laps
+                finishPlacement++;
+
+                //this is the main player. Make other racers finish
+                if (!player.isAI)
+                {
+                    var playersOrdered = allPlayers.Where(e => !e.finished).OrderBy(e => e.placement);
+                    PlacementFinishUI[] playerUIFinish = new PlacementFinishUI[allPlayers.Length];
+
+                    foreach (var p in playersOrdered)
+                    {
+                        //TODO: create then call a delayed function to finish players
+                        gameData.addPlayerFinish(p.name, finishPlacement, 0f);
+                        finishPlacement++;
+                    }
+
+                    var allPlayersOrdered = allPlayers.OrderBy(e => gameData.getPlacement(e.name)).ToArray();
+                    for (int i = 0; i < allPlayers.Length; i++)
+                    {
+                        //TODO:make these correct
+                        string playerName = allPlayersOrdered[i].name;
+                        PlacementFinishUI newFinishUI = createPlacementFinishUI(playerName,
+                            gameData.getTotalTime(playerName), gameData.getPlacement(playerName),
+                            i * -50);
+                        newFinishUI.startAnimation();
+                    }
+
+                    //TODO:put next/exit buttons on gameData so we can switch tracks with them
+                    gameData.printContents();
+                }
+            }
+        }
+    }
+
+    private PlacementFinishUI createPlacementFinishUI(string _playerTxt, string _lapTimeTxt,
+        string _placementNumberTxt, float _downwardDistance)
+    {
+        //TODO:add this new prefab to the pausable prefab list
+        PlacementFinishUI placFinishUI = Instantiate(initialPlacementFinishUI, canvas.transform.position + new Vector3(40, -50, 0), Quaternion.identity) as PlacementFinishUI;
+        placFinishUI.transform.parent = canvas.transform;
+        placFinishUI.setPrams(_playerTxt, _lapTimeTxt, _placementNumberTxt, _downwardDistance);
+        return placFinishUI;
     }
 
 }

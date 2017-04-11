@@ -11,7 +11,6 @@ public class PlacementUI : PausableBehaviour
     protected override void _awake()
     {
         textComponent = GetComponent<Text>();
-        //transform.position = new Vector3(Screen.width, 30f, Camera.main.nearClipPlane);
     }
 
     protected override void _update()
