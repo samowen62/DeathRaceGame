@@ -1,32 +1,28 @@
 ﻿using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
-
+using System;
 
 public class GameContext : MonoBehaviour {
 
     public StartingSequence staringSequence;
-
     public RacePlayer player;
-
     public Track track;
-
     public GameData gameData;
-
-    private RacePlayer[] allPlayers;
-
     public Dictionary<RacePlayer, PlacementDTO> racerPlacement;
 
     //TODO:Resources.Load doesn't work so I'm doing this instead in the meantime
     public PlacementFinishUI initialPlacementFinishUI;
-
     public Canvas canvas;
+    public ProceedUI proceedUI;
 
     public int laps;
+    public bool skipStart = false;
 
     //Highest placement still attainable
     private int finishPlacement = 1;
 
+    private RacePlayer[] allPlayers;
     private GameObject[] pauseUIComponents;
     private PausableBehaviour[] pausableComponents;
 
@@ -52,7 +48,8 @@ public class GameContext : MonoBehaviour {
             Debug.LogWarning("No GameData object found!!");
         } else
         {
-            foreach(var player in allPlayers)
+            proceedUI.gameData = gameData;
+            foreach (var player in allPlayers)
             {
                 if (!gameData.validatePlayerName(player.name))
                 {
@@ -76,19 +73,14 @@ public class GameContext : MonoBehaviour {
             component.SetActive(false);
         }
 
-
-        /**
-         * set allPlayers.behaviorBlocked/staringSequence.seq_finished to true/false 
-         * in an actual game and false/true when testing to skip sequence
-         */
         foreach (RacePlayer p in allPlayers)
         {
-            p.behaviorBlocked = false;
+            p.behaviorBlocked = !skipStart;
             racerPlacement.Add(p, new PlacementDTO(laps));
         }
 
-        staringSequence.finished = true;
-        staringSequence.seq_finished = true;
+        staringSequence.finished = skipStart;
+        staringSequence.seq_finished = skipStart;
         paused = false;
 
     }
@@ -98,6 +90,7 @@ public class GameContext : MonoBehaviour {
 
         findPlacement();
 
+        //Start the race!
         if (staringSequence.finished && player.behaviorBlocked && !paused)//Only change if player blocked (only should call once)
         {
             foreach (RacePlayer p in allPlayers)
@@ -251,7 +244,7 @@ public class GameContext : MonoBehaviour {
             Debug.Log(player.name + " Finished!");
             player.finishRace();
 
-            //TODO:null check if debugging on gameData
+            //null check if debugging on gameData
             if (!debugging)
             {
                 gameData.addPlayerFinish(player.name, finishPlacement, 0f);//TODO:change 0f to sum of laps
@@ -277,11 +270,15 @@ public class GameContext : MonoBehaviour {
                         string playerName = allPlayersOrdered[i].name;
                         PlacementFinishUI newFinishUI = createPlacementFinishUI(playerName,
                             gameData.getTotalTime(playerName), gameData.getPlacement(playerName),
-                            i * -50);
+                            (i + 1) * -50);
+                        //TODO:add these in pauseable array menu
+                        pauseUIComponents.Concat(new GameObject[] { newFinishUI.gameObject });
+                        pausableComponents.Concat(new PausableBehaviour[] { newFinishUI });
                         newFinishUI.startAnimation();
                     }
 
-                    //TODO:put next/exit buttons on gameData so we can switch tracks with them
+                    proceedUI.AppearAfterSeconds(initialPlacementFinishUI.waitingTime);
+
                     gameData.printContents();
                 }
             }

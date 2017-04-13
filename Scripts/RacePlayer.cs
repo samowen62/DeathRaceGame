@@ -525,7 +525,6 @@ public class RacePlayer : PausableBehaviour
 
             //when we hit a boost panel
             case "BoostPanel":
-                Debug.Log("Boost Power");
                 current_speed = fwd_boost_speed;
                 boostSound.Play();
                 coll.gameObject.GetComponent<BoostPanel>().boostAnimation();

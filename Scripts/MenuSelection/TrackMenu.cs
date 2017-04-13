@@ -12,6 +12,8 @@ public class TrackMenu : MonoBehaviour
 
     public GameData gameData;
 
+    public SceneFade sceneFade;
+
     //TODO: use array of buttons with enum class specifying string
     private Button track_1_button;
     private Button track_2_button;
@@ -64,7 +66,7 @@ public class TrackMenu : MonoBehaviour
     private void load_test_1()
     {
         DontDestroyOnLoad(gameData);
-        gameData.loadSceneAfterSeconds("paperEngine", 0f);
+        gameData.loadSceneAfterSeconds(gameData.sceneSequence[0], 0f);
     }
 
     private void load_test_2()
@@ -90,15 +92,17 @@ public class TrackMenu : MonoBehaviour
         }
     }
 
+    //TODO:put both of these in a util method
     private void SyncLoadLevel(string levelName)
     {
-        async = SceneManager.LoadSceneAsync(levelName);
-        StartCoroutine(Load());
+        StartCoroutine(Load(levelName));
     }
 
-    IEnumerator Load()
+    IEnumerator Load(string levelName)
     {
-        Debug.Log("progress: " + async.progress);
+        sceneFade.fade();
+        yield return new WaitForSeconds(sceneFade.duration);
+        async = SceneManager.LoadSceneAsync(levelName);
         yield return async;
     }
 }

@@ -5,7 +5,7 @@ public class CenterTextUI : PausableBehaviour
 {
     private CenterText status;
 
-    private Text text;
+    private Text centerText;
     private Image image;
 
     public RacePlayer player;
@@ -13,7 +13,7 @@ public class CenterTextUI : PausableBehaviour
     public Color deathColor;
 
     protected override void _awake () {
-        text = transform.Find("CenterText").GetComponent<Text>();
+        centerText = transform.Find("CenterText").GetComponent<Text>();
         image = GetComponent<Image>();
 
         status = CenterText.NONE;
@@ -41,7 +41,7 @@ public class CenterTextUI : PausableBehaviour
 
     protected override void onPause()
     {
-        text.text = "";
+        centerText.text = "";
         image.enabled = false;
     }
 
@@ -55,17 +55,18 @@ public class CenterTextUI : PausableBehaviour
         switch (status)
         {
             case CenterText.NONE:
-                text.text = "";
+                
+                centerText.text = "";
                 image.enabled = false;
                 break;
             case CenterText.FINISHED:
-                text.text = "FINISH";
-                text.color = finishColor;
+                centerText.text = "FINISH";
+                centerText.color = finishColor;
                 image.enabled = true;
                 break;
             case CenterText.DEATH:
-                text.text = "DEATH";
-                text.color = deathColor;
+                centerText.text = "DEATH";
+                centerText.color = deathColor;
                 image.enabled = false;
                 break;
         }

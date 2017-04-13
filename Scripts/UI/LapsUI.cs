@@ -36,8 +36,11 @@ public class LapsUI : PausableBehaviour {
         string text = "";
 
         int laps = Mathf.Min(context.laps, placement.lap);
-        for (int i = 0; i < placement.lap - 1; i++)
+        for (int i = 0; i < laps - 1; i++)
         {
+            //TODO:find out why this is happening
+            if (placement.lap - 2 - i < 0 || placement.lap - 2 - i >= placement.lapTimes.Length)
+                break;
             text += LAP + (placement.lap - 1 - i) + COLON +
                 string.Format(FORMAT, placement.lapTimes[placement.lap - 2 - i]) + NEW_LINE; 
         }

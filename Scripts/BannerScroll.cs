@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class BannerScroll : PausableBehaviour
 {
@@ -10,7 +9,6 @@ public class BannerScroll : PausableBehaviour
 
     protected override void _awake () {
         banner = GetComponent<MeshRenderer>();
-        //Debug.Log(transform.position);
     }
 
     protected override void _update () {

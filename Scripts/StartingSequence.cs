@@ -12,6 +12,8 @@ public class StartingSequence : PausableBehaviour
 
     private Text screenText;
 
+    public AudioObject boostSound;
+
     public bool finished { get; set; }
     public bool seq_finished { get; set; }
 
@@ -36,6 +38,12 @@ public class StartingSequence : PausableBehaviour
         //only in sequence if in here
         if (progress > scriptBegin && progress < scriptEnd)
         {
+            //TODO:adjust timing
+            if (!boostSound.started)
+            {
+                boostSound.Play();
+            }
+
             if(progress < scriptBegin + 1f)
             {
                 screenText.text = "3";

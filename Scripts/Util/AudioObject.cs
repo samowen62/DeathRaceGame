@@ -12,6 +12,11 @@ public class AudioObject : PausableBehaviour
 
     private bool isPlaying;
 
+    public bool started {
+        get
+        { return audio.isPlaying; }
+    }
+
     //TODO:add param for how many copies we want to make in the
     //event we need to clone the audio source to play twice or more at once
 

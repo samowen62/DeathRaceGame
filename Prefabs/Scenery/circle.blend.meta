@@ -1,77 +1,15 @@
 fileFormatVersion: 2
-guid: 7c28387699e38174688bbcd0f3eb0de7
-timeCreated: 1491172065
+guid: 3b385d8c9e420174d912cefe0245200a
+timeCreated: 1492031584
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
-    100000: BezierCurve
-    100002: Plane
-    100004: Plane_001
-    100006: Plane_002
-    100008: Plane_003
-    100010: Plane_004
-    100012: Plane_005
-    100014: Plane_007
-    100016: Plane_008
-    100018: //RootNode
-    100020: newGroundCollider
-    100022: Plane_006
-    100024: HealingPanel
-    100026: Plane_009
-    400000: BezierCurve
-    400002: Plane
-    400004: Plane_001
-    400006: Plane_002
-    400008: Plane_003
-    400010: Plane_004
-    400012: Plane_005
-    400014: Plane_007
-    400016: Plane_008
-    400018: //RootNode
-    400020: newGroundCollider
-    400022: Plane_006
-    400024: HealingPanel
-    400026: Plane_009
-    2300000: BezierCurve
-    2300002: Plane
-    2300004: Plane_001
-    2300006: Plane_002
-    2300008: Plane_003
-    2300010: Plane_004
-    2300012: Plane_005
-    2300014: Plane_007
-    2300016: Plane_008
-    2300018: newGroundCollider
-    2300020: Plane_006
-    2300022: HealingPanel
-    2300024: Plane_009
-    3300000: BezierCurve
-    3300002: Plane
-    3300004: Plane_001
-    3300006: Plane_002
-    3300008: Plane_003
-    3300010: Plane_004
-    3300012: Plane_005
-    3300014: Plane_007
-    3300016: Plane_008
-    3300018: newGroundCollider
-    3300020: Plane_006
-    3300022: HealingPanel
-    3300024: Plane_009
-    4300000: Plane_005
-    4300002: Plane_004
-    4300004: Plane_001
-    4300006: Plane
-    4300008: BezierCurve
-    4300010: Plane_008
-    4300012: Plane_007
-    4300014: Plane_003
-    4300016: Plane_002
-    4300018: Plane_006
-    4300020: newGroundCollider
-    4300022: Plane_009
-    4300024: HealingPanel
+    100000: //RootNode
+    400000: //RootNode
+    2300000: //RootNode
+    3300000: //RootNode
+    4300000: Cylinder
     7400000: Default Take
     9500000: //RootNode
   materials:

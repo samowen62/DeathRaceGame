@@ -10,6 +10,8 @@ public class MainMenu : MonoBehaviour {
 
     public AudioObject hoverSound;
 
+    public SceneFade scenefade;
+
     private Button startGameButton;
     private Button optionsGameButton;
     private Button exitGameButton;
@@ -22,7 +24,7 @@ public class MainMenu : MonoBehaviour {
     private AsyncOperation async = null;
 
     // Use this for initialization
-    void Start () {
+    void Awake () {
         Debug.Log("Death Race Game Start!!");
         Button [] buttons = FindObjectsOfType<Button>();
 
@@ -51,10 +53,8 @@ public class MainMenu : MonoBehaviour {
                     break;
             }
         }
-        
-        
     }
- 
+
     private void startButtonClicked()
     {
         if (!startBlocked)
@@ -79,15 +79,15 @@ public class MainMenu : MonoBehaviour {
     }
 
     private void SyncLoadLevel(string levelName)
-    {
-        async = SceneManager.LoadSceneAsync(levelName);
-        StartCoroutine(Load());
+    { 
+        StartCoroutine(Load(levelName));
     }
 
     //TODO: fix this!! and in TrackMenu.cs
-    IEnumerator Load()
+    IEnumerator Load(string levelName)
     {
-        Debug.Log("progress: " + async.progress);
-        yield return async;
+        scenefade.fade();
+        yield return new WaitForSeconds(scenefade.duration);
+        async = SceneManager.LoadSceneAsync(levelName);
     }
 }

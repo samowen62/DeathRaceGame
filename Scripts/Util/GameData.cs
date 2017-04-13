@@ -8,7 +8,7 @@ public class GameData : PausableBehaviour
 {
 
     /* params to be set by the user */
-    public int numTracks = 2;
+    private int numTracks;
     public string[] sceneSequence;
 
 
@@ -29,6 +29,7 @@ public class GameData : PausableBehaviour
 
     // Use this for initialization
     protected override void _awake () {
+        numTracks = sceneSequence.Length;
         if (sceneSequence.Length == 0){
             Debug.LogError("No valid scenes to turn to!");
         }
@@ -108,15 +109,21 @@ public class GameData : PausableBehaviour
         Debug.Log("Race finished!");
         playersFinished = 0;
         currentTrack++;
-        loadSceneAfterSeconds(sceneSequence[currentTrack], 3f);
+
+        //Return to the main menu if the sequence has finished
+        //TODO: build screen for final race results
+        if(currentTrack == sceneSequence.Length)
+        {
+            loadSceneAfterSeconds("MainMenu", 0.5f);
+            return;
+        }
+
+        loadSceneAfterSeconds(sceneSequence[currentTrack], 0.5f);
     }
 
     public void loadSceneAfterSeconds(string sceneName, float seconds)
     {
-        if(Array.IndexOf(sceneSequence, sceneName) < 0)
-        {
-            Debug.LogError(sceneName + " Not found!");
-        }
+        //TODO: fade scene
         callAfterSeconds(seconds, () =>
         {
             async = SceneManager.LoadSceneAsync(sceneName);
