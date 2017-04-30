@@ -135,6 +135,7 @@ public class RacePlayer : PausableBehaviour
     public float max_bonus_health = 150f;
     public float health_per_frame_healing = 0.2f;
     public float health_blink_speed = 20f;
+    private bool over_healing_area = false;
     private float health_warning_thresh = 25f;
     private float player_health;
     public float health
@@ -290,45 +291,7 @@ public class RacePlayer : PausableBehaviour
             return;
         }
 
-        //Player is ricocheting of the wall
-        if(wall_bounce_velocity != 0)
-        {
-            transform.position += wall_bounce_velocity * transform.right;
-            wall_bounce_velocity /= wall_bounce_deccel;
-
-            if(Mathf.Abs(wall_bounce_velocity) < wall_bounce_threshold)
-            {
-                wall_bounce_velocity = 0;
-            }
-        }
-
-        //Player is attacking another
-        if (!Vector3.zero.Equals(attack_velocity))
-        {
-            transform.position += attack_velocity;
-            attack_velocity /= attack_deccel;
-
-            shipRenderer.transform.localRotation = Quaternion.AngleAxis(50f, shipRenderer.transform.forward) * base_ship_rotation;
-
-
-            if (Mathf.Abs(attack_velocity.sqrMagnitude) < attack_threshold)
-            {
-                attack_velocity = Vector3.zero;
-            }
-        }
-
-        //Player was attacked
-        if (!Vector3.zero.Equals(attacked_velocity))
-        {
-            //Debug.Log("attacked :" + attacked_velocity);
-            transform.position += attacked_velocity;
-            attacked_velocity /= attack_deccel;
-
-            if (Mathf.Abs(attacked_velocity.sqrMagnitude) < attack_threshold)
-            {
-                attacked_velocity = Vector3.zero;
-            }
-        }
+        checkMiscMovement();
 
         bool accelerating = isEffectiveAI || player_inputs.w_key;
 
@@ -347,20 +310,6 @@ public class RacePlayer : PausableBehaviour
 
             status = PlayerStatus.ONTRACK;
             downward_speed = 0f;
-
-            if (downHit.collider.gameObject.tag == "HealingArea")
-            {
-                
-                if(player_health < starting_health)
-                {
-                    player_health = Mathf.Min(starting_health, player_health + health_per_frame_healing);
-                }
-
-                if(player_health > health_warning_thresh)
-                {
-                    shipRenderer.material.SetFloat("_Blend", 0);
-                }
-            }
 
             if (accelerating)
             {
@@ -387,31 +336,7 @@ public class RacePlayer : PausableBehaviour
 
             previousGravity = -downHit.normal;
 
-            //if there is a pitch slowly change it back to normal
-            if (totalPitch != 0f)
-            {
-                totalPitch -= pitch_decel;
-                totalPitch = Mathf.Max(totalPitch, 0);
-                transform.localRotation *= Quaternion.AngleAxis(totalPitch, transform.forward);
-            }
-
-            //if there is a roll slowly change it back to normal
-            if (totalRoll > 0f)
-            {
-                totalRoll -= roll_decel;
-                totalRoll = Mathf.Max(totalRoll, 0);
-            }
-            else if (totalRoll < 0f)
-            {
-                totalRoll += roll_decel;
-                totalRoll = Mathf.Min(totalRoll, 0);
-            }
-
-            //Attack the opponent racer
-            if (player_inputs.e_key && playersToAttack.Count > 0)
-            {
-                attack_player();
-            }
+            checkGroundMovement();
 
             //Smoothly adjust our height
             float distance = downHit.distance - height_above_cast;
@@ -458,6 +383,96 @@ public class RacePlayer : PausableBehaviour
         }
     }
 
+    private void checkGroundMovement()
+    {
+        //we are over a headling area
+        if (downHit.collider.gameObject.tag == "HealingArea")
+        {
+            over_healing_area = true;
+            if (player_health < starting_health)
+            {
+                player_health = Mathf.Min(starting_health, player_health + health_per_frame_healing);
+            }
+        }
+        else
+        {
+            over_healing_area = false;
+            if (player_health > health_warning_thresh)
+            {
+                shipRenderer.material.SetFloat("_Blend", 0);
+            }
+        }
+
+        //if there is a pitch slowly change it back to normal
+        if (totalPitch != 0f)
+        {
+            totalPitch -= pitch_decel;
+            totalPitch = Mathf.Max(totalPitch, 0);
+            transform.localRotation *= Quaternion.AngleAxis(totalPitch, transform.forward);
+        }
+
+        //if there is a roll slowly change it back to normal
+        if (totalRoll > 0f)
+        {
+            totalRoll -= roll_decel;
+            totalRoll = Mathf.Max(totalRoll, 0);
+        }
+        else if (totalRoll < 0f)
+        {
+            totalRoll += roll_decel;
+            totalRoll = Mathf.Min(totalRoll, 0);
+        }
+
+        //Attack the opponent racer
+        if (player_inputs.e_key && playersToAttack.Count > 0)
+        {
+            attack_player();
+        }
+    }
+
+    private void checkMiscMovement()
+    {
+        //Player is ricocheting of the wall
+        if (wall_bounce_velocity != 0)
+        {
+            transform.position += wall_bounce_velocity * transform.right;
+            wall_bounce_velocity /= wall_bounce_deccel;
+
+            if (Mathf.Abs(wall_bounce_velocity) < wall_bounce_threshold)
+            {
+                wall_bounce_velocity = 0;
+            }
+        }
+
+        //Player is attacking another
+        if (!Vector3.zero.Equals(attack_velocity))
+        {
+            transform.position += attack_velocity;
+            attack_velocity /= attack_deccel;
+
+            shipRenderer.transform.localRotation = Quaternion.AngleAxis(50f, shipRenderer.transform.forward) * base_ship_rotation;
+
+
+            if (Mathf.Abs(attack_velocity.sqrMagnitude) < attack_threshold)
+            {
+                attack_velocity = Vector3.zero;
+            }
+        }
+
+        //Player was attacked
+        if (!Vector3.zero.Equals(attacked_velocity))
+        {
+            //Debug.Log("attacked :" + attacked_velocity);
+            transform.position += attacked_velocity;
+            attacked_velocity /= attack_deccel;
+
+            if (Mathf.Abs(attacked_velocity.sqrMagnitude) < attack_threshold)
+            {
+                attacked_velocity = Vector3.zero;
+            }
+        }
+    }
+
     private void shakeCamera()
     {
         float randNrX = UnityEngine.Random.Range(gyrationFactor, -gyrationFactor);
@@ -481,11 +496,22 @@ public class RacePlayer : PausableBehaviour
 
     private void setColorForHealth()
     {
-        //add beeping too?
-        if (player_health < health_warning_thresh)
+        //TODO:add beeping too?
+        if (over_healing_area)
         {
-            float t = Mathf.PingPong(Time.time * health_blink_speed / player_health, 0.4f);
-            shipRenderer.material.SetFloat("_Blend", t);
+            float t = Mathf.PingPong(Time.time * 2f, 0.4f);
+            //TODO:make sure green working
+            shipRenderer.material.SetFloat("_Green", t);
+            shipRenderer.material.SetFloat("_Blend", 0);
+        }
+        else
+        {
+            shipRenderer.material.SetFloat("_Green", 0);
+            if (player_health < health_warning_thresh)
+            {
+                float t = Mathf.PingPong(Time.time * health_blink_speed / player_health, 0.4f);
+                shipRenderer.material.SetFloat("_Blend", t);
+            }
         }
     }
 
