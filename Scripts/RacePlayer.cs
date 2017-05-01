@@ -131,6 +131,8 @@ public class RacePlayer : PausableBehaviour
     /* Related to player health */
     private Material shipMaterial;
     private Material redMaterial;
+    private Color baseTint = new Color(0f, 0f, 0f, 1.0f);
+    private Color tintColor;
     public float starting_health = 100f;
     public float max_bonus_health = 150f;
     public float health_per_frame_healing = 0.2f;
@@ -202,7 +204,10 @@ public class RacePlayer : PausableBehaviour
 
     private PlayerInputDTO player_inputs;
 
-    //renderer of ship
+    /* Related to player appearance */
+    private float baseIntensity = 0.6f;
+    private float maxIntensity = 2f;
+    private Light playerTrail;
     private MeshRenderer shipRenderer;
     private Quaternion base_ship_rotation;
 
@@ -225,12 +230,17 @@ public class RacePlayer : PausableBehaviour
         {
             Debug.LogError("Please name the ship prefab 'Ship' in this instance of RacePlayer.cs");
         }
+
+        //Set up ship renderer properties
         base_ship_rotation = shipRenderer.transform.localRotation;
         shipMaterial = shipRenderer.material;
+        tintColor = shipMaterial.GetColor("_Tint");
+        shipMaterial.SetColor("_Tint", baseTint);      
         redMaterial = new Material(Shader.Find("Transparent/Diffuse"));
         redMaterial.color = new Color32(1, 0, 0, 1);
-        tilt = Quaternion.identity;
+        playerTrail = shipRenderer.transform.FindChild("Light").GetComponent<Light>();
 
+        tilt = Quaternion.identity;
         lastCheckPoint = track[0].startingCheckPoint;
 
         //TODO: Fix this to avoid jumping the rotation on start. Maybe just give current speed on start?
@@ -263,7 +273,7 @@ public class RacePlayer : PausableBehaviour
                 shipRenderer.enabled = true;
 
                 player_health = starting_health;
-                shipRenderer.material.SetFloat("_Blend", 0);
+                shipMaterial.SetFloat("_Blend", 0);
 
                 //TODO:this needs to be fixed
                 Camera.main.transform.localPosition = playerToCamera;
@@ -277,7 +287,9 @@ public class RacePlayer : PausableBehaviour
         }
 
         setColorForHealth();
-    
+
+        setLightColor();
+
         //Player is returning to the track. Block other behavior by returning
         if (status == PlayerStatus.RETURNINGTOTRACK)
         {
@@ -383,6 +395,17 @@ public class RacePlayer : PausableBehaviour
         }
     }
 
+    private void setLightColor()
+    {
+        if(current_speed <= fwd_max_speed)
+        {
+            playerTrail.intensity = (baseIntensity * current_speed) / fwd_max_speed;
+        } else
+        {
+            playerTrail.intensity = maxIntensity * (current_speed - fwd_max_speed) / (fwd_boost_speed - fwd_max_speed) + baseIntensity;
+        }
+    }
+
     private void checkGroundMovement()
     {
         //we are over a headling area
@@ -399,7 +422,7 @@ public class RacePlayer : PausableBehaviour
             over_healing_area = false;
             if (player_health > health_warning_thresh)
             {
-                shipRenderer.material.SetFloat("_Blend", 0);
+                shipMaterial.SetFloat("_Blend", 0);
             }
         }
 
@@ -433,6 +456,7 @@ public class RacePlayer : PausableBehaviour
     private void checkMiscMovement()
     {
         //Player is ricocheting of the wall
+        //TODO: redo this for forward collissions
         if (wall_bounce_velocity != 0)
         {
             transform.position += wall_bounce_velocity * transform.right;
@@ -462,7 +486,6 @@ public class RacePlayer : PausableBehaviour
         //Player was attacked
         if (!Vector3.zero.Equals(attacked_velocity))
         {
-            //Debug.Log("attacked :" + attacked_velocity);
             transform.position += attacked_velocity;
             attacked_velocity /= attack_deccel;
 
@@ -499,18 +522,17 @@ public class RacePlayer : PausableBehaviour
         //TODO:add beeping too?
         if (over_healing_area)
         {
-            float t = Mathf.PingPong(Time.time * 2f, 0.4f);
-            //TODO:make sure green working
-            shipRenderer.material.SetFloat("_Green", t);
-            shipRenderer.material.SetFloat("_Blend", 0);
+            float t = Mathf.PingPong(Time.time * 1f, 0.4f);
+            shipMaterial.SetColor("_Tint", tintColor);
+            shipMaterial.SetFloat("_Blend", t);
         }
         else
         {
-            shipRenderer.material.SetFloat("_Green", 0);
+            shipMaterial.SetColor("_Tint", baseTint);
             if (player_health < health_warning_thresh)
             {
                 float t = Mathf.PingPong(Time.time * health_blink_speed / player_health, 0.4f);
-                shipRenderer.material.SetFloat("_Blend", t);
+                shipMaterial.SetFloat("_Blend", t);
             }
         }
     }
@@ -543,9 +565,17 @@ public class RacePlayer : PausableBehaviour
 
                     wall_bounce_velocity = current_speed * wall_bounce_speed_to_bounce_ratio * Vector3.Dot(wallHit.normal, transform.forward);
                     current_speed /= wall_bounce_curr_speed_deccel;
+                }
+                else if (Physics.Raycast(transform.position - 2f * transform.forward, transform.forward, out wallHit, rayCastDistance, AppConfig.wallMask))
+                {
+                    damage(attack_bump_damage);
+                    bumpSound.Play();
+                    Debug.Log("fwd collision");
+                    wall_bounce_velocity = current_speed * wall_bounce_speed_to_bounce_ratio * Vector3.Dot(wallHit.normal, transform.forward);
+                    current_speed = 0f;
                 } else
                 {
-                    Debug.LogWarning("Detected hit with wall but cannot find wall on left or right!");
+                    Debug.LogWarning("Detected hit with wall but cannot find wall on left, right or front!");
                 }
                 break;
 
