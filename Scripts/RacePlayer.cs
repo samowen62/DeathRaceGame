@@ -2,12 +2,6 @@
 using System.Collections.Generic;
 using System;
 
-/**
- * NOTES:
- * 
- *  1) To set the initial position and rotation of this object in unity let this player start for
- *     just a second or two and use the resulting orientation so that we take rigidBody motion into account
- */
 public class RacePlayer : PausableBehaviour
 {
 
@@ -87,7 +81,7 @@ public class RacePlayer : PausableBehaviour
     private RaycastHit downHit;
     private RaycastHit wallHit;
 
-    private float wall_bounce_velocity = 0f;
+    private Vector3 wall_bounce_velocity = Vector3.zero;
     private PlayerStatus status = PlayerStatus.ONTRACK;
 
     /* Related to player gliding */
@@ -132,7 +126,7 @@ public class RacePlayer : PausableBehaviour
     private Material shipMaterial;
     private Material redMaterial;
     private Color baseTint = new Color(0f, 0f, 0f, 1.0f);
-    private Color tintColor;
+    private Color tintColor = new Color(0f, 1f, 0.2f, 1.0f);
     public float starting_health = 100f;
     public float max_bonus_health = 150f;
     public float health_per_frame_healing = 0.2f;
@@ -234,7 +228,6 @@ public class RacePlayer : PausableBehaviour
         //Set up ship renderer properties
         base_ship_rotation = shipRenderer.transform.localRotation;
         shipMaterial = shipRenderer.material;
-        tintColor = shipMaterial.GetColor("_Tint");
         shipMaterial.SetColor("_Tint", baseTint);      
         redMaterial = new Material(Shader.Find("Transparent/Diffuse"));
         redMaterial.color = new Color32(1, 0, 0, 1);
@@ -370,7 +363,7 @@ public class RacePlayer : PausableBehaviour
                 {
                     lastTimeOnGround = pauseInvariantTime;
                 }
-                wall_bounce_velocity = 0;
+                wall_bounce_velocity = Vector3.zero;
             }
             /* called once to return player to the track*/
             else if ((pauseInvariantTime - lastTimeOnGround) > timeAllowedNotOnTrack && !inFreefall)
@@ -456,15 +449,14 @@ public class RacePlayer : PausableBehaviour
     private void checkMiscMovement()
     {
         //Player is ricocheting of the wall
-        //TODO: redo this for forward collissions
-        if (wall_bounce_velocity != 0)
+        if (!Vector3.zero.Equals(wall_bounce_velocity))
         {
-            transform.position += wall_bounce_velocity * transform.right;
+            transform.position += wall_bounce_velocity;
             wall_bounce_velocity /= wall_bounce_deccel;
 
-            if (Mathf.Abs(wall_bounce_velocity) < wall_bounce_threshold)
+            if (wall_bounce_velocity.magnitude < wall_bounce_threshold)
             {
-                wall_bounce_velocity = 0;
+                wall_bounce_velocity = Vector3.zero;
             }
         }
 
@@ -552,31 +544,26 @@ public class RacePlayer : PausableBehaviour
 
                 if (Physics.Raycast(transform.position, -transform.right, out wallHit, rayCastDistance, AppConfig.wallMask))
                 {
-                    damage(attack_bump_damage);
-                    bumpSound.Play();
-
-                    wall_bounce_velocity = -wall_bounce_speed_to_bounce_ratio * current_speed * Vector3.Dot(wallHit.normal, transform.forward);
                     current_speed /= wall_bounce_curr_speed_deccel;
                 }
                 else if (Physics.Raycast(transform.position, transform.right, out wallHit, rayCastDistance, AppConfig.wallMask))
                 {
-                    damage(attack_bump_damage);
-                    bumpSound.Play();
-
-                    wall_bounce_velocity = current_speed * wall_bounce_speed_to_bounce_ratio * Vector3.Dot(wallHit.normal, transform.forward);
                     current_speed /= wall_bounce_curr_speed_deccel;
                 }
                 else if (Physics.Raycast(transform.position - 2f * transform.forward, transform.forward, out wallHit, rayCastDistance, AppConfig.wallMask))
                 {
-                    damage(attack_bump_damage);
-                    bumpSound.Play();
-                    Debug.Log("fwd collision");
-                    wall_bounce_velocity = current_speed * wall_bounce_speed_to_bounce_ratio * Vector3.Dot(wallHit.normal, transform.forward);
                     current_speed = 0f;
                 } else
                 {
                     Debug.LogWarning("Detected hit with wall but cannot find wall on left, right or front!");
+                    return;
                 }
+
+                damage(attack_bump_damage);
+                bumpSound.Play();
+
+                wall_bounce_velocity = wallHit.normal * wall_bounce_speed_to_bounce_ratio * current_speed;
+
                 break;
 
             //when we hit a boost panel
