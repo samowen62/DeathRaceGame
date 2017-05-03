@@ -6,7 +6,7 @@ using System;
 public class GameContext : MonoBehaviour {
 
     public StartingSequence staringSequence;
-    public RacePlayer player;
+    public RacePlayer playerMain;
     public Track track;
     public GameData gameData;
     public Dictionary<RacePlayer, PlacementDTO> racerPlacement;
@@ -91,7 +91,7 @@ public class GameContext : MonoBehaviour {
         findPlacement();
 
         //Start the race!
-        if (staringSequence.finished && player.behaviorBlocked && !paused)//Only change if player blocked (only should call once)
+        if (staringSequence.finished && playerMain.behaviorBlocked && !paused)//Only change if player blocked (only should call once)
         {
             foreach (RacePlayer p in allPlayers)
             {
@@ -158,15 +158,17 @@ public class GameContext : MonoBehaviour {
             {
                 if(player.trackPointNumInSeq > playerTrackPoint - skipTrackPoints)
                 {
+                    if (player.Equals(playerMain))
+                        Debug.Log(player.trackPointNumInSeq + " in seq");
                     racerPlacement[player].latestTrackPoint = player.trackPointNumInSeq;
                 }
             }
             else if (playerTrackPoint < skipTrackPoints)
             {
                 //player passes the finish line
-                if (playerTrackPoint == 1 && player.passedFinish && !player.finished)
+                if (player.passedFinish && !player.finished) //TODO: should check if on track point 1
                 {
-                    finishPlayer(playerTrackPoint);
+                    finishLap(playerTrackPoint, player);
                 }
                 else
                 {
@@ -220,7 +222,7 @@ public class GameContext : MonoBehaviour {
         }
     }
 
-    private void finishPlayer(int playerTrackPoint)
+    private void finishLap(int playerTrackPoint, RacePlayer player)
     {
         player.passedFinish = false;
         racerPlacement[player].lap++;
@@ -247,23 +249,29 @@ public class GameContext : MonoBehaviour {
             //null check if debugging on gameData
             if (!debugging)
             {
-                gameData.addPlayerFinish(player.name, finishPlacement, 0f);//TODO:change 0f to sum of laps
+                float totalLapTime = racerPlacement[player].lapTimes.Sum();
+                gameData.addPlayerFinish(player.name, finishPlacement, totalLapTime);
                 finishPlacement++;
 
-                //this is the main player. Make other racers finish
-                if (!player.isAI)
+                //if this is the main player or all but 1 have finished. Make other racers finish
+                var unfinishedplayersOrdered = allPlayers.Where(e => !e.finished).OrderBy(e => e.placement);
+                if (player.Equals(playerMain) || unfinishedplayersOrdered.Count() == 1)
                 {
-                    var playersOrdered = allPlayers.Where(e => !e.finished).OrderBy(e => e.placement);
+                    player.finishMainPlayer();
                     PlacementFinishUI[] playerUIFinish = new PlacementFinishUI[allPlayers.Length];
 
-                    foreach (var p in playersOrdered)
+                    foreach (var p in unfinishedplayersOrdered)
                     {
                         //TODO: create then call a delayed function to finish players
-                        gameData.addPlayerFinish(p.name, finishPlacement, 0f);
+                        fillEmptyLaps(p);
+                        totalLapTime = racerPlacement[p].lapTimes.Sum();
+                        //TODO:the unfinished laps will be 0. populate them!!
+                        p.finishRace();
+                        gameData.addPlayerFinish(p.name, finishPlacement, totalLapTime);
                         finishPlacement++;
                     }
 
-                    var allPlayersOrdered = allPlayers.OrderBy(e => gameData.getPlacement(e.name)).ToArray();
+                    RacePlayer[] allPlayersOrdered = allPlayers.OrderBy(e => gameData.getPlacement(e.name)).ToArray();
                     for (int i = 0; i < allPlayers.Length; i++)
                     {
                         //TODO:make these correct
@@ -281,6 +289,37 @@ public class GameContext : MonoBehaviour {
 
                     gameData.printContents();
                 }
+            }
+        }
+    }
+
+    /**
+     * Fills the lap times on an unfinished player. We will use the latest lap
+     * time to populate the remaining laps
+     */
+    private void fillEmptyLaps(RacePlayer p)
+    {
+        float lastLapTime = 0f;
+        float[] lapTimes = racerPlacement[p].lapTimes;
+        for(int i = lapTimes.Length - 1; i >= 0; i--)
+        {
+            if(lapTimes[i] > 0)
+            {
+                lastLapTime = lapTimes[i];
+                break;
+            }
+        }
+
+        //TODO: add a bit so not the same as main racer
+        float lapTime = staringSequence.time - lastLapTime;
+        for (int i = lapTimes.Length - 1; i >= 0; i--)
+        {
+            if (lapTimes[i] > 0)
+            {
+                break;
+            }else
+            {
+                lapTimes[i] = lapTime;
             }
         }
     }

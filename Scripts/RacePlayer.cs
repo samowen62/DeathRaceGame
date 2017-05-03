@@ -62,7 +62,6 @@ public class RacePlayer : PausableBehaviour
     private Vector3 prev_up;
     private Quaternion global_orientation;
     private Quaternion tilt;
-    private float yaw;
     private float smooth_y;
     private float height_above_cast = 5f;
     private float current_speed;
@@ -242,7 +241,6 @@ public class RacePlayer : PausableBehaviour
             transform.position = downHit.point + hover_height * transform.up;
             transform.rotation = Quaternion.FromToRotation(transform.up, downHit.normal) * transform.rotation;
             global_orientation = transform.rotation;
-            yaw = transform.rotation.eulerAngles.y;
             previousGravity = -downHit.normal;
         } else
         {
@@ -501,7 +499,6 @@ public class RacePlayer : PausableBehaviour
         status = PlayerStatus.RETURNINGTOTRACK;
         timeStartReturning = pauseInvariantTime;
         current_speed = 0f;
-        yaw = lastCheckPoint.yaw;
 
         returningToTrackRotationBegin = transform.rotation;
         returningToTrackPositionBegin = transform.position;
@@ -733,8 +730,6 @@ public class RacePlayer : PausableBehaviour
             }
         }
 
-        yaw += turn_angle;
-
         //calculate vertical axis for nose diving
         if (status == PlayerStatus.INAIR)
         {
@@ -914,6 +909,11 @@ public class RacePlayer : PausableBehaviour
 
         finishedWithRace = true;
         fwd_max_speed *= 0.6f;
+    }
+
+    public void finishMainPlayer()
+    {
+        finishRace();
         Camera.main.transform.localPosition = finishedCameraPosition;
         Camera.main.transform.localRotation = finishedCameraRotation;
     }
