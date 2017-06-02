@@ -118,8 +118,10 @@ public class RacePlayer : PausableBehaviour
         }
     }
     private float timeCameraShake = 1.7f;
+    private float timeCameraShakeBump = 0.2f;
     private float timeAllowedDead = 4f;
     private float gyrationFactor = 0.2f;
+    private bool cameraIsShaking = false;
 
     /* Related to player health */
     private Material shipMaterial;
@@ -188,7 +190,34 @@ public class RacePlayer : PausableBehaviour
     private float timeStartReturning = 0f;
     private float timeStartDeath = 0f;
 
-    private Vector3 playerToCamera = new Vector3(0, 10, -20);
+    private float boostPlacerToCamera_Z = 8f; //how much farther away the camera is during boost
+    private float boostCameraSpeed = 0.5f;
+    private float boostCameraDistance = 0f;
+    private Vector3 _playerToCamera = new Vector3(0, 10, -20);
+    private Vector3 playerToCamera
+    {
+        get
+        {
+            if(current_speed <= fwd_max_speed)
+            {
+                return _playerToCamera;
+            }
+            float target_z_distance = Mathf.Lerp(0, boostPlacerToCamera_Z, 
+                (current_speed - fwd_max_speed)/ (fwd_boost_speed - fwd_max_speed));
+            //control how fast the camera can zoom out
+            if(target_z_distance - boostCameraDistance > boostCameraSpeed)
+            {
+                boostCameraDistance += boostCameraSpeed;
+            } else if (boostCameraDistance - target_z_distance > boostCameraSpeed)
+            {
+                boostCameraDistance -= boostCameraSpeed;
+            } else
+            {
+                boostCameraDistance = target_z_distance;
+            }
+            return _playerToCamera - new Vector3(0, 0, boostCameraDistance);
+        }
+    }
 
     private Quaternion returningToTrackRotationBegin;
     private Vector3 returningToTrackPositionBegin;
@@ -218,7 +247,7 @@ public class RacePlayer : PausableBehaviour
             Debug.LogError("Error: only 1 component of type 'Track' allowed in the scene");
         }
 
-        shipRenderer = transform.FindChild("Ship").gameObject.GetComponent<MeshRenderer>();
+        shipRenderer = transform.Find("Ship").gameObject.GetComponent<MeshRenderer>();
         if (shipRenderer == null)
         {
             Debug.LogError("Please name the ship prefab 'Ship' in this instance of RacePlayer.cs");
@@ -230,7 +259,7 @@ public class RacePlayer : PausableBehaviour
         shipMaterial.SetColor("_Tint", baseTint);      
         redMaterial = new Material(Shader.Find("Transparent/Diffuse"));
         redMaterial.color = new Color32(1, 0, 0, 1);
-        playerTrail = shipRenderer.transform.FindChild("Light").GetComponent<Light>();
+        playerTrail = shipRenderer.transform.Find("Light").GetComponent<Light>();
 
         tilt = Quaternion.identity;
         lastCheckPoint = track[0].startingCheckPoint;
@@ -251,12 +280,13 @@ public class RacePlayer : PausableBehaviour
     //TODO: refactor this into a few private functions
     protected override void _update()
     {
+        if (cameraIsShaking)
+        {
+            shakeCamera();
+        }
+
         if (dead)
         {
-            if(pauseInvariantTime - timeStartDeath < timeCameraShake && !isEffectiveAI)
-            {
-                shakeCamera();
-            }
             if (pauseInvariantTime - timeStartDeath > timeAllowedDead && !isEffectiveAI)
             {
                 Debug.Log("returning" + (pauseInvariantTime - timeStartDeath));
@@ -265,9 +295,7 @@ public class RacePlayer : PausableBehaviour
 
                 player_health = starting_health;
                 shipMaterial.SetFloat("_Blend", 0);
-
-                //TODO:this needs to be fixed
-                Camera.main.transform.localPosition = playerToCamera;
+                
                 return_to_track();
             }
             return;
@@ -300,8 +328,11 @@ public class RacePlayer : PausableBehaviour
 
         prev_up = transform.up;
 
-        /* Adjust the position and rotation of the ship to the track */
-        //Debug.DrawRay(transform.position + height_above_cast * prev_up, -prev_up, Color.red, 120);
+        //TODO:refactor into function
+        if(current_speed >= fwd_max_speed)
+        {
+            Camera.main.transform.localPosition = playerToCamera;
+        }
 
         if (Physics.Raycast(transform.position + height_above_cast * prev_up, -prev_up, out downHit, 
             inFreefall ? freeFallRayCastDistance : rayCastDistance, AppConfig.groundMask))
@@ -488,10 +519,26 @@ public class RacePlayer : PausableBehaviour
 
     private void shakeCamera()
     {
+        //don't shake the camera during the finish line sequence
+        if (finishedWithRace)
+        {
+            return;
+        }
+
         float randNrX = UnityEngine.Random.Range(gyrationFactor, -gyrationFactor);
         float randNrY = UnityEngine.Random.Range(gyrationFactor, -gyrationFactor);
         float randNrZ = UnityEngine.Random.Range(gyrationFactor, -gyrationFactor);
         Camera.main.transform.position += new Vector3(randNrX, randNrY, randNrZ);
+    }
+
+    private void shakeCameraForSeconds(float timeCameraShakeBump)
+    {
+        cameraIsShaking = true;
+        callAfterSeconds(timeCameraShakeBump, () =>
+        {
+            cameraIsShaking = false;
+            Camera.main.transform.localPosition = playerToCamera;
+        });
     }
 
     private void return_to_track()
@@ -556,6 +603,7 @@ public class RacePlayer : PausableBehaviour
                     return;
                 }
 
+                shakeCameraForSeconds(timeCameraShakeBump);
                 damage(attack_bump_damage);
                 bumpSound.Play();
 
@@ -897,6 +945,7 @@ public class RacePlayer : PausableBehaviour
             explosion.Trigger(transform.position, transform.rotation, timeCameraShake);
             current_speed = 0;
             shipRenderer.enabled = false;
+            shakeCameraForSeconds(timeCameraShake);
         }
     }
 

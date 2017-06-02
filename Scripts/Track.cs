@@ -86,8 +86,10 @@ public class Track : MonoBehaviour {
             Debug.LogError("Must add trackName to track!");
         }
 
+        //TODO:add error handling here
         XmlDocument doc = new XmlDocument();
-        doc.Load(Application.dataPath + TRACK_DATA_ROOT + trackName + TRACK_DATA_FILE_NAME);
+        string fileName = Application.dataPath + TRACK_DATA_ROOT + trackName + TRACK_DATA_FILE_NAME;
+        doc.Load(fileName);
         var pointList = doc.GetElementsByTagName("Point");
 
         if (pointList.Count == 0)

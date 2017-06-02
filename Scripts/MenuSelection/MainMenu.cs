@@ -21,7 +21,6 @@ public class MainMenu : MonoBehaviour {
     private const string END_GAME_BUTTON = "EndGame";
 
     private bool startBlocked = false;
-    private AsyncOperation async = null;
 
     // Use this for initialization
     void Awake () {
@@ -88,6 +87,6 @@ public class MainMenu : MonoBehaviour {
     {
         scenefade.fade();
         yield return new WaitForSeconds(scenefade.duration);
-        async = SceneManager.LoadSceneAsync(levelName);
+        SceneManager.LoadSceneAsync(levelName);
     }
 }
