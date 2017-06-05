@@ -158,8 +158,8 @@ public class GameContext : MonoBehaviour {
             {
                 if(player.trackPointNumInSeq > playerTrackPoint - skipTrackPoints)
                 {
-                    if (player.Equals(playerMain))
-                        Debug.Log(player.trackPointNumInSeq + " in seq");
+                    //if (player.Equals(playerMain))
+                    //    Debug.Log(player.trackPointNumInSeq + " in seq");
                     racerPlacement[player].latestTrackPoint = player.trackPointNumInSeq;
                 }
             }
@@ -264,10 +264,8 @@ public class GameContext : MonoBehaviour {
                     {
                         //TODO: create then call a delayed function to finish players
                         fillEmptyLaps(p);
-                        totalLapTime = racerPlacement[p].lapTimes.Sum();
-                        //TODO:the unfinished laps will be 0. populate them!!
                         p.finishRace();
-                        gameData.addPlayerFinish(p.name, finishPlacement, totalLapTime);
+                        gameData.addPlayerFinish(p.name, finishPlacement, racerPlacement[p].lapTimes);
                         finishPlacement++;
                     }
 

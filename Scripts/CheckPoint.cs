@@ -14,7 +14,7 @@ public class CheckPoint : MonoBehaviour {
         if (Physics.Raycast(gameObject.transform.position, -gameObject.transform.up, out downHit, GetComponent<SphereCollider>().radius, AppConfig.groundMask))
         {
             trackNormal = downHit.normal;
-            trackPoint = downHit.point + (AppConfig.hoverHeight * downHit.normal);//this 1.8f needs to be the hover height as well
+			trackPoint = downHit.point + ((AppConfig.hoverHeight + 0.5f) * downHit.normal);//this 1.8f needs to be the hover height as well
             trackForward = gameObject.transform.forward;
             yaw = (Quaternion.FromToRotation(transform.up, downHit.normal) * transform.rotation).eulerAngles.y;
         } else

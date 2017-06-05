@@ -190,7 +190,7 @@ public class RacePlayer : PausableBehaviour
     private float timeStartReturning = 0f;
     private float timeStartDeath = 0f;
 
-    private float boostPlacerToCamera_Z = 8f; //how much farther away the camera is during boost
+    private float boostPlacerToCamera_Z = 5f; //how much farther away the camera is during boost
     private float boostCameraSpeed = 0.5f;
     private float boostCameraDistance = 0f;
     private Vector3 _playerToCamera = new Vector3(0, 10, -20);
@@ -328,12 +328,13 @@ public class RacePlayer : PausableBehaviour
 
         prev_up = transform.up;
 
-        //TODO:refactor into function
-        if(current_speed >= fwd_max_speed)
+        
+        if(!isAI && current_speed >= fwd_max_speed)
         {
             Camera.main.transform.localPosition = playerToCamera;
         }
 
+        //TODO:refactor into function
         if (Physics.Raycast(transform.position + height_above_cast * prev_up, -prev_up, out downHit, 
             inFreefall ? freeFallRayCastDistance : rayCastDistance, AppConfig.groundMask))
         {
@@ -416,6 +417,7 @@ public class RacePlayer : PausableBehaviour
             }
         }
     }
+
 
     private void setLightColor()
     {
@@ -533,6 +535,8 @@ public class RacePlayer : PausableBehaviour
 
     private void shakeCameraForSeconds(float timeCameraShakeBump)
     {
+        if (isEffectiveAI) return;
+
         cameraIsShaking = true;
         callAfterSeconds(timeCameraShakeBump, () =>
         {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using System.Linq;
 
 public class GameData : PausableBehaviour
 {
@@ -73,17 +74,16 @@ public class GameData : PausableBehaviour
     /*
      * Signal a player as finished the race
      */
-    public void addPlayerFinish(string playerName, int placement, float totalTime)
+    public void addPlayerFinish(string playerName, int placement, float[] lapTimes)
     {
         playerData[playerName].placements[currentTrack] = placement;
-        playerData[playerName].lapTimes[currentTrack] = totalTime;
+        playerData[playerName].lapTimes[currentTrack] = lapTimes.ToList<float>();//TODO:test this lol
         playersFinished++;
 
         //The game is over
         if(playersFinished == PlayerNames.Length)
         {
-            //loadNextTrack();
-            Debug.Log("GAMWE IS OVER");
+            Debug.Log("GAME IS OVER");
         }
     }
 
@@ -111,10 +111,9 @@ public class GameData : PausableBehaviour
         currentTrack++;
 
         //Return to the main menu if the sequence has finished
-        //TODO: build screen for final race results
         if(currentTrack == sceneSequence.Length)
         {
-            loadSceneAfterSeconds("MainMenu", 0.5f);
+            loadSceneAfterSeconds("CurcuitResults", 0.5f);
             return;
         }
 
@@ -123,7 +122,6 @@ public class GameData : PausableBehaviour
 
     public void loadSceneAfterSeconds(string sceneName, float seconds)
     {
-        //TODO: fade scene
         callAfterSeconds(seconds, () =>
         {
             async = SceneManager.LoadSceneAsync(sceneName);
