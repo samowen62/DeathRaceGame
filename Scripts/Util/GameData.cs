@@ -104,6 +104,18 @@ public class GameData : PausableBehaviour
         }
     }
 
+    /*
+     * Used to get all player data
+     */
+    public List<string> getPlayersByPlacement()//TODO:also return total lap times
+    {
+        return playerData
+            .OrderBy(e => e.Value.placements.ToList().Sum())
+            .Select(e => e.Key)
+            .ToList();
+    }
+
+
     public void loadNextTrack()
     {
         Debug.Log("Race finished!");

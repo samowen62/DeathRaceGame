@@ -198,6 +198,9 @@ public class RacePlayer : PausableBehaviour
     {
         get
         {
+            if (finishedWithRace){
+                return finishedCameraPosition;
+            }
             if(current_speed <= fwd_max_speed)
             {
                 return _playerToCamera;
@@ -625,6 +628,8 @@ public class RacePlayer : PausableBehaviour
             //when we cross the finish line
             case "FinishLine":
                 passedFinish = true;
+                //This is a bug fix to not let this indicator on for too long
+                callAfterSeconds(1f, () => passedFinish = false);
                 break;
 
             //when we hit a trackpoint trigger
