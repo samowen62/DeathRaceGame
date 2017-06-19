@@ -29,7 +29,7 @@ public class SceneFade : PausableBehaviour {
         startTime = Time.fixedTime;
         started = true;
 
-        fadeToBlack.rectTransform.sizeDelta = new Vector2(Screen.width, Screen.height);
+        fadeToBlack.rectTransform.sizeDelta = new Vector2(2 * Screen.width, 2* Screen.height);
         fadeToBlack.transform.position = new Vector3(Screen.width / 2, Screen.height / 2);
     }
 }

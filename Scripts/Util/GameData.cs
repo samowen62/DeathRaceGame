@@ -65,7 +65,7 @@ public class GameData : PausableBehaviour
     {
         if (validatePlayerName(playerName))
         {
-            return "Time: " + String.Format("{0:f}", playerData[playerName].lapTimes[currentTrack]);
+            return "Time: " + String.Format("{0:f} s", playerData[playerName].lapTimes[currentTrack].Sum());
         }
 
         return null;

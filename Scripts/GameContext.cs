@@ -125,8 +125,6 @@ public class GameContext : MonoBehaviour {
             return;
         }
 
-        //add laps to OrderBy
-        //TODO:redo this. Save players that have finished
         int i = 1;
 
         var placement = racerPlacement
@@ -148,7 +146,7 @@ public class GameContext : MonoBehaviour {
                 {
                     playerTrackPoint = racerPlacement[player].latestTrackPoint = player.trackPointNumInSeq;
                 }
-                else
+                else //TODO:is this necessary?
                 {
                     break;
                 }
@@ -159,19 +157,15 @@ public class GameContext : MonoBehaviour {
                 if(player.trackPointNumInSeq > playerTrackPoint - skipTrackPoints)
                 {
                     racerPlacement[player].latestTrackPoint = player.trackPointNumInSeq;
+                    //Debug.Log(player.name + " || " + player.trackPointNumInSeq);
                 }
             }
             else if (playerTrackPoint < skipTrackPoints)
             {
                 //player passes the finish line
-                if (player.passedFinish && !player.finished) //TODO: should check if on track point 1
+                if (player.passedFinish && !player.finished)
                 {
                     finishLap(playerTrackPoint, player);
-                }
-                else
-                {
-                    //keep false until the finish line is passed in the few track points leading up to the finish
-                    player.passedFinish = false;
                 }
             }
         }
@@ -259,7 +253,6 @@ public class GameContext : MonoBehaviour {
 
                     foreach (var p in unfinishedplayersOrdered)
                     {
-                        //TODO: create then call a delayed function to finish players
                         fillEmptyLaps(p);
                         p.finishRace();
                         gameData.addPlayerFinish(p.name, finishPlacement, racerPlacement[p].lapTimes);
@@ -269,11 +262,10 @@ public class GameContext : MonoBehaviour {
                     RacePlayer[] allPlayersOrdered = allPlayers.OrderBy(e => gameData.getPlacement(e.name)).ToArray();
                     for (int i = 0; i < allPlayers.Length; i++)
                     {
-                        //TODO:make these correct
                         string playerName = allPlayersOrdered[i].name;
                         PlacementFinishUI newFinishUI = createPlacementFinishUI(playerName,
                             gameData.getTotalTime(playerName), gameData.getPlacement(playerName),
-                            (i + 1) * -50);
+                            (i + 1) * -50 );
                         //TODO:add these in pauseable array menu
                         pauseUIComponents.Concat(new GameObject[] { newFinishUI.gameObject });
                         pausableComponents.Concat(new PausableBehaviour[] { newFinishUI });
@@ -305,8 +297,8 @@ public class GameContext : MonoBehaviour {
             }
         }
 
-        //TODO: add a bit so not the same as main racer
-        float lapTime = staringSequence.time - lastLapTime;
+        //TODO may want to factor in distance from finish line instead of just adding .15 [i.e. trackpoint num]
+        float lapTime = staringSequence.time - lastLapTime + 0.15f;
         for (int i = lapTimes.Length - 1; i >= 0; i--)
         {
             if (lapTimes[i] > 0)
@@ -323,7 +315,10 @@ public class GameContext : MonoBehaviour {
         string _placementNumberTxt, float _downwardDistance)
     {
         //TODO:add this new prefab to the pausable prefab list
-        PlacementFinishUI placFinishUI = Instantiate(initialPlacementFinishUI, canvas.transform.position + new Vector3(40, -50, 0), Quaternion.identity) as PlacementFinishUI;
+        PlacementFinishUI placFinishUI = Instantiate(
+            initialPlacementFinishUI, 
+            canvas.transform.position + new Vector3(40, 20, 0), 
+            Quaternion.identity) as PlacementFinishUI;
         placFinishUI.transform.parent = canvas.transform;
         placFinishUI.setPrams(_playerTxt, _lapTimeTxt, _placementNumberTxt, _downwardDistance);
         return placFinishUI;
