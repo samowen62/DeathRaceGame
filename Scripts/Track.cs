@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Xml;
 using System.Linq;
+using System.IO;
 
 //TODO: use this class to store AI data
 public class Track : MonoBehaviour {
@@ -18,13 +18,11 @@ public class Track : MonoBehaviour {
 
     public Vector3 starting_point;
 
+    public TextAsset asset;
+
     private TrackPoint[] points;
 
-    //prefab of track
     private GameObject trackPrefab;
-
-    private const string TRACK_DATA_ROOT = "/Prefabs/Tracks/";
-    private const string TRACK_DATA_FILE_NAME = "/TrackData.xml";
 
     public bool loaded { get; set; }
 
@@ -86,10 +84,8 @@ public class Track : MonoBehaviour {
             Debug.LogError("Must add trackName to track!");
         }
 
-        //TODO:add error handling here
         XmlDocument doc = new XmlDocument();
-        string fileName = Application.dataPath + TRACK_DATA_ROOT + trackName + TRACK_DATA_FILE_NAME;
-        doc.Load(fileName);
+        doc.Load(new MemoryStream(asset.bytes));
         var pointList = doc.GetElementsByTagName("Point");
 
         if (pointList.Count == 0)
