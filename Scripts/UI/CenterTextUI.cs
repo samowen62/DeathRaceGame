@@ -52,6 +52,11 @@ public class CenterTextUI : PausableBehaviour
 
     private void updateText()
     {
+        //not initialized yet. believe it's a race condition when GameContext.Awake() calls pausableObj.behaviorBlockedbehaviorBlocked = false
+        if (image == null)
+        {
+            return;
+        }
         switch (status)
         {
             case CenterText.NONE:

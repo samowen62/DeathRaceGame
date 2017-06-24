@@ -9,7 +9,12 @@ public class GameContext : MonoBehaviour {
     public RacePlayer playerMain;
     public Track track;
     public GameData gameData;
-    public Dictionary<RacePlayer, PlacementDTO> racerPlacement;
+    private Dictionary<RacePlayer, PlacementDTO> racerPlacement;
+
+    public Dictionary<RacePlayer, PlacementDTO> getracerPlacement()
+    {
+        return racerPlacement;
+    }
 
     //TODO:Resources.Load doesn't work so I'm doing this instead in the meantime
     public PlacementFinishUI initialPlacementFinishUI;
@@ -37,7 +42,6 @@ public class GameContext : MonoBehaviour {
     public bool debugging = false;
 
     void Awake () {
-
         pauseLastPressed = 0f;
 
         allPlayers = FindObjectsOfType<RacePlayer>();

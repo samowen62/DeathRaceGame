@@ -10,8 +10,6 @@ public class Track : MonoBehaviour {
 
     public TrackPoint initialTrackPoint;
 
-    public string trackName;
-
     public float baseWidth;
 
     public bool isTrackReversed = true;
@@ -75,14 +73,9 @@ public class Track : MonoBehaviour {
 
     /**
      * This reads the xml file associated with this track and grabs the bezier curve data
-     *  - looks at the in the TrackData.xml file in the <trackName> folder in Prefabs/Tracks
      */
     private void readTrackData()
     {
-        if (trackName == "" || trackName == null)
-        {
-            Debug.LogError("Must add trackName to track!");
-        }
 
         XmlDocument doc = new XmlDocument();
         doc.Load(new MemoryStream(asset.bytes));

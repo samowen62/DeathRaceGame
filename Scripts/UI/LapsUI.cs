@@ -24,10 +24,11 @@ public class LapsUI : PausableBehaviour {
     protected override void _update () {
         if(placement == null)
         {
-            if (context.racerPlacement != null)
+            if (context.getracerPlacement() != null)
             {
-                placement = context.racerPlacement[player];
-            }else
+                placement = context.getracerPlacement()[player];     
+            }
+            else
             {
                 return;
             }
