@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class StartingSequence : PausableBehaviour
 {
 
-    private const float scriptBegin = 2f;
+    private const float scriptBegin = 4f;
     private const float scriptEnd = scriptBegin + 5f;
 
     private const float fontSmall = 120f;
@@ -13,6 +13,10 @@ public class StartingSequence : PausableBehaviour
     private Text screenText;
 
     public AudioObject boostSound;
+
+    public BezierSpline cameraPath;
+
+    public RacePlayer mainRacer;
 
     public bool finished { get; set; }
     public bool seq_finished { get; set; }
@@ -35,12 +39,25 @@ public class StartingSequence : PausableBehaviour
         if (seq_finished) return;
 
         float progress = pauseInvariantTime;
-        //only in sequence if in here
-        if (progress > scriptBegin && progress < scriptEnd)
+
+        if(progress <= scriptBegin)
         {
-            //TODO:adjust timing
+            float t = 0.98f - progress / scriptBegin;
+            Vector3 cameraPt = cameraPath.GetPoint(t);
+            Camera.main.transform.position = cameraPt;
+
+            Vector3 cameraDir = mainRacer.transform.position - cameraPt;
+            cameraDir = Vector3.ProjectOnPlane(cameraDir.normalized, mainRacer.transform.up);
+            Camera.main.transform.rotation = 
+                Quaternion.LookRotation(cameraDir, mainRacer.transform.up) * mainRacer.cameraRotation;
+        }
+        else if (progress > scriptBegin && progress < scriptEnd)
+        {
+            //TODO:adjust timing on boost sound
             if (!boostSound.started)
             {
+                Camera.main.transform.localPosition = mainRacer.playerToCamera;
+                Camera.main.transform.localRotation = mainRacer.cameraRotation;
                 boostSound.Play();
             }
 
@@ -64,7 +81,7 @@ public class StartingSequence : PausableBehaviour
                 screenText.fontSize = 180;
                 finished = true;
             }
-            else if(progress < scriptBegin + 5f)
+            else if(progress < scriptEnd)
             {
                 screenText.text = "";
                 seq_finished = true;

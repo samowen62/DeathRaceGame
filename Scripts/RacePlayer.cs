@@ -14,7 +14,7 @@ public class RacePlayer : PausableBehaviour
         {
             return _placement;
         }
-        set{
+        set {
             if (!finished)
             {
                 _placement = value;
@@ -23,11 +23,11 @@ public class RacePlayer : PausableBehaviour
     }
 
     /* Related to air and returning mechanics */
-    public float gravity = 1700f; 
+    public float gravity = 1700f;
     public float returningToTrackSpeed = 0.8f;
     public float timeAllowedNotOnTrack = 2f;
     public float timeSpentReturning = 1.5f;
-   
+
 
     /*Ship handling parameters, must be multiples of 5!! */
     public float fwd_accel = 80f;
@@ -52,7 +52,7 @@ public class RacePlayer : PausableBehaviour
     public float ship_mesh_tilt_hard_turn = 3f;
 
     /* Related to ship orientation and sticking to the track*/
-    public float hover_height = AppConfig.hoverHeight - 0.5f;       
+    public float hover_height = AppConfig.hoverHeight - 0.5f;
     public float height_smooth = 7f;                               //How fast the ship will readjust to "hover_height"
     public float pitch_smooth = 5f;                                //How fast the ship will adjust its rotation to match track normal
     public float height_correction = 2.2f;
@@ -75,7 +75,7 @@ public class RacePlayer : PausableBehaviour
             return current_speed;
         }
     }
-  
+
     private Vector3 previousGravity;
     private RaycastHit downHit;
     private RaycastHit wallHit;
@@ -150,7 +150,7 @@ public class RacePlayer : PausableBehaviour
     {
         get
         {
-            if(current_TrackPoint != null)
+            if (current_TrackPoint != null)
             {
                 return current_TrackPoint.num_in_seq;
             }
@@ -193,8 +193,11 @@ public class RacePlayer : PausableBehaviour
     private float boostPlacerToCamera_Z = 5f; //how much farther away the camera is during boost
     private float boostCameraSpeed = 0.5f;
     private float boostCameraDistance = 0f;
+
+    //TODO: make this some kind of game constant
     private Vector3 _playerToCamera = new Vector3(0, 10, -20);
-    private Vector3 playerToCamera
+    public Quaternion cameraRotation { get { return Quaternion.Euler(6, 0, 0); }}
+    public Vector3 playerToCamera
     {
         get
         {
