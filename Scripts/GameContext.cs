@@ -108,12 +108,12 @@ public class GameContext : MonoBehaviour {
     private void handleInputs()
     {
         //pause game
-        if (!paused && Input.GetKey(KeyCode.Q) && (Time.fixedTime - pauseLastPressed > buttonPressTime))
+        if (!paused && Input.GetKey(AppConfig.PAUSE_BUTTON) && (Time.fixedTime - pauseLastPressed > buttonPressTime))
         {
             pauseGame();
         }
         //un pause game
-        else if(paused && Input.GetKey(KeyCode.Q) && (Time.fixedTime - pauseLastPressed > buttonPressTime))
+        else if(paused && Input.GetKey(AppConfig.PAUSE_BUTTON) && (Time.fixedTime - pauseLastPressed > buttonPressTime))
         {
             unpauseGame();
         }

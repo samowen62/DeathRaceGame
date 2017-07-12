@@ -1,19 +1,23 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public static class AppConfig {
 
-    public static int groundMask = 1 << 8;
-    public static int wallMask = 1 << 11;
+    public static readonly int groundMask = 1 << 8;
+    public static readonly int wallMask = 1 << 11;
     //delete??
-    public static int trackPointMask = 1 << 12;
+    public static readonly int trackPointMask = 1 << 12;
 
-    public static string MENU_MAIN = "MainMenu";
-    public static string MENU_TRACK = "TrackMenu";
+    public static readonly string MENU_MAIN = "MainMenu";
+    public static readonly string MENU_TRACK = "TrackMenu";
 
-    public static string TRACK_PAPER_ENGINE = "paperEngine";
-    public static string TRACK_STAIRS = "StairsTrack";
+    public static readonly string TRACK_PAPER_ENGINE = "paperEngine";
+    public static readonly string TRACK_STAIRS = "StairsTrack";
 
+    public static readonly KeyCode PAUSE_BUTTON = KeyCode.F;
+    public static readonly KeyCode BOOST_BUTTON = KeyCode.Q;
+    public static readonly KeyCode SHARP_TURN_BUTTON = KeyCode.Space;
+    public static readonly KeyCode FORWARD_BUTTON = KeyCode.W;
+    public static readonly KeyCode ATTACK_BUTTON = KeyCode.E;
 
     public static float hoverHeight = 1.8f;
 

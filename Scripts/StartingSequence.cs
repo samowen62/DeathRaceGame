@@ -4,7 +4,7 @@ using UnityEngine.UI;
 public class StartingSequence : PausableBehaviour
 {
 
-    private const float scriptBegin = 4f;
+    private const float scriptBegin = 5f;
     private const float scriptEnd = scriptBegin + 5f;
 
     private const float fontSmall = 120f;
@@ -18,7 +18,7 @@ public class StartingSequence : PausableBehaviour
 
     public RacePlayer mainRacer;
 
-    public bool finished { get; set; }
+    public bool finished { get; set; } 
     public bool seq_finished { get; set; }
 
     public float time {
@@ -30,8 +30,6 @@ public class StartingSequence : PausableBehaviour
 
     protected override void _awake () {
         screenText = GetComponent<Text>();
-        finished = false;
-        seq_finished = false;
     }
 
     protected override void _update () {

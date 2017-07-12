@@ -4,10 +4,11 @@ public class PlayerInputDTO  {
 
     public float horizonalAxis { private set; get; }
     public float verticalAxis { private set; get; }
-    public bool spaceBar { private set; get; }
+    public bool sharpTurnButton { private set; get; }
     public bool pauseButton { private set; get; }
-    public bool w_key { private set; get; }
-    public bool e_key { private set; get; }
+    public bool boostButton { private set; get; }
+    public bool forwardButton { private set; get; }
+    public bool attackButton { private set; get; }
 
     public PlayerInputDTO()
     {
@@ -21,20 +22,22 @@ public class PlayerInputDTO  {
     {
         horizonalAxis = Input.GetAxis("Horizontal");
         verticalAxis = Input.GetAxis("Vertical");
-        spaceBar = Input.GetKey(KeyCode.Space);
-        pauseButton = Input.GetKey(KeyCode.Q);
-        w_key = Input.GetKey(KeyCode.W);
-        e_key = Input.GetKey(KeyCode.E);
+        sharpTurnButton = Input.GetKey(AppConfig.SHARP_TURN_BUTTON);
+        pauseButton = Input.GetKey(AppConfig.PAUSE_BUTTON);
+        boostButton = Input.GetKey(AppConfig.BOOST_BUTTON);
+        forwardButton = Input.GetKey(AppConfig.FORWARD_BUTTON);
+        attackButton = Input.GetKey(AppConfig.ATTACK_BUTTON);
     }
 
     public void setToZero()
     {
         horizonalAxis = 0f;
         verticalAxis = 0f;
-        spaceBar = false;
+        sharpTurnButton = false;
         pauseButton = false;
-        w_key = false;
-        e_key = false;
+        boostButton = false;
+        forwardButton = false;
+        attackButton = false;
     }
 
 }

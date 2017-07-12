@@ -34,6 +34,8 @@ public class RacePlayer : PausableBehaviour
     public float fwd_max_speed = 130f;
     public float fwd_boost_speed = 170f;
     public float fwd_boost_decel = 2.5f;
+    public float boost_time_window = 2.2f;
+    public int boost_cost = 10;
     public AudioObject boostSound;
 
     public float brake_speed = 200f;
@@ -187,6 +189,7 @@ public class RacePlayer : PausableBehaviour
 
     private float lastTimeOnGround = 0f;
     private float lastTimeAttacked = 0f;
+    private float lastTimeBoostPower = 0f;
     private float timeStartReturning = 0f;
     private float timeStartDeath = 0f;
 
@@ -330,15 +333,10 @@ public class RacePlayer : PausableBehaviour
 
         checkMiscMovement();
 
-        bool accelerating = isEffectiveAI || player_inputs.w_key;
+        bool accelerating = isEffectiveAI || player_inputs.forwardButton;
 
         prev_up = transform.up;
 
-        
-        if(!isAI && current_speed >= fwd_max_speed)
-        {
-            Camera.main.transform.localPosition = playerToCamera;
-        }
 
         //TODO:refactor into function
         if (Physics.Raycast(transform.position + height_above_cast * prev_up, -prev_up, out downHit, 
@@ -477,7 +475,7 @@ public class RacePlayer : PausableBehaviour
         }
 
         //Attack the opponent racer
-        if (player_inputs.e_key && playersToAttack.Count > 0)
+        if (player_inputs.attackButton && playersToAttack.Count > 0)
         {
             attack_player();
         }
@@ -522,6 +520,28 @@ public class RacePlayer : PausableBehaviour
             {
                 attacked_velocity = Vector3.zero;
             }
+        }
+
+        //Player is using boost power
+        if (player_inputs.boostButton && (pauseInvariantTime - lastTimeBoostPower > boost_time_window))
+        {
+            if(player_health <= 2f) return;
+
+            float boost_factor = 1f ;//want to use less than normal boost power if low health
+            if(player_health <= boost_cost + 1)
+            {
+                boost_factor = player_health / (boost_cost + 1);
+            }
+
+            current_speed += boost_factor * (fwd_boost_speed - current_speed);
+            boostSound.Play();
+            lastTimeBoostPower = pauseInvariantTime;
+            slowlyDamage((int)(boost_factor * boost_cost));
+        }
+
+        if (!isAI && current_speed >= fwd_max_speed)
+        {
+            Camera.main.transform.localPosition = playerToCamera;
         }
     }
 
@@ -630,6 +650,8 @@ public class RacePlayer : PausableBehaviour
 
             //when we cross the finish line
             case "FinishLine":
+                if (status == PlayerStatus.RETURNINGTOTRACK) return;
+
                 passedFinish = true;
                 //This is a bug fix to not let this indicator on for too long
                 callAfterSeconds(1f, () => passedFinish = false);
@@ -748,7 +770,7 @@ public class RacePlayer : PausableBehaviour
         {
             horizontal_input = player_inputs.horizonalAxis;
             vertical_input = player_inputs.verticalAxis;
-            spaceBar = player_inputs.spaceBar;
+            spaceBar = player_inputs.sharpTurnButton;
             prev_h = horizontal_input;
         }
         else
@@ -940,15 +962,32 @@ public class RacePlayer : PausableBehaviour
     }
 
     /**
+     * called to slowly inflict damage (10 points per second) to the player by _damage amount
+     */
+    public void slowlyDamage(int _damage)
+    {
+        while(_damage > 0)
+        {
+            callAfterSeconds(0.1f * _damage, () =>
+            {
+                damage(1f);
+            });
+            --_damage;
+        }
+    }
+
+    /**
      * called to damage the current player by _damage amount
      */
     public void damage(float _damage)
     {
+        if (dead) return;
+
         player_health -= _damage;
         player_health = Math.Max(player_health, 0f);
         player_health = Math.Min(player_health, max_bonus_health);
 
-        //The Player has died
+        //The Player has died >:)
         if (player_health <= 0)
         {
             Debug.Log(name + " died!");
