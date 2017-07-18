@@ -19,9 +19,11 @@ public class GameData : PausableBehaviour
     public string[] PlayerNames =
     {
         "Player 1",
-        "AI 1"
+        "Player 2"
     };
 
+    /* This will define the main player in this race */
+    public string mainPlayer = "Player 1";
 
     //map of player names to Data objects
     private Dictionary<string, DataDTO> playerData;

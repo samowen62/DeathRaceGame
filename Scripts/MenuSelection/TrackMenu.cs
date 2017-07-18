@@ -12,8 +12,6 @@ public class TrackMenu : MonoBehaviour
 
     public GameData gameData;
 
-    public SceneFade sceneFade;
-
     //TODO: use array of buttons with enum class specifying string
     private Button track_1_button;
     private Button track_2_button;
@@ -66,7 +64,7 @@ public class TrackMenu : MonoBehaviour
     private void load_test_1()
     {
         DontDestroyOnLoad(gameData);
-        gameData.loadSceneAfterSeconds(gameData.sceneSequence[0], 0f);
+        gameData.loadSceneAfterSeconds("RacerMenu", 0.0f);
     }
 
     private void load_test_2()
@@ -86,7 +84,7 @@ public class TrackMenu : MonoBehaviour
         if (!loadingBlocked)
         {
             loadingBlocked = true;
-            Debug.Log("Started Test Track sequence");
+            Debug.Log("Back to main");
 
             SyncLoadLevel(AppConfig.MENU_MAIN);
         }
@@ -100,8 +98,6 @@ public class TrackMenu : MonoBehaviour
 
     IEnumerator Load(string levelName)
     {
-        sceneFade.fade();
-        yield return new WaitForSeconds(sceneFade.duration);
         async = SceneManager.LoadSceneAsync(levelName);
         yield return async;
     }

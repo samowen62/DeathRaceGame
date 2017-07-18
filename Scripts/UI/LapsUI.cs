@@ -49,7 +49,7 @@ public class LapsUI : PausableBehaviour {
         if (!player.finished && placement.lap <= placement.lapStart.Length)
         {
             text += CURRENT_LAP + string.Format(FORMAT, pauseInvariantTime - placement.lapStart[placement.lap - 1]);
-        }
+        }//figure out why it's only printing 1 lap
         textComponent.text = text;
     }
 }

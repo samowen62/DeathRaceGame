@@ -34,4 +34,15 @@ public static class AppConfig {
         lr.SetPosition(0, start);
         lr.SetPosition(1, end);
     }
+
+    public static void changeParent(GameObject newParent, GameObject child)
+    {
+        Vector3 oldTrans = child.transform.localPosition;
+        Vector3 oldScale = child.transform.localScale;
+        Quaternion oldRotation = child.transform.localRotation;
+        child.transform.SetParent(newParent.transform);
+        child.transform.localPosition = oldTrans;
+        child.transform.localRotation = oldRotation;
+        child.transform.localScale = oldScale;
+    }
 }

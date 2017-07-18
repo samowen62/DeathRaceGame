@@ -1,11 +1,10 @@
 ﻿using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
-using System;
 
 public class GameContext : MonoBehaviour {
 
-    public StartingSequence staringSequence;
+    public StartingSequence startingSequence;
     public RacePlayer playerMain;
     public Track track;
     public GameData gameData;
@@ -59,6 +58,28 @@ public class GameContext : MonoBehaviour {
                 {
                     Debug.LogWarning(player.name + " not legal player name");
                 }
+
+                /* find the main player and set all objects accordingly */
+                if (gameData.mainPlayer.Equals(player.name))
+                {
+                    player.isAI = false;
+                    playerMain = player;
+                    startingSequence.mainRacer = player;
+
+                    //TODO:find neater way of doing this!!!
+                    canvas.transform.Find("Placement").GetComponent<PlacementUI>().player = player;
+                    canvas.transform.Find("HealthBar").GetComponent<HealthUI>().player = player;
+                    canvas.transform.Find("LapTimes").GetComponent<LapsUI>().player = player;
+                    canvas.transform.Find("Speed").GetComponent<MPHUI>().player = player;
+                    canvas.transform.Find("CenterTextBG").GetComponent<CenterTextUI>().player = player;
+                    
+                    AppConfig.changeParent(player.gameObject, GameObject.Find("CameraPath"));
+                    AppConfig.changeParent(player.gameObject, Camera.main.gameObject);
+                }
+                else
+                {
+                    player.isAI = true;
+                }
             }
         }
 
@@ -83,8 +104,8 @@ public class GameContext : MonoBehaviour {
             racerPlacement.Add(p, new PlacementDTO(laps));
         }
 
-        staringSequence.finished = skipStart;
-        staringSequence.seq_finished = skipStart;
+        startingSequence.finished = skipStart;
+        startingSequence.seq_finished = skipStart;
         paused = false;
 
     }
@@ -95,12 +116,12 @@ public class GameContext : MonoBehaviour {
         findPlacement();
 
         //Start the race!
-        if (staringSequence.finished && playerMain.behaviorBlocked && !paused)//Only change if player blocked (only should call once)
+        if (startingSequence.finished && playerMain.behaviorBlocked && !paused)//Only change if player blocked (only should call once)
         {
             foreach (RacePlayer p in allPlayers)
             {
                 p.behaviorBlocked = false;
-                racerPlacement[p].lapStart[0] = staringSequence.time;
+                racerPlacement[p].lapStart[0] = startingSequence.time;
             }
         }
 	}
@@ -209,7 +230,7 @@ public class GameContext : MonoBehaviour {
             component.behaviorBlocked = false;
         }
 
-        if (!staringSequence.finished)
+        if (!startingSequence.finished)
         {
             foreach (RacePlayer p in allPlayers)
             {
@@ -226,7 +247,7 @@ public class GameContext : MonoBehaviour {
 
         if (lap <= laps)
         {
-            float time = staringSequence.time;
+            float time = startingSequence.time;
 
             racerPlacement[player].lapStart[lap - 1] = time;
             racerPlacement[player].lapTimes[lap - 2] = time - racerPlacement[player].lapStart[lap - 2];
@@ -237,7 +258,7 @@ public class GameContext : MonoBehaviour {
         //player finishes the race!!
         else if (lap - 1 == laps)
         {
-            racerPlacement[player].lapTimes[laps - 1] = staringSequence.time - racerPlacement[player].lapStart[laps - 1];
+            racerPlacement[player].lapTimes[laps - 1] = startingSequence.time - racerPlacement[player].lapStart[laps - 1];
 
             Debug.Log(player.name + " Finished!");
             player.finishRace();
@@ -302,7 +323,7 @@ public class GameContext : MonoBehaviour {
         }
 
         //TODO may want to factor in distance from finish line instead of just adding .15 [i.e. trackpoint num]
-        float lapTime = staringSequence.time - lastLapTime + 0.15f;
+        float lapTime = startingSequence.time - lastLapTime + 0.15f;
         for (int i = lapTimes.Length - 1; i >= 0; i--)
         {
             if (lapTimes[i] > 0)

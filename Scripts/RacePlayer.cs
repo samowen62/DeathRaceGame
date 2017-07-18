@@ -296,7 +296,7 @@ public class RacePlayer : PausableBehaviour
 
         if (dead)
         {
-            if (pauseInvariantTime - timeStartDeath > timeAllowedDead && !isEffectiveAI)
+            if (pauseInvariantTime - timeStartDeath > timeAllowedDead)//&& !isEffectiveAI to keep AI dead
             {
                 Debug.Log("returning" + (pauseInvariantTime - timeStartDeath));
                 dead = false;
