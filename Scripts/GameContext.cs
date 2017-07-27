@@ -288,8 +288,10 @@ public class GameContext : MonoBehaviour {
                     for (int i = 0; i < allPlayers.Length; i++)
                     {
                         string playerName = allPlayersOrdered[i].name;
-                        PlacementFinishUI newFinishUI = createPlacementFinishUI(playerName,
-                            gameData.getTotalTime(playerName), gameData.getPlacement(playerName),
+                        PlacementFinishUI newFinishUI = createPlacementFinishUI(
+                            AppConfig.getRacerDisplayName(playerName),
+                            gameData.getTotalTime(playerName), 
+                            gameData.getPlacement(playerName),
                             (i + 1) * -50 );
                         //TODO:add these in pauseable array menu
                         pauseUIComponents.Concat(new GameObject[] { newFinishUI.gameObject });

@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine.UI;
 
 public class PlacementUI : PausableBehaviour
 {
@@ -18,6 +17,10 @@ public class PlacementUI : PausableBehaviour
         if (!player.finished)
         {
             textComponent.text = getPlacementString(player.placement);
+        }
+        else
+        {
+            textComponent.text = "";
         }
     }
 
@@ -42,7 +45,7 @@ public class PlacementUI : PausableBehaviour
             case 8:
                 return "8th";
             default:
-                return "?? :O";
+                return "Err";
         }
     }
 }

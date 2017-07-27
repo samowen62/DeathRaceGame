@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 public static class AppConfig {
 
@@ -44,5 +46,29 @@ public static class AppConfig {
         child.transform.localPosition = oldTrans;
         child.transform.localRotation = oldRotation;
         child.transform.localScale = oldScale;
+    }
+
+    /* Map of player names to display names. Used below */
+    public static Dictionary<string, string> displayNameMap = new Dictionary<string, string>()
+    {
+        {"Player 1", "Sharp Ship" },
+        {"Player 2", "Red Racer" },
+        {"Player 3", "Green Machine" }
+    };
+
+    /**
+     * gets the racer's display name given the internally used game 
+     * (i.e.) "Player 1" -> "Sharp Racer"
+     */
+    public static string getRacerDisplayName(string playername)
+    {
+        string displayName = "No displayName!";
+        if (displayNameMap.TryGetValue(playername, out displayName))
+        {
+            return displayName;
+        }
+
+        Debug.Log("no display name found for player: " + playername + "!!");
+        return displayName;
     }
 }

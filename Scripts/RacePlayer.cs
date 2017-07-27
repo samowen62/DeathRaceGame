@@ -17,6 +17,10 @@ public class RacePlayer : PausableBehaviour
         set {
             if (!finished)
             {
+                if(_placement != value)
+                {
+                    Debug.Log(name + " moved to " + value);
+                }
                 _placement = value;
             }
         }

@@ -8,8 +8,11 @@ public class OptionHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     private Text thisText;
     private Color initialColor;
+    private Color disableColor = Color.gray;
     private int initialSize;
     private int hoverSize;
+
+    private bool disabled = false;
 
     public Color hoverColor;
 
@@ -23,13 +26,33 @@ public class OptionHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (disabled) return;
+
         thisText.color = hoverColor;
         thisText.fontSize = hoverSize;
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        if (disabled) return;
+
         thisText.color = initialColor;
         thisText.fontSize = initialSize;
+    }
+
+    public void disable()
+    {
+        disabled = true;
+        thisText.color = disableColor;
+        thisText.fontSize = initialSize;
+    }
+
+    public void enable()
+    {
+        if (disabled) {
+            disabled = false;
+            thisText.color = initialColor;
+            thisText.fontSize = initialSize;
+        }
     }
 }

@@ -14,12 +14,11 @@ public class RacerMenu : MonoBehaviour {
 
     public SceneFade sceneFade;
 
-    private string selectedRacer = null;
+    public OptionHover proceedButton;
+
+    private RacerOption selectedRacer = null;
 
     private AsyncOperation async = null;
-
-    private Button proceedButton;
-    private Button backButton;
 
     private const string PLAYER_1 = "Player 1";
     private const string PLAYER_2 = "Player 2";
@@ -36,36 +35,36 @@ public class RacerMenu : MonoBehaviour {
 
         Button[] buttons = FindObjectsOfType<Button>();
 
+        proceedButton.disable();
+
         foreach (var button in buttons)
         {
             switch (button.name)
             {
                 //TODO: on click with a player we should highlight or outline them
                 case PLAYER_1:
-                    button.onClick.AddListener(delegate () { selectedRacer = PLAYER_1; });
+                    button.onClick.AddListener(() => chooseRacer(button));
                     UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, button, gameObject);
                     break;
 
                 case PLAYER_2:
-                    button.onClick.AddListener(delegate () { selectedRacer = PLAYER_2; });
+                    button.onClick.AddListener(() => chooseRacer(button));
                     UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, button, gameObject);
                     break;
 
                 case PLAYER_3:
-                    button.onClick.AddListener(delegate () { selectedRacer = PLAYER_3; });
+                    button.onClick.AddListener(() => chooseRacer(button));
                     UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, button, gameObject);
                     break;
 
                 case BACK_BUTTON:
-                    proceedButton = button;
-                    proceedButton.onClick.AddListener(delegate () { backButtonClicked(); });
-                    UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, proceedButton, gameObject);
+                    button.onClick.AddListener(delegate () { backButtonClicked(); });
+                    UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, button, gameObject);
 
                     break;
                 case PROCEED:
-                    backButton = button;
-                    backButton.onClick.AddListener(delegate () { proceedButtonClicked(); });
-                    UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, backButton, gameObject);
+                    button.onClick.AddListener(delegate () { proceedButtonClicked(); });
+                    UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, button, gameObject);
 
                     break;
                 default:
@@ -75,12 +74,20 @@ public class RacerMenu : MonoBehaviour {
         }
     }
 
+    private void chooseRacer( Button button)
+    {
+        if(selectedRacer != null) selectedRacer.deselect();
+
+        selectedRacer = button.GetComponent<RacerOption>();
+        selectedRacer.select();
+        proceedButton.enable();
+    }
 
     private void proceedButtonClicked()
     {
         if (selectedRacer == null) return;
 
-        gameData.mainPlayer = selectedRacer;
+        gameData.mainPlayer = selectedRacer.name;
         DontDestroyOnLoad(gameData);
         sceneFade.fade();
         gameData.loadSceneAfterSeconds(gameData.sceneSequence[0], sceneFade.duration);
