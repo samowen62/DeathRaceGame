@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 347de57719b428e4bae0de5a6a866d20
-timeCreated: 1504966953
+guid: 76d77812a707eea478b56edf402fbc7b
+timeCreated: 1505057867
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
@@ -11,57 +11,67 @@ ModelImporter:
     100006: //RootNode
     100008: Plane
     100010: Track
-    100012: Wall
-    100014: Wall_001
-    100016: Wall_002
-    100018: WallVisible
-    100020: WallVisible_001
-    100022: WallVisible_002
+    100012: TrackPoints
+    100014: Wall
+    100016: Wall_001
+    100018: Wall_002
+    100020: WallVisible
+    100022: WallVisible_001
+    100024: WallVisible_002
+    100026: altTrackPoints
     400000: altTrack
     400002: AltTrackPlane_longer_
     400004: AltTrackPlane_longer__001
     400006: //RootNode
     400008: Plane
     400010: Track
-    400012: Wall
-    400014: Wall_001
-    400016: Wall_002
-    400018: WallVisible
-    400020: WallVisible_001
-    400022: WallVisible_002
+    400012: TrackPoints
+    400014: Wall
+    400016: Wall_001
+    400018: Wall_002
+    400020: WallVisible
+    400022: WallVisible_001
+    400024: WallVisible_002
+    400026: altTrackPoints
     2300000: altTrack
     2300002: AltTrackPlane_longer_
     2300004: AltTrackPlane_longer__001
     2300006: Plane
     2300008: Track
-    2300010: Wall
-    2300012: Wall_001
-    2300014: Wall_002
-    2300016: WallVisible
-    2300018: WallVisible_001
-    2300020: WallVisible_002
+    2300010: TrackPoints
+    2300012: Wall
+    2300014: Wall_001
+    2300016: Wall_002
+    2300018: WallVisible
+    2300020: WallVisible_001
+    2300022: WallVisible_002
+    2300024: altTrackPoints
     3300000: altTrack
     3300002: AltTrackPlane_longer_
     3300004: AltTrackPlane_longer__001
     3300006: Plane
     3300008: Track
-    3300010: Wall
-    3300012: Wall_001
-    3300014: Wall_002
-    3300016: WallVisible
-    3300018: WallVisible_001
-    3300020: WallVisible_002
-    4300000: AltTrackPlane_longer__001
-    4300002: WallVisible_002
-    4300004: Wall_002
-    4300006: Wall_001
-    4300008: WallVisible_001
-    4300010: WallVisible
-    4300012: Wall
-    4300014: Plane
-    4300016: altTrack
-    4300018: AltTrackPlane_longer_
-    4300020: Track
+    3300010: TrackPoints
+    3300012: Wall
+    3300014: Wall_001
+    3300016: Wall_002
+    3300018: WallVisible
+    3300020: WallVisible_001
+    3300022: WallVisible_002
+    3300024: altTrackPoints
+    4300000: TrackPoints
+    4300002: AltTrackPlane_longer__001
+    4300004: WallVisible_002
+    4300006: Wall_002
+    4300008: Wall_001
+    4300010: WallVisible_001
+    4300012: WallVisible
+    4300014: Wall
+    4300016: Plane
+    4300018: altTrack
+    4300020: AltTrackPlane_longer_
+    4300022: Track
+    4300024: altTrackPoints
     7400000: Default Take
     9500000: //RootNode
   materials:

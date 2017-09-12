@@ -146,9 +146,6 @@ public class GameContext : MonoBehaviour {
      */
     private void findPlacement()
     {
-        if (!track.loaded) { 
-            return;
-        }
 
         int i = 1;
 

@@ -26,7 +26,7 @@ public class BoostPanel : PausableBehaviour
     // Update is called once per frame
     protected override void _update()
     {
-        //TODO: wait for trackpoints to be updated a better concurrent way
+        //TODO: wait for trackpoints to be updated a better concurrent way and remove this check!!
         //Extend an AfterTrackLoaded class
         if (innerCone == null || outerCone == null)
             return;
@@ -70,6 +70,8 @@ public class BoostPanel : PausableBehaviour
     protected override void _awake()
     {
         orientPanel();
+
+        findCones();
     }
 
     /**
@@ -107,19 +109,11 @@ public class BoostPanel : PausableBehaviour
      */
     private void orientPanel()
     {
-        StartCoroutine(setOrientiationWhenTrackLoaded());       
-    }
-
-    IEnumerator setOrientiationWhenTrackLoaded()
-    {
         Track track = FindObjectOfType(typeof(Track)) as Track;
-        while (!track.loaded)
-        {
-            yield return null;
-        }
 
         RaycastHit downHit;
-        TrackPoint closestPosition = track.findClosestTrackPointTo(transform.position);
+        //TODO:will need to change this when pasting on different paths. Don't specify PathChoice!
+        TrackPoint closestPosition = track.findClosestTrackPointTo(transform.position, TrackPoint.PathChoice.PATH_A);
 
         if (Physics.Raycast(transform.position, -transform.forward, out downHit, 30f, AppConfig.groundMask))
         {
@@ -130,10 +124,6 @@ public class BoostPanel : PausableBehaviour
         {
             Debug.LogError("Error: cannot find track to BoostPanel (" + this.name + "). Please orient this boost panel's z-axis up relative to the track and place the center above the track");
         }
-
-        findCones();
-
-        yield return 0;
     }
 
 }

@@ -2,8 +2,8 @@
 using System.Xml;
 using System.Linq;
 using System.IO;
+using System.Collections.Generic;
 
-//TODO: use this class to store AI data
 public class Track : MonoBehaviour {
 
     public CheckPoint startingCheckPoint;
@@ -18,17 +18,17 @@ public class Track : MonoBehaviour {
 
     public TextAsset asset;
 
-    private TrackPoint[] points;
+    private List<TrackPoint> points = new List<TrackPoint>();
 
     private GameObject trackPrefab;
 
-    public bool loaded { get; set; }
+    public bool creatingTrackPoints = false;
 
     public int totalTrackPoints
     {
         get
         {
-            return points.Length;
+            return points.Count;
         }
         set
         {
@@ -38,16 +38,24 @@ public class Track : MonoBehaviour {
 
     // Use this for initialization
     void Awake () {
-        loaded = false;
-        validateTrack();
+        if (creatingTrackPoints)
+        {
+            validateTrack();
 
-        readTrackData();
+            readTrackData();
+        } else
+        {
+            points = transform.GetComponentsInChildren<TrackPoint>().ToList();
+        }
 	}
 
-    public TrackPoint findClosestTrackPointTo(Vector3 target)
+    public TrackPoint findClosestTrackPointTo(Vector3 target, TrackPoint.PathChoice pathChoice)
     {
         //TODO maybe avoid Linq if too much linking overhead
-        return points.OrderByDescending(e => (e.transform.position - target).magnitude).Last();
+        return points
+            .Where(point => point.pathChoice == pathChoice)
+            .OrderByDescending(point => (point.transform.position - target).sqrMagnitude)
+            .Last();
     }
 
 
@@ -79,21 +87,52 @@ public class Track : MonoBehaviour {
 
         XmlDocument doc = new XmlDocument();
         doc.Load(new MemoryStream(asset.bytes));
-        var pointList = doc.GetElementsByTagName("Point");
 
+        System.Action<string, TrackPoint.PathChoice> addPointsFunction =
+            (string parentNode, TrackPoint.PathChoice trackChoice) =>
+        {
+            var trackPointList = doc.GetElementsByTagName(parentNode);
+            if (trackPointList.Count > 0)
+            {
+                generatePoints(trackPointList.Item(0).ChildNodes, trackChoice);
+            }
+        };
+
+        addPointsFunction("TrackPoints", TrackPoint.PathChoice.PATH_A);
+        addPointsFunction("TrackPoints-a", TrackPoint.PathChoice.PATH_A);
+        addPointsFunction("TrackPoints-b", TrackPoint.PathChoice.PATH_B);
+        addPointsFunction("TrackPoints-c", TrackPoint.PathChoice.PATH_C);
+    }
+
+
+
+    private void calculateTangents(TrackPoint[] trackPoints)
+    {
+        int len = trackPoints.Length;
+        for (int i = 0; i < len; i++)
+        {
+            Vector3 tangent = (trackPoints[(i + 1) % len].transform.position - trackPoints[(i - 1 + len) % len].transform.position);
+            trackPoints[i].GetComponent<SphereCollider>().radius = baseWidth / 2;// tangent.magnitude / 2;//TODO:This needs to extend the width of the track as well
+            trackPoints[i].tangent = isTrackReversed ? -tangent.normalized : tangent.normalized;
+            trackPoints[i].next = trackPoints[(i + 1) % len];
+        }
+    }
+
+    private void generatePoints(XmlNodeList pointList, TrackPoint.PathChoice pathChoice)
+    {
         if (pointList.Count == 0)
         {
             Debug.LogError("Need to have point data in xml file!");
         }
 
-        var bezierPointList = doc.GetElementsByTagName("BezierPoint");
-
+        //TODO: use bezier points to read in width. Currently we do nothing with them
+        /*var bezierPointList = doc.GetElementsByTagName("BezierPoint");
         if (bezierPointList.Count == 0)
         {
             Debug.LogError("Need to have bezier point data in xml file!");
-        }
+        }*/
 
-        points = new TrackPoint[pointList.Count];
+        var trackPoints = new TrackPoint[pointList.Count];
         int i = 0;
 
         GameObject TrackPointParent = new GameObject();
@@ -113,7 +152,7 @@ public class Track : MonoBehaviour {
              *  1) Negate z
              *  2) Rotate the point 180 on the y axis          
              */
-            b_point = Quaternion.AngleAxis(180,Vector3.up) * b_point;
+            b_point = Quaternion.AngleAxis(180, Vector3.up) * b_point;
 
             /*
              * This will transform the bezier points into the real track's 
@@ -125,15 +164,16 @@ public class Track : MonoBehaviour {
             b_point = trackPrefab.transform.rotation * b_point;
             b_point += trackPrefab.transform.position;
 
-            TrackPoint new_point = (TrackPoint) Instantiate(initialTrackPoint, b_point, Quaternion.identity, TrackPointParent.transform);
-            
+            TrackPoint new_point = Instantiate(initialTrackPoint, b_point, Quaternion.identity, TrackPointParent.transform);
+
             new_point.tag = "TrackPoint";
+            new_point.pathChoice = pathChoice;
             new_point.gameObject.AddComponent<SphereCollider>();
             new_point.gameObject.GetComponent<SphereCollider>().isTrigger = true;
             //new_point.width = System.Convert.ToSingle(point.ChildNodes.Item(3).InnerText);
             new_point.width = baseWidth;
 
-            points[i] = new_point;
+            trackPoints[i] = new_point;
             i++;
         }
 
@@ -141,10 +181,11 @@ public class Track : MonoBehaviour {
         //linearly interpolate through all the points[] to set the correct width multiplier for
         //each point. This should be multiplied by the scale of the track to get the proper width
 
+        calculateTangents(trackPoints);
 
-        calculateTangents(isTrackReversed);
+        points.AddRange(trackPoints.ToList());
 
-        TrackPoint track_point = findClosestTrackPointTo(starting_point);
+        TrackPoint track_point = findClosestTrackPointTo(starting_point, pathChoice);
         int point_num = 1;
 
         while (track_point.num_in_seq == -1)
@@ -153,20 +194,6 @@ public class Track : MonoBehaviour {
             track_point.name = "TrackPoint " + point_num;
             track_point = track_point.next;
             point_num++;
-        }
-
-        loaded = true;
-    }
-
-    private void calculateTangents(bool _isTrackReversed)
-    {
-        int len = points.Length;
-        for (int i = 0; i < len; i++)
-        {
-            Vector3 tangent = (points[(i + 1) % len].transform.position - points[(i - 1 + len) % len].transform.position);
-            points[i].GetComponent<SphereCollider>().radius = baseWidth / 2;// tangent.magnitude / 2;//TODO:This needs to extend the width of the track as well
-            points[i].tangent = _isTrackReversed ? -tangent.normalized : tangent.normalized;
-            points[i].next = points[(i + 1) % len];
         }
     }
 }
