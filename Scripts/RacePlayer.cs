@@ -7,6 +7,7 @@ public class RacePlayer : PausableBehaviour
 
     /* AI indicator */
     public bool isAI = true;
+    public TrackPoint.PathChoice AIPathChoice = TrackPoint.PathChoice.PATH_A;
     private int _placement;
     public int placement
     {
@@ -149,26 +150,14 @@ public class RacePlayer : PausableBehaviour
         }
     }
 
+    public PlacementManager placementManager;
     /* Last checkpoint of the player */
-    private CheckPoint lastCheckPoint;
+    private Vector3 lastCheckPointUp;
+    private Vector3 lastCheckPointPosition;
+    private TrackPoint lastCheckPoint;
     private TrackPoint current_TrackPoint;
-    public int trackPointNumInSeq
-    {
-        get
-        {
-            if (current_TrackPoint != null)
-            {
-                return current_TrackPoint.num_in_seq;
-            }
-            else
-            {
-                return -1;
-            }
-        }
-    }
+ 
 
-
-    public bool passedFinish = false;
     private bool finishedWithRace = false;
     public bool finished
     {
@@ -275,7 +264,7 @@ public class RacePlayer : PausableBehaviour
         playerTrail = shipRenderer.transform.Find("Light").GetComponent<Light>();
 
         tilt = Quaternion.identity;
-        lastCheckPoint = track[0].startingCheckPoint;
+        //lastCheckPoint = track[0].startingCheckPoint;
 
         //TODO: Fix this to avoid jumping the rotation on start. Maybe just give current speed on start?
         if (Physics.Raycast(transform.position, -transform.up, out downHit, rayCastDistance, AppConfig.groundMask))
@@ -583,8 +572,9 @@ public class RacePlayer : PausableBehaviour
 
         returningToTrackRotationBegin = transform.rotation;
         returningToTrackPositionBegin = transform.position;
-        returningToTrackRotationEnd = Quaternion.LookRotation(lastCheckPoint.trackForward, lastCheckPoint.trackNormal);
-        returningToTrackPositionEnd = lastCheckPoint.trackPoint;
+        returningToTrackRotationEnd = //lastCheckPointTransform.localRotation;//TODO:not sure if this is right. THey don't have rotations!
+        Quaternion.LookRotation(lastCheckPoint.tangent, lastCheckPointUp);
+        returningToTrackPositionEnd = lastCheckPointPosition;
     }
 
     private void setColorForHealth()
@@ -611,11 +601,6 @@ public class RacePlayer : PausableBehaviour
     {
         switch (coll.gameObject.tag)
         {
-            //set the last checkpoint the player got to
-            case "CheckPoint":
-                lastCheckPoint = coll.gameObject.GetComponent<CheckPoint>();
-                Debug.Log("Reached checkpoint " + lastCheckPoint.name);
-                break;
 
             //create a velocity vector from bouncing off the wall
             case "CollissionWall":
@@ -656,16 +641,36 @@ public class RacePlayer : PausableBehaviour
             case "FinishLine":
                 if (status == PlayerStatus.RETURNINGTOTRACK) return;
 
-                passedFinish = true;
-                //This is a bug fix to not let this indicator on for too long
-                callAfterSeconds(1f, () => passedFinish = false);
+                if (!finished && placementManager.crossFinish(this))
+                {
+                    if (isEffectiveAI)
+                    {
+                        finishRace();
+                    }
+                    else
+                    {
+                        finishMainPlayer();
+                    }
+                }
                 break;
 
             //when we hit a trackpoint trigger
             case "TrackPoint":
                 if (status != PlayerStatus.RETURNINGTOTRACK)
                 {
-                    current_TrackPoint = coll.gameObject.GetComponent<TrackPoint>();
+                    TrackPoint trackPoint = coll.gameObject.GetComponent<TrackPoint>();
+
+                    //AI should only stick to one path
+                    if (!isEffectiveAI || AIPathChoice == trackPoint.pathChoice)
+                    {
+                        current_TrackPoint = trackPoint;
+                    }
+                    
+                    if(placementManager.updateTrackPoint(this, trackPoint)){
+                        lastCheckPoint = trackPoint;
+                        lastCheckPointUp = transform.up;
+                        lastCheckPointPosition = transform.position + (AppConfig.hoverHeight + 1.0f) * lastCheckPointUp;
+                    }
                 }
                 break;
 

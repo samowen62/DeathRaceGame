@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class BoostPanel : PausableBehaviour
 {
@@ -26,8 +25,7 @@ public class BoostPanel : PausableBehaviour
     // Update is called once per frame
     protected override void _update()
     {
-        //TODO: wait for trackpoints to be updated a better concurrent way and remove this check!!
-        //Extend an AfterTrackLoaded class
+
         if (innerCone == null || outerCone == null)
             return;
 

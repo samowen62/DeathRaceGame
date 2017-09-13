@@ -1,0 +1,3 @@
+SplitJoinTrack CheckPoints:
+	A: 180, 164(B), 150(B), 133
+	B: 180, 165(B), 150(B), 133

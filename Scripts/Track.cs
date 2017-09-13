@@ -3,10 +3,9 @@ using System.Xml;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
+using UnityEditor;
 
 public class Track : MonoBehaviour {
-
-    public CheckPoint startingCheckPoint;
 
     public TrackPoint initialTrackPoint;
 
@@ -172,6 +171,7 @@ public class Track : MonoBehaviour {
             new_point.gameObject.GetComponent<SphereCollider>().isTrigger = true;
             //new_point.width = System.Convert.ToSingle(point.ChildNodes.Item(3).InnerText);
             new_point.width = baseWidth;
+            new_point.num_in_seq = -1;
 
             trackPoints[i] = new_point;
             i++;
@@ -194,6 +194,34 @@ public class Track : MonoBehaviour {
             track_point.name = "TrackPoint " + point_num;
             track_point = track_point.next;
             point_num++;
+        }
+    }
+
+    /**
+     * Used to remove unecessary items from the menu when not generating trackPoints
+     */
+    [CustomEditor(typeof(Track))]
+    public class TrackEditor : Editor
+    {
+        override public void OnInspectorGUI()
+        {
+            var track = target as Track;
+
+            track.creatingTrackPoints = EditorGUILayout.Toggle("Creating TrackPoints Asset", track.creatingTrackPoints);
+
+            using (var group = new EditorGUILayout.FadeGroupScope(System.Convert.ToSingle(track.creatingTrackPoints)))
+            {
+                if (group.visible == true)
+                {
+                    EditorGUI.indentLevel++;
+                    track.initialTrackPoint = (TrackPoint) EditorGUILayout.ObjectField("Initial TrackPoint", track.initialTrackPoint, typeof(TrackPoint), true);
+                    track.baseWidth = EditorGUILayout.FloatField("Track base width", track.baseWidth);
+                    track.isTrackReversed = EditorGUILayout.Toggle("Is track reversed", track.isTrackReversed);
+                    track.starting_point = EditorGUILayout.Vector3Field("Starting point", track.starting_point);
+                    track.asset = (TextAsset)EditorGUILayout.ObjectField("TrackData.xml file", track.asset, typeof(TextAsset), true);
+                    EditorGUI.indentLevel--;
+                }
+            }
         }
     }
 }

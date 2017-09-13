@@ -7,6 +7,7 @@ public class GameContext : MonoBehaviour {
     public StartingSequence startingSequence;
     public RacePlayer playerMain;
     public Track track;
+    public PlacementManager placementManager;
     public GameData gameData;
     private Dictionary<RacePlayer, PlacementDTO> racerPlacement;
 
@@ -45,6 +46,8 @@ public class GameContext : MonoBehaviour {
 
         allPlayers = FindObjectsOfType<RacePlayer>();
         gameData = FindObjectOfType<GameData>();
+
+        placementManager.addPlayers(allPlayers.ToList());
 
         if(gameData == null)
         {
@@ -113,7 +116,7 @@ public class GameContext : MonoBehaviour {
 	void Update () {
         handleInputs();
 
-        findPlacement();
+        //findPlacement();
 
         //Start the race!
         if (startingSequence.finished && playerMain.behaviorBlocked && !paused)//Only change if player blocked (only should call once)
@@ -144,7 +147,7 @@ public class GameContext : MonoBehaviour {
     /**
      * Determines order of player placement. (i.e. first through last place)
      */
-    private void findPlacement()
+   /* private void findPlacement()
     {
 
         int i = 1;
@@ -191,7 +194,7 @@ public class GameContext : MonoBehaviour {
                 }
             }
         }
-    }
+    }*/
 
     public void pauseGame()
     {
@@ -238,7 +241,6 @@ public class GameContext : MonoBehaviour {
 
     private void finishLap(int playerTrackPoint, RacePlayer player)
     {
-        player.passedFinish = false;
         racerPlacement[player].lap++;
         int lap = racerPlacement[player].lap;
 
