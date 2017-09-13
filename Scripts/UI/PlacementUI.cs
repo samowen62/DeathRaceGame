@@ -2,8 +2,9 @@
 
 public class PlacementUI : PausableBehaviour
 {
-
     public RacePlayer player;
+
+    public PlacementManager placementManager;
 
     private Text textComponent;
 
@@ -16,7 +17,7 @@ public class PlacementUI : PausableBehaviour
     {
         if (!player.finished)
         {
-            textComponent.text = getPlacementString(player.placement);
+            textComponent.text = getPlacementString(placementManager.getPlacementOf(player));
         }
         else
         {
@@ -24,6 +25,7 @@ public class PlacementUI : PausableBehaviour
         }
     }
 
+    //TODO: don't allow this to change too often
     private string getPlacementString(int placement)
     {
         switch (placement)

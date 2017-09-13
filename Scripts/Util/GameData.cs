@@ -76,12 +76,12 @@ public class GameData : PausableBehaviour
     /*
      * Signal a player as finished the race
      */
-    public void addPlayerFinish(string playerName, int placement, float[] lapTimes)
+    public void addPlayerFinish(string playerName, float[] lapTimes)
     {
-        playerData[playerName].placements[currentTrack] = placement;
-        playerData[playerName].lapTimes[currentTrack] = lapTimes.ToList<float>();//TODO:test this lol
         playersFinished++;
-
+        playerData[playerName].placements[currentTrack] = playersFinished;
+        playerData[playerName].lapTimes[currentTrack] = lapTimes.ToList();
+        
         //The game is over
         if(playersFinished == PlayerNames.Length)
         {
@@ -146,6 +146,19 @@ public class GameData : PausableBehaviour
     IEnumerator Load(float seconds)
     {
         yield return async;
+    }
+
+    public class DataDTO
+    {
+        public int[] placements;
+
+        public List<float>[] lapTimes;
+
+        public DataDTO(int tracks)
+        {
+            placements = new int[tracks];
+            lapTimes = new List<float>[tracks];
+        }
     }
 
 }

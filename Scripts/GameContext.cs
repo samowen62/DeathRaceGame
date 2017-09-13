@@ -9,23 +9,13 @@ public class GameContext : MonoBehaviour {
     public Track track;
     public PlacementManager placementManager;
     public GameData gameData;
-    private Dictionary<RacePlayer, PlacementDTO> racerPlacement;
-
-    public Dictionary<RacePlayer, PlacementDTO> getracerPlacement()
-    {
-        return racerPlacement;
-    }
 
     //TODO:Resources.Load doesn't work so I'm doing this instead in the meantime
     public PlacementFinishUI initialPlacementFinishUI;
     public Canvas canvas;
     public ProceedUI proceedUI;
 
-    public int laps;
     public bool skipStart = false;
-
-    //Highest placement still attainable
-    private int finishPlacement = 1;
 
     private RacePlayer[] allPlayers;
     private GameObject[] pauseUIComponents;
@@ -39,7 +29,7 @@ public class GameContext : MonoBehaviour {
 
     private float pauseLastPressed;
     private bool paused;
-    public bool debugging = false;
+    private bool gameFinished = false;
 
     void Awake () {
         pauseLastPressed = 0f;
@@ -89,8 +79,6 @@ public class GameContext : MonoBehaviour {
         pauseUIComponents = GameObject.FindGameObjectsWithTag("PauseUI");
         pausableComponents = FindObjectsOfType<PausableBehaviour>();
 
-        racerPlacement = new Dictionary<RacePlayer, PlacementDTO>();
-
         foreach (var component in pausableComponents)
         {
             component.behaviorBlocked = false;
@@ -104,7 +92,6 @@ public class GameContext : MonoBehaviour {
         foreach (RacePlayer p in allPlayers)
         {
             p.behaviorBlocked = !skipStart;
-            racerPlacement.Add(p, new PlacementDTO(laps));
         }
 
         startingSequence.finished = skipStart;
@@ -116,15 +103,12 @@ public class GameContext : MonoBehaviour {
 	void Update () {
         handleInputs();
 
-        //findPlacement();
-
         //Start the race!
         if (startingSequence.finished && playerMain.behaviorBlocked && !paused)//Only change if player blocked (only should call once)
         {
             foreach (RacePlayer p in allPlayers)
             {
                 p.behaviorBlocked = false;
-                racerPlacement[p].lapStart[0] = startingSequence.time;
             }
         }
 	}
@@ -144,91 +128,17 @@ public class GameContext : MonoBehaviour {
 
     }
 
-    /**
-     * Determines order of player placement. (i.e. first through last place)
-     */
-   /* private void findPlacement()
-    {
-
-        int i = 1;
-
-        var placement = racerPlacement
-            .OrderByDescending(e => e.Value.lap)
-            .ThenBy(e => e.Key.trackPointNumInSeq);
-
-        foreach(var racer in placement)
-        {
-            racer.Key.placement = i;
-            i++;
-        }
-
-        foreach (var player in allPlayers)
-        {
-            int playerTrackPoint = racerPlacement[player].latestTrackPoint;
-
-            if(playerTrackPoint == -1) {
-                if (player.trackPointNumInSeq == track.totalTrackPoints)
-                {
-                    playerTrackPoint = racerPlacement[player].latestTrackPoint = player.trackPointNumInSeq;
-                }
-                else //TODO:is this necessary?
-                {
-                    break;
-                }
-            }
-
-            if (playerTrackPoint > player.trackPointNumInSeq)
-            {
-                if(player.trackPointNumInSeq > playerTrackPoint - skipTrackPoints)
-                {
-                    racerPlacement[player].latestTrackPoint = player.trackPointNumInSeq;
-                    //Debug.Log(player.name + " || " + player.trackPointNumInSeq);
-                }
-            }
-            else if (playerTrackPoint < skipTrackPoints)
-            {
-                //player passes the finish line
-                if (player.passedFinish && !player.finished)
-                {
-                    finishLap(playerTrackPoint, player);
-                }
-            }
-        }
-    }*/
 
     public void pauseGame()
     {
         Debug.Log("paused game");
-        pauseLastPressed = Time.fixedTime;
-        paused = true;
-
-        foreach (var component in pausableComponents)
-        {
-            component.behaviorBlocked = true;
-        }
-
-        foreach (var component in pauseUIComponents)
-        {
-            component.SetActive(true);
-        }
-
+        pausePressed(true);
     }
 
     public void unpauseGame()
     {
         Debug.Log("un-paused game");
-        pauseLastPressed = Time.fixedTime;
-        paused = false;
-
-        foreach (var component in pauseUIComponents)
-        {
-            component.SetActive(false);
-        }
-
-        foreach (var component in pausableComponents)
-        {
-            component.behaviorBlocked = false;
-        }
+        pausePressed(false);
 
         if (!startingSequence.finished)
         {
@@ -239,101 +149,73 @@ public class GameContext : MonoBehaviour {
         }
     }
 
-    private void finishLap(int playerTrackPoint, RacePlayer player)
+    private void pausePressed(bool pause)
     {
-        racerPlacement[player].lap++;
-        int lap = racerPlacement[player].lap;
+        pauseLastPressed = Time.fixedTime;
+        paused = pause;
 
-        if (lap <= laps)
+        foreach (var component in pauseUIComponents)
         {
-            float time = startingSequence.time;
-
-            racerPlacement[player].lapStart[lap - 1] = time;
-            racerPlacement[player].lapTimes[lap - 2] = time - racerPlacement[player].lapStart[lap - 2];
-
-            Debug.Log(player.name + " entered lap " + racerPlacement[player].lap + " total time: " + racerPlacement[player].lapTimes[lap - 2]);
-            playerTrackPoint = track.totalTrackPoints;
+            component.SetActive(pause);
         }
-        //player finishes the race!!
-        else if (lap - 1 == laps)
+
+        foreach (var component in pausableComponents)
         {
-            racerPlacement[player].lapTimes[laps - 1] = startingSequence.time - racerPlacement[player].lapStart[laps - 1];
-
-            Debug.Log(player.name + " Finished!");
-            player.finishRace();
-
-            //null check if debugging on gameData
-            if (!debugging)
-            {
-                gameData.addPlayerFinish(player.name, finishPlacement, racerPlacement[player].lapTimes);
-                finishPlacement++;
-
-                //if this is the main player or all but 1 have finished. Make other racers finish
-                var unfinishedplayersOrdered = allPlayers.Where(e => !e.finished).OrderBy(e => e.placement);
-                if (player.Equals(playerMain) || unfinishedplayersOrdered.Count() == 1)
-                {
-                    player.finishMainPlayer();
-                    PlacementFinishUI[] playerUIFinish = new PlacementFinishUI[allPlayers.Length];
-
-                    foreach (var p in unfinishedplayersOrdered)
-                    {
-                        fillEmptyLaps(p);
-                        p.finishRace();
-                        gameData.addPlayerFinish(p.name, finishPlacement, racerPlacement[p].lapTimes);
-                        finishPlacement++;
-                    }
-
-                    RacePlayer[] allPlayersOrdered = allPlayers.OrderBy(e => gameData.getPlacement(e.name)).ToArray();
-                    for (int i = 0; i < allPlayers.Length; i++)
-                    {
-                        string playerName = allPlayersOrdered[i].name;
-                        PlacementFinishUI newFinishUI = createPlacementFinishUI(
-                            AppConfig.getRacerDisplayName(playerName),
-                            gameData.getTotalTime(playerName), 
-                            gameData.getPlacement(playerName),
-                            (i + 1) * -50 );
-                        //TODO:add these in pauseable array menu
-                        pauseUIComponents.Concat(new GameObject[] { newFinishUI.gameObject });
-                        pausableComponents.Concat(new PausableBehaviour[] { newFinishUI });
-                        newFinishUI.startAnimation();
-                    }
-
-                    proceedUI.AppearAfterSeconds(initialPlacementFinishUI.waitingTime);
-
-                    gameData.printContents();
-                }
-            }
+            component.behaviorBlocked = pause;
         }
     }
 
     /**
-     * Fills the lap times on an unfinished player. We will use the latest lap
-     * time to populate the remaining laps
+     * called from the placement manager once a racer crosses the finish line. All logic 
+     * related to finishes are handled here
      */
-    private void fillEmptyLaps(RacePlayer p)
+    public void finishPlayer(RacePlayer player)
     {
-        float lastLapTime = 0f;
-        float[] lapTimes = racerPlacement[p].lapTimes;
-        for(int i = lapTimes.Length - 1; i >= 0; i--)
+        gameData.addPlayerFinish(player.name, 
+            placementManager.getLapTimesForPlayer(player));
+
+        if (player.isAI)
         {
-            if(lapTimes[i] > 0)
-            {
-                lastLapTime = lapTimes[i];
-                break;
-            }
+            player.finishRace();
         }
 
-        //TODO may want to factor in distance from finish line instead of just adding .15 [i.e. trackpoint num]
-        float lapTime = startingSequence.time - lastLapTime + 0.15f;
-        for (int i = lapTimes.Length - 1; i >= 0; i--)
+        var unfinishedplayersOrdered = placementManager.getUnfinishedPlayersOrdered();
+
+        //Finish race if main finishes or all else are
+        if (!gameFinished && (player.Equals(playerMain) || unfinishedplayersOrdered.Count() == 1))
         {
-            if (lapTimes[i] > 0)
-            {
-                break;
-            }else
-            {
-                lapTimes[i] = lapTime;
+            gameFinished = true;
+            player.finishMainPlayer();
+            PlacementFinishUI[] playerUIFinish = new PlacementFinishUI[allPlayers.Length];
+
+            foreach (var unfinishedPlayer in unfinishedplayersOrdered)
+            {                
+                placementManager.forcePlayerFinish(unfinishedPlayer);
+                gameData.addPlayerFinish(unfinishedPlayer.name, 
+                    placementManager.getLapTimesForPlayer(player));
+                if (!(player.Equals(playerMain))){
+                    unfinishedPlayer.finishRace();
+                }
             }
+
+            RacePlayer[] allPlayersOrdered = allPlayers.OrderBy(e => gameData.getPlacement(e.name)).ToArray();
+            for (int i = 0; i < allPlayersOrdered.Length; i++)
+            {
+                string playerName = allPlayersOrdered[i].name;
+                PlacementFinishUI newFinishUI = createPlacementFinishUI(
+                    AppConfig.getRacerDisplayName(playerName),
+                    gameData.getTotalTime(playerName),
+                    gameData.getPlacement(playerName),
+                    (i + 1) * -50);
+                //TODO:add these in pauseable array menu
+                pauseUIComponents.Concat(new GameObject[] { newFinishUI.gameObject });
+                pausableComponents.Concat(new PausableBehaviour[] { newFinishUI });
+                newFinishUI.startAnimation();
+            }
+
+            proceedUI.AppearAfterSeconds(initialPlacementFinishUI.waitingTime);
+
+            gameData.printContents();
         }
     }
 

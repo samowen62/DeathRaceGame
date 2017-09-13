@@ -8,24 +8,6 @@ public class RacePlayer : PausableBehaviour
     /* AI indicator */
     public bool isAI = true;
     public TrackPoint.PathChoice AIPathChoice = TrackPoint.PathChoice.PATH_A;
-    private int _placement;
-    public int placement
-    {
-        get
-        {
-            return _placement;
-        }
-        set {
-            if (!finished)
-            {
-                if(_placement != value)
-                {
-                    Debug.Log(name + " moved to " + value);
-                }
-                _placement = value;
-            }
-        }
-    }
 
     /* Related to air and returning mechanics */
     public float gravity = 1700f;
@@ -641,17 +623,7 @@ public class RacePlayer : PausableBehaviour
             case "FinishLine":
                 if (status == PlayerStatus.RETURNINGTOTRACK) return;
 
-                if (!finished && placementManager.crossFinish(this))
-                {
-                    if (isEffectiveAI)
-                    {
-                        finishRace();
-                    }
-                    else
-                    {
-                        finishMainPlayer();
-                    }
-                }
+                placementManager.crossFinish(this);
                 break;
 
             //when we hit a trackpoint trigger
