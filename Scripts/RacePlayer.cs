@@ -550,7 +550,13 @@ public class RacePlayer : PausableBehaviour
     {
         status = PlayerStatus.RETURNINGTOTRACK;
         timeStartReturning = pauseInvariantTime;
+        attack_velocity = Vector3.zero;
+        attacked_velocity = Vector3.zero;
+        wall_bounce_velocity = Vector3.zero;
+
         current_speed = 0f;
+        totalPitch = 0f;
+        totalRoll = 0f;
 
         returningToTrackRotationBegin = transform.rotation;
         returningToTrackPositionBegin = transform.position;
@@ -642,7 +648,7 @@ public class RacePlayer : PausableBehaviour
                     if(placementManager.updateTrackPoint(this, trackPoint)){
                         lastCheckPoint = trackPoint;
                         lastCheckPointUp = transform.up;
-                        lastCheckPointPosition = transform.position + (AppConfig.hoverHeight + 1.0f) * lastCheckPointUp;
+                        lastCheckPointPosition = transform.position + (AppConfig.hoverHeight) * lastCheckPointUp;
                     }
                 }
                 break;
