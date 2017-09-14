@@ -18,9 +18,12 @@ public class LapsUI : PausableBehaviour {
 
     protected override void _awake () {
         textComponent = GetComponent<Text>();
+        textComponent.text = "";
     }
 
     protected override void _update () {
+
+        if (!player.startedLap1) return;
 
         string text = "";
         float[] lapTimes = placementManager.getLapTimesForPlayer(player);

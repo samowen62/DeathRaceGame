@@ -171,6 +171,8 @@ public class GameContext : MonoBehaviour {
      */
     public void finishPlayer(RacePlayer player)
     {
+        if (player.finished) return;
+
         gameData.addPlayerFinish(player.name, 
             placementManager.getLapTimesForPlayer(player));
 

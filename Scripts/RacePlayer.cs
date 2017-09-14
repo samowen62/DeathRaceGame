@@ -139,7 +139,7 @@ public class RacePlayer : PausableBehaviour
     private TrackPoint lastCheckPoint;
     private TrackPoint current_TrackPoint;
  
-
+    public bool startedLap1 { get; private set; }
     private bool finishedWithRace = false;
     public bool finished
     {
@@ -623,6 +623,7 @@ public class RacePlayer : PausableBehaviour
             case "FinishLine":
                 if (status == PlayerStatus.RETURNINGTOTRACK) return;
 
+                startedLap1 = true;
                 placementManager.crossFinish(this);
                 break;
 

@@ -19,6 +19,7 @@ ModelImporter:
     100022: WallVisible_001
     100024: WallVisible_002
     100026: altTrackPoints
+    100028: TrackUnderside
     400000: altTrack
     400002: AltTrackPlane_longer_
     400004: AltTrackPlane_longer__001
@@ -33,6 +34,7 @@ ModelImporter:
     400022: WallVisible_001
     400024: WallVisible_002
     400026: altTrackPoints
+    400028: TrackUnderside
     2300000: altTrack
     2300002: AltTrackPlane_longer_
     2300004: AltTrackPlane_longer__001
@@ -46,6 +48,7 @@ ModelImporter:
     2300020: WallVisible_001
     2300022: WallVisible_002
     2300024: altTrackPoints
+    2300026: TrackUnderside
     3300000: altTrack
     3300002: AltTrackPlane_longer_
     3300004: AltTrackPlane_longer__001
@@ -59,6 +62,7 @@ ModelImporter:
     3300020: WallVisible_001
     3300022: WallVisible_002
     3300024: altTrackPoints
+    3300026: TrackUnderside
     4300000: TrackPoints
     4300002: AltTrackPlane_longer__001
     4300004: WallVisible_002
@@ -72,6 +76,7 @@ ModelImporter:
     4300020: AltTrackPlane_longer_
     4300022: Track
     4300024: altTrackPoints
+    4300026: TrackUnderside
     7400000: Default Take
     9500000: //RootNode
   materials:

@@ -25,12 +25,15 @@ public class HealthUI : PausableBehaviour
         textComponent = transform.Find("HealthDisplay").GetComponent<Text>();
         scaleComponent = transform.Find("ImageScale");
         imageComponent = scaleComponent.Find("HealthBarImage").GetComponent<Image>();
+        //TODO:see what we want to do here
+        textComponent.fontSize = 10;
     }
 
     protected override void _update()
     {
         current_color = getColor();
-        textComponent.text = _HEALTH + ((int)player.health);
+        //TODO: here too
+        textComponent.text = _HEALTH;// + ((int)player.health);
         textComponent.color = current_color;
         imageComponent.color = current_color;
         current_scale.x = player.health / player.starting_health;

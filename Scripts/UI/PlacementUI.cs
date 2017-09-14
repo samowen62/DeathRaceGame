@@ -8,6 +8,8 @@ public class PlacementUI : PausableBehaviour
 
     private Text textComponent;
 
+    private float timeLastUpdated = 0f;
+
     protected override void _awake()
     {
         textComponent = GetComponent<Text>();
@@ -17,7 +19,11 @@ public class PlacementUI : PausableBehaviour
     {
         if (!player.finished)
         {
-            textComponent.text = getPlacementString(placementManager.getPlacementOf(player));
+            if (pauseInvariantTime - timeLastUpdated > 0.7f)
+            {
+                timeLastUpdated = pauseInvariantTime;
+                textComponent.text = getPlacementString(placementManager.getPlacementOf(player));
+            }
         }
         else
         {

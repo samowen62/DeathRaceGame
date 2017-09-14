@@ -81,7 +81,9 @@ public class GameData : PausableBehaviour
         playersFinished++;
         playerData[playerName].placements[currentTrack] = playersFinished;
         playerData[playerName].lapTimes[currentTrack] = lapTimes.ToList();
-        
+
+        Debug.Log(playerName + " finished " + playersFinished);
+
         //The game is over
         if(playersFinished == PlayerNames.Length)
         {

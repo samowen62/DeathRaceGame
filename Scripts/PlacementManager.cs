@@ -126,7 +126,6 @@ public class PlacementManager : PausableBehaviour
             //check if player finished
             if (listOfPlayers[player].finished)
             {
-                Debug.Log("Player " + player.name + " finished!");
                 gameContext.finishPlayer(player);
             }
         }
