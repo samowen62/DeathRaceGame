@@ -4,6 +4,11 @@ using System;
 
 public class RacePlayer : PausableBehaviour
 {
+    //TODO: to organize these private varibles:
+    // 1) organize and indent based on section
+    // 2) change some to const or private. Waaay too many publics
+    // 3) change some to private set with public get where needed
+
 
     /* AI indicator */
     public bool isAI = true;
@@ -82,12 +87,16 @@ public class RacePlayer : PausableBehaviour
     public float pitch_decel = 10f;
 
     /* Related to player attacking */
+
+        //effects
     public Explosion explosion;
+    public SwipeTrail swipeTrail;
+
     private Dictionary<string, RacePlayer> playersToAttack;
     private Vector3 attack_velocity = Vector3.zero;
     private Vector3 attacked_velocity = Vector3.zero;
     public AudioObject bumpSound;
-    public float attack_time_window = 0.4f;
+    private float attack_time_window = 0.25f;
     public float attack_deccel = 10;
     public float attack_threshold = 5;
     public float attack_magnitude = 5;
@@ -450,7 +459,7 @@ public class RacePlayer : PausableBehaviour
         }
 
         //Attack the opponent racer
-        if (player_inputs.attackButton && playersToAttack.Count > 0)
+        if (player_inputs.attackButton)
         {
             attack_player();
         }
@@ -660,6 +669,16 @@ public class RacePlayer : PausableBehaviour
                     playersToAttack.Add(coll.name, coll.gameObject.GetComponent<RacePlayer>());
                 }
                 bump(coll.gameObject.GetComponent<RacePlayer>(), false);
+
+                //the AI may decide to attack another player >:)
+                //TODO: I should add more special effects for this. It's not obvious they're attacking
+                if (isAI)
+                {
+                    callAfterSeconds(0.1f, () =>
+                    {
+                        attack_player();
+                    });
+                }
                 break;
 
             //Make sure falling player doesn't fall through ground
@@ -731,21 +750,6 @@ public class RacePlayer : PausableBehaviour
     public void passPlayerInputs(PlayerInputDTO _player_inputs)
     {
         player_inputs = _player_inputs;
-    }
-
-    /**
-     * returns how deep into the trackpoint this player is
-     */
-    public float depthInTrackPoint()
-    {
-        if (current_TrackPoint != null)
-        {
-            return current_TrackPoint.distanceTraversed(transform.position);
-        }
-        else
-        {
-            return 0f;
-        }
     }
 
     private void turnShip(bool inAir)
@@ -898,7 +902,7 @@ public class RacePlayer : PausableBehaviour
      */
     private void attack_player()
     {
-        if(pauseInvariantTime - lastTimeAttacked > attack_time_window)
+        if(pauseInvariantTime - lastTimeAttacked > attack_time_window && playersToAttack.Count > 0)
         {
             lastTimeAttacked = pauseInvariantTime;
 
@@ -925,6 +929,10 @@ public class RacePlayer : PausableBehaviour
 
         if (attacking)
         {
+            if (swipeTrail != null)
+            {
+                swipeTrail.swipe(Vector3.Dot(playerToOpponent, transform.right) < 0);
+            }
             damage(attack_damage_transfer_factor * _damage);
             totalRoll = Vector3.Dot(playerToOpponent, transform.right) > 0 ? attack_roll : -attack_roll;
         }

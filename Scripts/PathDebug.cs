@@ -16,12 +16,14 @@ public class PathDebug : MonoBehaviour {
 	
     void Awake()
     {
-        previousSpot = target.transform.position; ;
+        previousSpot = target.transform.position;
     }
 
 	// Update is called once per frame
 	void Update () {
-        Debug.DrawLine(target.transform.position, previousSpot, Color.red, 60f);
+        AppConfig.DrawLine(previousSpot, target.transform.position, Color.blue);
+
+        //Debug.Log((previousSpot - target.transform.position).magnitude);
 
         previousSpot = target.transform.position;
     }

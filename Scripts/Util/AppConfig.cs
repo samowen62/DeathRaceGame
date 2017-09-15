@@ -26,7 +26,7 @@ public static class AppConfig {
     public static void DrawLine(Vector3 start, Vector3 end, Color color)
     {
         GameObject myLine = new GameObject();
-        myLine.name = "Bezier Line";
+        myLine.name = "Line";
         myLine.transform.position = start;
         myLine.AddComponent<LineRenderer>();
         LineRenderer lr = myLine.GetComponent<LineRenderer>();

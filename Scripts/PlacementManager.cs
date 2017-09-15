@@ -237,7 +237,7 @@ public class PlacementManager : PausableBehaviour
         public int CompareTo(object other)
         {
             PlayerPlacement that = other as PlayerPlacement;
-            return totalPoints * (this.lap - that.lap) + 
+            return totalPoints * (that.lap - this.lap) + 
                 (this.latestPointPath_A - that.latestPointPath_A +
                 this.latestPointPath_B - that.latestPointPath_B +
                 this.latestPointPath_C - that.latestPointPath_C);

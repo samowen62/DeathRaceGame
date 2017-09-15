@@ -29,6 +29,7 @@ public class LapsUI : PausableBehaviour {
         float[] lapTimes = placementManager.getLapTimesForPlayer(player);
         float lastLapStart = placementManager.getLastLapStart(player);
 
+        //TODO:format for minutes not just seconds
         for(int i = lapTimes.Length - 1; i >= 0; i--)
         {
             if (lapTimes[i] != 0f)
