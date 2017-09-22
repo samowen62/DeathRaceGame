@@ -215,6 +215,7 @@ public class GameContext : MonoBehaviour {
                 newFinishUI.startAnimation();
             }
 
+            //scene
             proceedUI.AppearAfterSeconds(initialPlacementFinishUI.waitingTime);
 
             gameData.printContents();

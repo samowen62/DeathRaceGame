@@ -41,7 +41,6 @@ public class RacerMenu : MonoBehaviour {
         {
             switch (button.name)
             {
-                //TODO: on click with a player we should highlight or outline them
                 case PLAYER_1:
                     button.onClick.AddListener(() => chooseRacer(button));
                     UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, button, gameObject);

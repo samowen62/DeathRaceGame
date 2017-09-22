@@ -11,13 +11,9 @@ public class Explosion : PausableBehaviour
 
     public AudioObject sound;
 
-    //TODO: verify
-    private bool isPlaying;
-
     protected override void _awake () {
         animation = GetComponent<Animator>();
         renderers = GetComponentsInChildren<MeshRenderer>();
-        isPlaying = false;
 
         foreach (var r in renderers)
         {
@@ -33,26 +29,12 @@ public class Explosion : PausableBehaviour
         setVisible();
         animation.SetInteger("shouldExplode", 1);
         sound.Play();
-        isPlaying = true;
 
         callAfterSeconds(seconds, () =>
         {
-            isPlaying = false;
             setInvisible();
             animation.SetInteger("shouldExplode", -1);
         });
-    }
-
-    protected override void onPause()
-    {
-        //if (isPlaying)
-            //animation.Stop();
-    }
-
-    protected override void onUnPause()
-    {
-        //if(isPlaying)
-          //  animation.Play("Explosion");
     }
 
     private void setInvisible()
