@@ -570,7 +570,7 @@ public class RacePlayer : PausableBehaviour
         returningToTrackRotationBegin = transform.rotation;
         returningToTrackPositionBegin = transform.position;
         returningToTrackRotationEnd = //lastCheckPointTransform.localRotation;//TODO:not sure if this is right. THey don't have rotations!
-        Quaternion.LookRotation(lastCheckPoint.tangent, lastCheckPointUp);
+        Quaternion.LookRotation(-lastCheckPoint.tangent, lastCheckPointUp);
         returningToTrackPositionEnd = lastCheckPointPosition;
     }
 
@@ -694,6 +694,12 @@ public class RacePlayer : PausableBehaviour
                         current_speed *= 1f / (1 + 3 * rho * rho);
                         downward_speed = 0f;
                     }
+                }
+                break;
+            case "DeathZone":
+                if(status == PlayerStatus.INAIR)
+                {
+                    return_to_track();
                 }
                 break;
 
