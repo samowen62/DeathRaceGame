@@ -34,6 +34,15 @@ ModelImporter:
     100052: Curve1Points
     100054: Curve2
     100056: Curve2Points
+    100058: MainRail
+    100060: MainRail_MeshPart0
+    100062: MainRail_MeshPart1
+    100064: MainRail_MeshPart2
+    100066: Cube_000
+    100068: MainRail2
+    100070: MainRail2_MeshPart0
+    100072: MainRail2_MeshPart1
+    100074: WallCollider
     400000: BezierCurve
     400002: BezierCurve_001
     400004: Cube_001
@@ -63,6 +72,15 @@ ModelImporter:
     400052: Curve1Points
     400054: Curve2
     400056: Curve2Points
+    400058: MainRail
+    400060: MainRail_MeshPart0
+    400062: MainRail_MeshPart1
+    400064: MainRail_MeshPart2
+    400066: Cube_000
+    400068: MainRail2
+    400070: MainRail2_MeshPart0
+    400072: MainRail2_MeshPart1
+    400074: WallCollider
     2300000: BezierCurve
     2300002: BezierCurve_001
     2300004: Cube_001
@@ -91,6 +109,13 @@ ModelImporter:
     2300050: Curve1Points
     2300052: Curve2
     2300054: Curve2Points
+    2300056: MainRail_MeshPart0
+    2300058: MainRail_MeshPart1
+    2300060: MainRail_MeshPart2
+    2300062: Cube_000
+    2300064: MainRail2_MeshPart0
+    2300066: MainRail2_MeshPart1
+    2300068: WallCollider
     3300000: BezierCurve
     3300002: BezierCurve_001
     3300004: Cube_001
@@ -119,6 +144,13 @@ ModelImporter:
     3300050: Curve1Points
     3300052: Curve2
     3300054: Curve2Points
+    3300056: MainRail_MeshPart0
+    3300058: MainRail_MeshPart1
+    3300060: MainRail_MeshPart2
+    3300062: Cube_000
+    3300064: MainRail2_MeshPart0
+    3300066: MainRail2_MeshPart1
+    3300068: WallCollider
     4300000: Cube_006
     4300002: Cube_005
     4300004: Cube_004
@@ -147,6 +179,13 @@ ModelImporter:
     4300050: Curve1Points
     4300052: Curve2
     4300054: Curve1
+    4300056: MainRail_MeshPart0
+    4300058: MainRail_MeshPart1
+    4300060: MainRail_MeshPart2
+    4300062: Cube_000
+    4300064: MainRail2_MeshPart0
+    4300066: MainRail2_MeshPart1
+    4300068: WallCollider
     7400000: Default Take
     9500000: //RootNode
   materials:

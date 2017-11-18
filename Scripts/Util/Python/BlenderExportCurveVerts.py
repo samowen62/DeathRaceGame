@@ -7,6 +7,7 @@ Steps to export points of Bezier Spline:
 		to print out the xml data
 '''
 
+#did scale y by .5 .5 .75 1.1 = .206 is good :)
 import bpy
 
 def ftos(fl):
