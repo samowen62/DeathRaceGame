@@ -8,6 +8,7 @@ Steps to export points of Bezier Spline:
 '''
 
 #did scale y by .5 .5 .75 1.1 = .206 is good :)
+#camera gets closer to ship when off tracks
 import bpy
 
 def ftos(fl):
