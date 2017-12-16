@@ -43,6 +43,9 @@ ModelImporter:
     100070: MainRail2_MeshPart0
     100072: MainRail2_MeshPart1
     100074: WallCollider
+    100076: Water
+    100078: UnderWater
+    100080: WaterUpsidedown
     400000: BezierCurve
     400002: BezierCurve_001
     400004: Cube_001
@@ -81,6 +84,9 @@ ModelImporter:
     400070: MainRail2_MeshPart0
     400072: MainRail2_MeshPart1
     400074: WallCollider
+    400076: Water
+    400078: UnderWater
+    400080: WaterUpsidedown
     2300000: BezierCurve
     2300002: BezierCurve_001
     2300004: Cube_001
@@ -116,6 +122,9 @@ ModelImporter:
     2300064: MainRail2_MeshPart0
     2300066: MainRail2_MeshPart1
     2300068: WallCollider
+    2300070: Water
+    2300072: UnderWater
+    2300074: WaterUpsidedown
     3300000: BezierCurve
     3300002: BezierCurve_001
     3300004: Cube_001
@@ -151,6 +160,9 @@ ModelImporter:
     3300064: MainRail2_MeshPart0
     3300066: MainRail2_MeshPart1
     3300068: WallCollider
+    3300070: Water
+    3300072: UnderWater
+    3300074: WaterUpsidedown
     4300000: Cube_006
     4300002: Cube_005
     4300004: Cube_004
@@ -186,6 +198,9 @@ ModelImporter:
     4300064: MainRail2_MeshPart0
     4300066: MainRail2_MeshPart1
     4300068: WallCollider
+    4300070: Water
+    4300072: WaterUpsidedown
+    4300074: UnderWater
     7400000: Default Take
     9500000: //RootNode
   materials:
