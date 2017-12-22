@@ -5,10 +5,11 @@
         _NormalTex("Normap map", 2D) = "bump" {}
         _Glossiness("Smoothness", Range(0,1)) = 0.5
         _Metallic("Metallic", Range(0,1)) = 0.0
+		_Alpha("Alpha", Range(0,1)) = 1.0
         _ScrollXSpeed("X scroll speed", Range(-10, 10)) = 0
         _ScrollYSpeed("Y scroll speed", Range(-10, 10)) = -0.4 }
         SubShader{
-            Tags { "RenderType" = "Opaque" }
+            Tags {"Queue" = "Transparent" "RenderType"="Transparent" }
             LOD 200
 
             CGPROGRAM
@@ -30,6 +31,7 @@
 
         half _Glossiness;
         half _Metallic;
+		half _Alpha;
         fixed4 _Color;
 
         void surf(Input IN, inout SurfaceOutputStandard o) {
@@ -51,7 +53,7 @@
             // Metallic and smoothness come from slider variables
             o.Metallic = _Metallic;
             o.Smoothness = _Glossiness;
-            o.Alpha = c.a;
+            o.Alpha = _Alpha;
         }
         ENDCG
     }
