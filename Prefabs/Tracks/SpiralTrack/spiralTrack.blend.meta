@@ -47,6 +47,7 @@ ModelImporter:
     100078: UnderWater
     100080: WaterUpsidedown
     100082: WaterUpsideDown
+    100084: WindowsOutSide
     400000: BezierCurve
     400002: BezierCurve_001
     400004: Cube_001
@@ -89,6 +90,7 @@ ModelImporter:
     400078: UnderWater
     400080: WaterUpsidedown
     400082: WaterUpsideDown
+    400084: WindowsOutSide
     2300000: BezierCurve
     2300002: BezierCurve_001
     2300004: Cube_001
@@ -128,6 +130,7 @@ ModelImporter:
     2300072: UnderWater
     2300074: WaterUpsidedown
     2300076: WaterUpsideDown
+    2300078: WindowsOutSide
     3300000: BezierCurve
     3300002: BezierCurve_001
     3300004: Cube_001
@@ -167,6 +170,7 @@ ModelImporter:
     3300072: UnderWater
     3300074: WaterUpsidedown
     3300076: WaterUpsideDown
+    3300078: WindowsOutSide
     4300000: Cube_006
     4300002: Cube_005
     4300004: Cube_004
@@ -206,6 +210,7 @@ ModelImporter:
     4300072: WaterUpsidedown
     4300074: UnderWater
     4300076: WaterUpsideDown
+    4300078: WindowsOutSide
     7400000: Default Take
     9500000: //RootNode
   materials:
