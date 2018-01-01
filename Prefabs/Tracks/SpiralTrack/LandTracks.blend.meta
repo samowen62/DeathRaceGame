@@ -1,35 +1,15 @@
 fileFormatVersion: 2
-guid: 0d8ea27a2cddc0c43a8ca02128f01684
-timeCreated: 1514598762
+guid: c59cd35cb9689844dab05df162872f2a
+timeCreated: 1514838316
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
-    100000: Cube
-    100002: //RootNode
-    100004: TowerBase
-    100006: TowerLid
-    100008: TowerMain
-    400000: Cube
-    400002: //RootNode
-    400004: TowerBase
-    400006: TowerLid
-    400008: TowerMain
-    2300000: Cube
-    2300002: TowerBase
-    2300004: TowerLid
-    2300006: TowerMain
-    2300008: //RootNode
-    3300000: Cube
-    3300002: TowerBase
-    3300004: TowerLid
-    3300006: TowerMain
-    3300008: //RootNode
-    4300000: Cube
-    4300002: TowerLid
-    4300004: TowerBase
-    4300006: TowerMain
-    4300008: Tower
+    100000: //RootNode
+    400000: //RootNode
+    2300000: //RootNode
+    3300000: //RootNode
+    4300000: SurfPatch
     7400000: Default Take
     9500000: //RootNode
   materials:
@@ -62,11 +42,11 @@ ModelImporter:
     meshCompression: 0
     addColliders: 0
     importBlendShapes: 1
-    swapUVChannels: 1
+    swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
     optimizeMeshForGPU: 1
-    keepQuads: 1
+    keepQuads: 0
     weldVertices: 1
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
@@ -74,8 +54,8 @@ ModelImporter:
     secondaryUVPackMargin: 4
     useFileScale: 1
   tangentSpace:
-    normalSmoothAngle: 83
-    normalImportMode: 1
+    normalSmoothAngle: 60
+    normalImportMode: 0
     tangentImportMode: 3
   importAnimation: 1
   copyAvatar: 0
