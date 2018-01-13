@@ -9,6 +9,7 @@ public class BoostPanel : PausableBehaviour
 
     //Height of boost panels above the track
     private float trackHeight = 3f;
+    private float trackFindHeight = 10f;
 
     private MeshRenderer innerCone;
     private MeshRenderer outerCone;
@@ -102,8 +103,6 @@ public class BoostPanel : PausableBehaviour
 	
     /**
      * Sets the panel to be level with the track
-     * 
-     * MAKE SURE Z-AXIS OF PANEL IS MANUALLY ORIENTED RELATIVELY CLOSE TO DESIRED Y-AXIS
      */
     private void orientPanel()
     {
@@ -113,15 +112,17 @@ public class BoostPanel : PausableBehaviour
         //TODO:will need to change this when pasting on different paths. Don't specify PathChoice!
         TrackPoint closestPosition = track.findClosestTrackPointTo(transform.position, TrackPoint.PathChoice.PATH_A);
 
-        if (Physics.Raycast(transform.position, -transform.forward, out downHit, 30f, AppConfig.groundMask))
+        var orientedCorrectly = Physics.Raycast(transform.position, -transform.forward, out downHit, trackFindHeight, AppConfig.groundMask)
+        || Physics.Raycast(transform.position, -transform.up, out downHit, trackFindHeight, AppConfig.groundMask)
+        || Physics.Raycast(transform.position, transform.forward, out downHit, trackFindHeight, AppConfig.groundMask)
+        || Physics.Raycast(transform.position, transform.up, out downHit, trackFindHeight, AppConfig.groundMask);
+        if (!orientedCorrectly)
         {
-            transform.rotation = Quaternion.LookRotation(downHit.normal , closestPosition.tangent);
-            transform.position = trackHeight * downHit.normal + downHit.point;
+            Debug.LogError("Error: cannot find track to BoostPanel (" + this.name + "). Please orient this boost panel's x axis parrallel to the track");
         }
-        else
-        {
-            Debug.LogError("Error: cannot find track to BoostPanel (" + this.name + "). Please orient this boost panel's z-axis up relative to the track and place the center above the track");
-        }
+
+        transform.rotation = Quaternion.LookRotation(downHit.normal, closestPosition.tangent);
+        transform.position = trackHeight * downHit.normal + downHit.point;
     }
 
 }
