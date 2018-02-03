@@ -45,6 +45,8 @@ public class StartingSequence : PausableBehaviour
             Camera.main.transform.position = cameraPt;
 
             Vector3 cameraDir = mainRacer.transform.position - cameraPt;
+
+            // ensures camera has same z-axis as main racer
             cameraDir = Vector3.ProjectOnPlane(cameraDir.normalized, mainRacer.transform.up);
             Camera.main.transform.rotation = 
                 Quaternion.LookRotation(cameraDir, mainRacer.transform.up) * mainRacer.cameraRotation;

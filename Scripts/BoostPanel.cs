@@ -7,6 +7,9 @@ public class BoostPanel : PausableBehaviour
     public float movement_amplitude = 3f;
     public float movement_spin_speed = 1f;
 
+    [Tooltip("Which path choice (A/B/C) is this sticking to")]
+    public TrackPoint.PathChoice pathChoice = TrackPoint.PathChoice.PATH_A;
+
     //Height of boost panels above the track
     private float trackHeight = 3f;
     private float trackFindHeight = 10f;
@@ -109,8 +112,7 @@ public class BoostPanel : PausableBehaviour
         Track track = FindObjectOfType(typeof(Track)) as Track;
 
         RaycastHit downHit;
-        //TODO:will need to change this when pasting on different paths. Don't specify PathChoice!
-        TrackPoint closestPosition = track.findClosestTrackPointTo(transform.position, TrackPoint.PathChoice.PATH_A);
+        TrackPoint closestPosition = track.findClosestTrackPointTo(transform.position, pathChoice);
 
         var orientedCorrectly = Physics.Raycast(transform.position, -transform.forward, out downHit, trackFindHeight, AppConfig.groundMask)
         || Physics.Raycast(transform.position, -transform.up, out downHit, trackFindHeight, AppConfig.groundMask)

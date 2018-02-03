@@ -46,39 +46,3 @@ Shader "Custom/UnderwaterShader"
     }
     FallBack "Diffuse"
 }
-
-/*Properties {
-	_MainTex ("Texture", 2D) = ""
-	_Color("Mix Color", Color) = (1,1,1,1)
-	_Alpha("Mix Color Ratio", Range(0,1)) = 0.0
-}
- 
-SubShader {Pass {	// iPhone 3GS and later
-	GLSLPROGRAM
-	varying mediump vec2 uv;
- 
-	#ifdef VERTEX
-	void main() {
-		gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-		uv = gl_MultiTexCoord0.xy;
-	}
-	#endif
- 
-	#ifdef FRAGMENT
-	uniform lowp sampler2D _MainTex;
-	uniform fixed4 _Color;
-	uniform float _Alpha;
-	void main() {
-		//float4 color = lerp(_MainTex, Color, gradient);
-		//gl_FragColor = texture2D(_MainTex, uv);
-		gl_FragColor = _Color;
-	}
-	#endif		
-	ENDGLSL
-}}
- 
-SubShader {Pass {	// pre-3GS devices, including the September 2009 8GB iPod touch
-	SetTexture[_MainTex]
-}}
- 
-}*/
