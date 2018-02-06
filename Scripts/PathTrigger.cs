@@ -21,6 +21,7 @@ public class PathTrigger : PausableBehaviour
 
     private void Awake()
     {
+        OnAwake();
         upDirection = transform.up;
         initialPosition = transform.position;
         initialRotation = transform.rotation;
@@ -54,6 +55,11 @@ public class PathTrigger : PausableBehaviour
         transform.position = initialPosition;
         transform.rotation = initialRotation;
         yield return null;
+    }
+
+    protected virtual void OnAwake()
+    {
+
     }
 
     protected virtual void OnTriggerStart()
