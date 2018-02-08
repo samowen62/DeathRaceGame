@@ -4,12 +4,7 @@ using UnityEngine;
 
 public class BirdFlock : PathTrigger
 {
-    private Bird[] birds;
-
-    protected override void OnAwake()
-    {
-        birds = GetComponentsInChildren<Bird>();
-    }
+    public Bird[] birds;
 
     protected override void OnTriggerStart()
     {
