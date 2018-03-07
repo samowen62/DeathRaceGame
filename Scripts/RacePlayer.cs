@@ -865,25 +865,23 @@ public class RacePlayer : PausableBehaviour
         //TODO: play with these weight factors until we get it right!
         horizontal_input = 0.25f * h1 + 0.25f * h2 + 0.5f * h3;
 
-        //Debug.Log(h + "  " + h1 + " " + h2 + " " + h3);
         if (horizontal_input > hard_turn_multiplier)
         {
             spaceBar = true;
         }
         horizontal_input = Mathf.Clamp01(horizontal_input);
 
-        //TODO may have to factor in isTrackReversed here as well (Track.cs property) for the > sign
+        //TODO: may have to factor in isTrackReversed here as well (Track.cs property) for the > sign (don't think so though)
         int sign = Vector3.Dot(Vector3.Cross(transform.forward, transform.up), current_TrackPoint.tangent) > 0 ? -1 : 1;
 
         horizontal_input *= sign;
-
-        //Debug.Log(" h:" + horizontal_input + " prev_h:" + prev_h + " pitch: " + totalPitch +  " sign:" + sign);
 
         if(status == PlayerStatus.INAIR)
         {
             vertical_input = prev_v + max_delta_v;
             vertical_input = vertical_input > 1 ? 1 : vertical_input;
-        }else if(prev_v != 0)
+        }
+        else if(prev_v != 0)
         {
             vertical_input = prev_v - max_delta_v;
             vertical_input = vertical_input < 0 ? 0 : vertical_input;
@@ -894,9 +892,7 @@ public class RacePlayer : PausableBehaviour
         else if (prev_h - horizontal_input >= max_delta_h)
             horizontal_input = prev_h - max_delta_h;
 
-        //TODO inline function for clamping between +/- 1
-        horizontal_input = horizontal_input > 1 ? 1 : horizontal_input;
-        horizontal_input = horizontal_input < -1 ? -1 : horizontal_input;
+        horizontal_input = Mathf.Clamp(horizontal_input, -1, 1);
 
         prev_h = horizontal_input;
         prev_v = vertical_input;
