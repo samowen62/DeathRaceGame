@@ -13,6 +13,8 @@ public class RacePlayer : PausableBehaviour
     /* AI indicator */
     public bool isAI = true;
     public TrackPoint.PathChoice AIPathChoice = TrackPoint.PathChoice.PATH_A;
+    public AIAlgorithm ai_algorithm = AIAlgorithm.LOW_ANTICIPATION;
+
 
     /* Related to air and returning mechanics */
     public float gravity = 1700f;
@@ -166,6 +168,7 @@ public class RacePlayer : PausableBehaviour
     private Vector3 finishedCameraPosition = new Vector3(-3.75f, 9.15f, 10.45f);
     private Quaternion finishedCameraRotation = Quaternion.Euler(39.53f, 172.45f, 6.1f);
 
+    private int prev_h_sign = 1;
     private float prev_h = 0f;
     private float max_delta_h = 0.2f;
     private float prev_v = 0f;
@@ -828,12 +831,12 @@ public class RacePlayer : PausableBehaviour
 
     private void setInputsFromAI(out float horizontal_input, out float vertical_input, out bool spaceBar)
     {
-        //for h - is turning left and + is right!
+        // for h - is turning left and + is right!
         spaceBar = false;
         vertical_input = 0f;
         int nearEdge = AIUtil.checkIfNearEdge(transform.position, transform.up, current_TrackPoint);
 
-        //Need to turn the ship away from the edge
+        // Need to turn the ship away from the edge
         if(nearEdge != 0)
         {
             spaceBar = true;
@@ -845,25 +848,25 @@ public class RacePlayer : PausableBehaviour
             {
                 horizontal_input = prev_h - max_delta_h;
             }
-            horizontal_input = horizontal_input > 1 ? 1 : horizontal_input;
-            horizontal_input = horizontal_input < -1 ? -1 : horizontal_input;
+            horizontal_input = Mathf.Clamp(horizontal_input, -1, 1);
 
+            prev_h_sign = horizontal_input < 0 ? -1 : 1;
             prev_h = horizontal_input;
             return;
         }
 
-        //TODO: make more presumptive (look N = 3 spots ahead? then see how they compare to 1 and hard_turn_multiplier)
-        //adjust tangent for N spots ahead or calculate h for each. (the former has less calculations and doesn't lose much info)
+        // Look a few trackpoints ahead if we are on a track with many sharp turns.
+        if (ai_algorithm == AIAlgorithm.HIGH_ANTICIPATION)
+        {
+            float h3 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next.next.next);
+            float h2 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next.next);
+            float h1 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next);
 
-        //first check tangents of next and next.next? trackpoint. If their dot is small enough, don't do anything
-
-        //weight the farther away ones more
-        float h3 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next.next.next);
-        float h2 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next.next);
-        float h1 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next);
-
-        //TODO: play with these weight factors until we get it right!
-        horizontal_input = 0.25f * h1 + 0.25f * h2 + 0.5f * h3;
+            horizontal_input = 0.25f * h1 + 0.25f * h2 + 0.5f * h3;
+        } else
+        {
+            horizontal_input = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next);
+        }
 
         if (horizontal_input > hard_turn_multiplier)
         {
@@ -872,7 +875,20 @@ public class RacePlayer : PausableBehaviour
         horizontal_input = Mathf.Clamp01(horizontal_input);
 
         //TODO: may have to factor in isTrackReversed here as well (Track.cs property) for the > sign (don't think so though)
-        int sign = Vector3.Dot(Vector3.Cross(transform.forward, transform.up), current_TrackPoint.tangent) > 0 ? -1 : 1;
+        float signDiff = Vector3.Dot(Vector3.Cross(transform.forward, transform.up), current_TrackPoint.tangent);
+        int sign = signDiff > 0 ? -1 : 1;
+
+        if (ai_algorithm == AIAlgorithm.LOW_ANTICIPATION)
+        {
+            if (Math.Abs(signDiff) > (spaceBar ? 0.2 : 0.1) && prev_h_sign != sign)
+            {
+                prev_h_sign = sign;
+            }
+            else
+            {
+                sign = prev_h_sign;
+            }
+        }
 
         horizontal_input *= sign;
 

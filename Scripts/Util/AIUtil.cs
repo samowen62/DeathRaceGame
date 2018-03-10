@@ -20,7 +20,6 @@ public static class AIUtil {
         float distance_from_center = Vector3.Dot(curr_pos - curr_point.transform.position, Vector3.Cross(curr_normal, curr_point.tangent));
         if(Mathf.Abs(distance_from_center) >= curr_point.width * halfWidthToComfortableWidth)
         {
-            //Debug.Log("too close " + distance_from_center + " " + curr_point.width * halfWidthToComfortableWidth);
             return distance_from_center > 0 ? -1 : 1;
         }
 
