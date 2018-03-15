@@ -13,7 +13,6 @@ public class RacePlayer : PausableBehaviour
     /* AI indicator */
     public bool isAI = true;
     public TrackPoint.PathChoice AIPathChoice = TrackPoint.PathChoice.PATH_A;
-    public AIAlgorithm ai_algorithm = AIAlgorithm.LOW_ANTICIPATION;
 
 
     /* Related to air and returning mechanics */
@@ -168,7 +167,6 @@ public class RacePlayer : PausableBehaviour
     private Vector3 finishedCameraPosition = new Vector3(-3.75f, 9.15f, 10.45f);
     private Quaternion finishedCameraRotation = Quaternion.Euler(39.53f, 172.45f, 6.1f);
 
-    private int prev_h_sign = 1;
     private float prev_h = 0f;
     private float max_delta_h = 0.2f;
     private float prev_v = 0f;
@@ -572,8 +570,7 @@ public class RacePlayer : PausableBehaviour
 
         returningToTrackRotationBegin = transform.rotation;
         returningToTrackPositionBegin = transform.position;
-        returningToTrackRotationEnd = //lastCheckPointTransform.localRotation;//TODO:not sure if this is right. THey don't have rotations!
-        Quaternion.LookRotation(-lastCheckPoint.tangent, lastCheckPointUp);
+        returningToTrackRotationEnd = Quaternion.LookRotation(lastCheckPoint.tangent, lastCheckPointUp);
         returningToTrackPositionEnd = lastCheckPointPosition;
     }
 
@@ -849,24 +846,15 @@ public class RacePlayer : PausableBehaviour
                 horizontal_input = prev_h - max_delta_h;
             }
             horizontal_input = Mathf.Clamp(horizontal_input, -1, 1);
-
-            prev_h_sign = horizontal_input < 0 ? -1 : 1;
             prev_h = horizontal_input;
             return;
         }
 
         // Look a few trackpoints ahead if we are on a track with many sharp turns.
-        if (ai_algorithm == AIAlgorithm.HIGH_ANTICIPATION)
-        {
-            float h3 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next.next.next);
-            float h2 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next.next);
-            float h1 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next);
-
-            horizontal_input = 0.25f * h1 + 0.25f * h2 + 0.5f * h3;
-        } else
-        {
-            horizontal_input = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next);
-        }
+        float h3 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next.next.next);
+        float h2 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next.next);
+        float h1 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next);
+        horizontal_input = 0.25f * h1 + 0.25f * h2 + 0.5f * h3;
 
         if (horizontal_input > hard_turn_multiplier)
         {
@@ -874,21 +862,10 @@ public class RacePlayer : PausableBehaviour
         }
         horizontal_input = Mathf.Clamp01(horizontal_input);
 
-        //TODO: may have to factor in isTrackReversed here as well (Track.cs property) for the > sign (don't think so though)
         float signDiff = Vector3.Dot(Vector3.Cross(transform.forward, transform.up), current_TrackPoint.tangent);
         int sign = signDiff > 0 ? -1 : 1;
 
-        if (ai_algorithm == AIAlgorithm.LOW_ANTICIPATION)
-        {
-            if (Math.Abs(signDiff) > (spaceBar ? 0.2 : 0.1) && prev_h_sign != sign)
-            {
-                prev_h_sign = sign;
-            }
-            else
-            {
-                sign = prev_h_sign;
-            }
-        }
+        //Vector3.Dot(transform.position - current_TrackPoint.transform.position, )
 
         horizontal_input *= sign;
 

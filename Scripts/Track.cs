@@ -207,6 +207,7 @@ public class Track : MonoBehaviour {
         {
             var track = target as Track;
 
+            track.isTrackReversed = EditorGUILayout.Toggle("Is track reversed", track.isTrackReversed);
             track.creatingTrackPoints = EditorGUILayout.Toggle("Creating TrackPoints Asset", track.creatingTrackPoints);
 
             using (var group = new EditorGUILayout.FadeGroupScope(System.Convert.ToSingle(track.creatingTrackPoints)))
@@ -216,7 +217,6 @@ public class Track : MonoBehaviour {
                     EditorGUI.indentLevel++;
                     track.initialTrackPoint = (TrackPoint) EditorGUILayout.ObjectField("Initial TrackPoint", track.initialTrackPoint, typeof(TrackPoint), true);
                     track.baseWidth = EditorGUILayout.FloatField("Track base width", track.baseWidth);
-                    track.isTrackReversed = EditorGUILayout.Toggle("Is track reversed", track.isTrackReversed);
                     track.starting_point = EditorGUILayout.Vector3Field("Starting point", track.starting_point);
                     track.asset = (TextAsset)EditorGUILayout.ObjectField("TrackData.xml file", track.asset, typeof(TextAsset), true);
                     EditorGUI.indentLevel--;

@@ -44,35 +44,37 @@ public class GameContext : MonoBehaviour {
             Debug.LogWarning("No GameData object found!!");
         } else
         {
-            proceedUI.gameData = gameData;
-            foreach (var player in allPlayers)
+            proceedUI.gameData = gameData;          
+        }
+
+        foreach (var player in allPlayers)
+        {
+            if (!(gameData == null || gameData.validatePlayerName(player.name)))
             {
-                if (!gameData.validatePlayerName(player.name))
-                {
-                    Debug.LogWarning(player.name + " not legal player name");
-                }
+                Debug.LogWarning(player.name + " not legal player name");
+            }
 
-                /* find the main player and set all objects accordingly */
-                if (gameData.mainPlayer.Equals(player.name))
-                {
-                    player.isAI = false;
-                    playerMain = player;
-                    startingSequence.mainRacer = player;
+            /* find the main player and set all objects accordingly */
+            if ((gameData != null && gameData.mainPlayer.Equals(player.name))
+                || (gameData == null && player == playerMain))
+            {
+                player.isAI = false;
+                playerMain = player;
+                startingSequence.mainRacer = player;
 
-                    //TODO:find neater way of doing this!!!
-                    canvas.transform.Find("Placement").GetComponent<PlacementUI>().player = player;
-                    canvas.transform.Find("HealthBar").GetComponent<HealthUI>().player = player;
-                    canvas.transform.Find("LapTimes").GetComponent<LapsUI>().player = player;
-                    canvas.transform.Find("Speed").GetComponent<MPHUI>().player = player;
-                    canvas.transform.Find("CenterTextBG").GetComponent<CenterTextUI>().player = player;
-                    
-                    AppConfig.changeParent(player.gameObject, GameObject.Find("CameraPath"));
-                    AppConfig.changeParent(player.gameObject, Camera.main.gameObject);
-                }
-                else
-                {
-                    player.isAI = true;
-                }
+                //TODO:find neater way of doing this!!!
+                canvas.transform.Find("Placement").GetComponent<PlacementUI>().player = player;
+                canvas.transform.Find("HealthBar").GetComponent<HealthUI>().player = player;
+                canvas.transform.Find("LapTimes").GetComponent<LapsUI>().player = player;
+                canvas.transform.Find("Speed").GetComponent<MPHUI>().player = player;
+                canvas.transform.Find("CenterTextBG").GetComponent<CenterTextUI>().player = player;
+
+                AppConfig.changeParent(player.gameObject, GameObject.Find("CameraPath"));
+                AppConfig.changeParent(player.gameObject, Camera.main.gameObject);
+            }
+            else
+            {
+                player.isAI = true;
             }
         }
 
