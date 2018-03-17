@@ -6,8 +6,6 @@ public static class AppConfig {
 
     public static readonly int groundMask = 1 << 8;
     public static readonly int wallMask = 1 << 11;
-    //delete??
-    public static readonly int trackPointMask = 1 << 12;
 
     public static readonly string MENU_MAIN = "MainMenu";
     public static readonly string MENU_TRACK = "TrackMenu";
@@ -46,6 +44,17 @@ public static class AppConfig {
         child.transform.localPosition = oldTrans;
         child.transform.localRotation = oldRotation;
         child.transform.localScale = oldScale;
+    }
+
+    public static T findOnly<T>()
+    {
+        var obj = Object.FindObjectsOfType(typeof(T)) as T[];
+        if (obj.Length != 1)
+        {
+            Debug.LogError("Error: only 1 component of type '" + typeof(T) + "' allowed in the scene");
+            return default(T);
+        }
+        return obj[0];
     }
 
     /* Map of player names to display names. Used below */

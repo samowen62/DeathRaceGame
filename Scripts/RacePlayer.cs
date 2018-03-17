@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System;
+using UnityEngine.EventSystems;
 
 public class RacePlayer : PausableBehaviour
 {
@@ -142,7 +143,9 @@ public class RacePlayer : PausableBehaviour
         }
     }
 
-    public PlacementManager placementManager;
+    private PlacementManager placementManager;
+    private GameEventsUI gameEventsUI;
+
     /* Last checkpoint of the player */
     private Vector3 lastCheckPointUp;
     private Vector3 lastCheckPointPosition;
@@ -233,13 +236,8 @@ public class RacePlayer : PausableBehaviour
         player_inputs = new PlayerInputDTO();
         playersToAttack = new Dictionary<string, RacePlayer>();
 
-        //TODO: sanity check to assert that the public parameters are within reasonable range (positive or negative)
-        //TODO: abstract finding 1 object of type and 1 object of name in general util class with assertion
-        Track[] track = FindObjectsOfType(typeof(Track)) as Track[];
-        if(track.Length != 1)
-        {
-            Debug.LogError("Error: only 1 component of type 'Track' allowed in the scene");
-        }
+        gameEventsUI = AppConfig.findOnly<GameEventsUI>();
+        placementManager = AppConfig.findOnly<PlacementManager>();
 
         shipRenderer = transform.Find("Ship").gameObject.GetComponent<MeshRenderer>();
         if (shipRenderer == null)
@@ -254,9 +252,7 @@ public class RacePlayer : PausableBehaviour
         redMaterial = new Material(Shader.Find("Transparent/Diffuse"));
         redMaterial.color = new Color32(1, 0, 0, 1);
         playerTrail = shipRenderer.transform.Find("Light").GetComponent<Light>();
-
         tilt = Quaternion.identity;
-        //lastCheckPoint = track[0].startingCheckPoint;
 
         //TODO: Fix this to avoid jumping the rotation on start. Maybe just give current speed on start?
         if (Physics.Raycast(transform.position, -transform.up, out downHit, rayCastDistance, AppConfig.groundMask))
@@ -981,7 +977,7 @@ public class RacePlayer : PausableBehaviour
         //The Player has died >:)
         if (player_health <= 0)
         {
-            Debug.Log(name + " died!");
+            gameEventsUI.PlayerDeathMessage(name);
             dead = true;
             timeStartDeath = pauseInvariantTime;
             explosion.Trigger(transform.position, transform.rotation, timeCameraShake);
