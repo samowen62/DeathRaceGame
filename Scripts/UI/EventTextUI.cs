@@ -18,6 +18,7 @@ public class EventTextUI : PausableBehaviour
     protected override void _awake()
     {
         text = GetComponent<Text>();
+        text.text = "";
         colorAlpha = text.color.a;
     }
 
@@ -61,10 +62,5 @@ public class EventTextUI : PausableBehaviour
     public void fadeOut()
     {
         fading = true;
-    }
-
-    public void clear()
-    {
-        text.text = "";
     }
 }

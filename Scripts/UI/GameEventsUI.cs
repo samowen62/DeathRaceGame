@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 //maybe just put this in raceplayer then?
@@ -13,13 +11,6 @@ public class GameEventsUI : PausableBehaviour
     protected override void _awake()
     {
         initialEventTextUI = AppConfig.findOnly<EventTextUI>();
-        initialEventTextUI.clear();
-    }
-
-    // Update is called once per frame
-    protected override void _update()
-    {
-
     }
 
     private void addMessage(string message)
@@ -47,21 +38,21 @@ public class GameEventsUI : PausableBehaviour
 
     public void PlayerDeathMessage(string player)
     {
-        addMessage(player + " died");
+        addMessage(AppConfig.getRacerDisplayName(player) + " died");
     }
 
     public void PlayerFinishMessage(string player)
     {
-        throw new NotImplementedException();
+        addMessage(AppConfig.getRacerDisplayName(player) + " Finished");
     }
 
     public void PlayerKilledMessage(string player, string killedBy)
     {
-        throw new NotImplementedException();
+        addMessage(AppConfig.getRacerDisplayName(player) + " was killed by " + AppConfig.getRacerDisplayName(killedBy));
     }
 
     public void PlayerLapMessage(string player, int lap)
     {
-        throw new NotImplementedException();
+        addMessage(AppConfig.getRacerDisplayName(player) + " entered lap " + lap);
     }
 }

@@ -5,7 +5,8 @@ using System.Linq;
 
 public class PlacementManager : PausableBehaviour
 {
-    public GameContext gameContext;
+    private GameContext gameContext;
+    private GameEventsUI gameEventsUI;
 
     //TODO:restrict these to only be able to set to checkpoints
     //also these should have the largest num_in_seq. that number goes down to 0
@@ -27,6 +28,9 @@ public class PlacementManager : PausableBehaviour
 
     private void Start()
     {
+        gameContext = AppConfig.findOnly<GameContext>();
+        gameEventsUI = AppConfig.findOnly<GameEventsUI>();
+
         var paths = new List<TrackPoint.PathChoice>();
         if (firstCheckPoint_A != null && firstCheckPoint_A.isCheckPoint)
         {
@@ -121,7 +125,7 @@ public class PlacementManager : PausableBehaviour
         if (validCross(player)) {
 
             listOfPlayers[player].finishLap(pauseInvariantTime);
-            Debug.Log(player.name + " entered lap " + listOfPlayers[player].lap);
+            gameEventsUI.PlayerLapMessage(player.name, listOfPlayers[player].lap);
 
             //check if player finished
             if (listOfPlayers[player].finished)

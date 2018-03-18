@@ -279,7 +279,6 @@ public class RacePlayer : PausableBehaviour
         {
             if (pauseInvariantTime - timeStartDeath > timeAllowedDead)//&& !isEffectiveAI to keep AI dead
             {
-                Debug.Log("returning" + (pauseInvariantTime - timeStartDeath));
                 dead = false;
                 shipRenderer.enabled = true;
 
@@ -932,18 +931,24 @@ public class RacePlayer : PausableBehaviour
             bumpSound.Play();
         }
 
-        opponent.attack(playerToOpponent, _damage, attacking);
+        opponent.attack(name, playerToOpponent, _damage, attacking);
     }
 
     /**
      * called when one player attacks another from _dir direction with _damage
      */
-    public void attack(Vector3 _dir, float _damage, bool _attacking)
+    public void attack(string attackerName, Vector3 _dir, float _damage, bool _attacking)
     {
         attacked_velocity = _dir;
         if (_attacking)
         {
             totalRoll = Vector3.Dot(_dir, transform.right) < 0 ? attack_roll : -attack_roll;
+        }
+
+        // attack killed the this player
+        if (!dead && ((player_health - _damage) <= 0))
+        {
+            gameEventsUI.PlayerKilledMessage(name, attackerName);
         }
         damage(_damage);
     }
@@ -994,6 +999,7 @@ public class RacePlayer : PausableBehaviour
     {
         if (finishedWithRace) return;
 
+        gameEventsUI.PlayerFinishMessage(name);
         finishedWithRace = true;
         fwd_max_speed *= 0.6f;
     }
