@@ -88,11 +88,10 @@ public class RacePlayer : PausableBehaviour
     public float air_speed_damping = 0.6f;
     public float pitch_decel = 10f;
 
-    /* Related to player attacking */
-
-        //effects
+    /* Related to player effects */
     public Explosion explosion;
     public SwipeTrail swipeTrail;
+    public ElectricalEffect electricalEffect;
 
     private Dictionary<string, RacePlayer> playersToAttack;
     private Vector3 attack_velocity = Vector3.zero;
@@ -239,6 +238,7 @@ public class RacePlayer : PausableBehaviour
         gameEventsUI = AppConfig.findOnly<GameEventsUI>();
         placementManager = AppConfig.findOnly<PlacementManager>();
 
+        electricalEffect = transform.GetComponentInChildren<ElectricalEffect>();
         shipRenderer = transform.Find("Ship").gameObject.GetComponent<MeshRenderer>();
         if (shipRenderer == null)
         {
@@ -626,6 +626,7 @@ public class RacePlayer : PausableBehaviour
             case "BoostPanel":
                 current_speed = fwd_boost_speed;
                 boostSound.Play();
+                electricalEffect.Activate();
                 coll.gameObject.GetComponent<BoostPanel>().boostAnimation();
                 break;
 
