@@ -180,8 +180,8 @@ public class RacePlayer : PausableBehaviour
     private float timeStartReturning = 0f;
     private float timeStartDeath = 0f;
 
-    private float boostPlacerToCamera_Z = 5f; //how much farther away the camera is during boost
-    private float boostCameraSpeed = 0.5f;
+    private float boostPlayerToCamera_Z = 6f; //how much farther away the camera is during boost
+    private float boostCameraSpeed = 0.7f;
     private float boostCameraDistance = 0f;
 
     //TODO: make this some kind of game constant
@@ -198,7 +198,7 @@ public class RacePlayer : PausableBehaviour
             {
                 return _playerToCamera;
             }
-            float target_z_distance = Mathf.Lerp(0, boostPlacerToCamera_Z, 
+            float target_z_distance = Mathf.Lerp(0, boostPlayerToCamera_Z, 
                 (current_speed - fwd_max_speed)/ (fwd_boost_speed - fwd_max_speed));
             //control how fast the camera can zoom out
             if(target_z_distance - boostCameraDistance > boostCameraSpeed)
@@ -514,7 +514,7 @@ public class RacePlayer : PausableBehaviour
             }
 
             current_speed += boost_factor * (fwd_boost_speed - current_speed);
-            boostSound.Play();
+            boostEffects();
             lastTimeBoostPower = pauseInvariantTime;
             slowlyDamage((int)(boost_factor * boost_cost));
         }
@@ -625,8 +625,7 @@ public class RacePlayer : PausableBehaviour
             //when we hit a boost panel
             case "BoostPanel":
                 current_speed = fwd_boost_speed;
-                boostSound.Play();
-                electricalEffect.Activate();
+                boostEffects();
                 coll.gameObject.GetComponent<BoostPanel>().boostAnimation();
                 break;
 
@@ -886,6 +885,12 @@ public class RacePlayer : PausableBehaviour
         prev_h = horizontal_input;
         prev_v = vertical_input;
 
+    }
+
+    private void boostEffects()
+    {
+        boostSound.Play();
+                electricalEffect.Activate();
     }
 
     /**

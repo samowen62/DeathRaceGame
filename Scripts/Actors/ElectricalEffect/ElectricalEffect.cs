@@ -1,13 +1,21 @@
 ﻿
 using UnityEngine;
+using System.Linq;
 
 public class ElectricalEffect : PausableBehaviour {
 
     private Animator[] childAnimatiors;
+    private bool[] activeBolts;
+    private int numBolts;
+
+    public float totalTime = 0.8f;
 
     protected override void _awake () {
         childAnimatiors = gameObject.GetComponentsInChildren<Animator>();
-        foreach(var animator in childAnimatiors)
+        numBolts = childAnimatiors.Length;
+        activeBolts = new bool[numBolts];
+
+        foreach (var animator in childAnimatiors)
         {
             animator.gameObject.SetActive(false);
         }
@@ -15,35 +23,41 @@ public class ElectricalEffect : PausableBehaviour {
 
     public void Activate()
     {
-        makeActive(childAnimatiors.Length);
-        callAfterSeconds(0.7f, () => makeActive(6));
-        callAfterSeconds(0.9f, () => makeActive(4));
-        callAfterSeconds(1.2f, () => makeActive(2));
-        callAfterSeconds(1.5f, () => makeActive(0));
+        float timeBetweenCalls = totalTime / numBolts;
+        float baseTime = 0f;
+
+        for (int i = 0; i < numBolts; i++)
+        {
+            childAnimatiors[i].gameObject.SetActive(true);
+            activeBolts[i] = true;
+            callAfterSeconds(baseTime, () => makeInactive(1));
+            baseTime += timeBetweenCalls;
+        }
     }
 
-    private void makeActive(int amountActive)
+    private void makeInactive(int amountToInactivate)
     {
-        //TODO: do check up here
+        int amountActive = activeBolts.Count(b => b);
+        amountToInactivate = Mathf.Min(amountToInactivate, amountActive);
+
+        if (amountToInactivate == 0) return;
 
         // Randomly determine which electric bolts should be on
         var rand = new System.Random();
-        var length = childAnimatiors.Length;
         var cnt = 0;
-        var list = new bool[length];
-        while (cnt < amountActive)
+        while (cnt < amountToInactivate)
         {
-            var ind = rand.Next(0, length);
-            if (list[ind])
+            var ind = rand.Next(0, numBolts);
+            if (activeBolts[ind])
             {
-                list[ind] = true;
+                activeBolts[ind] = false;
                 cnt++;
             }
         }
 
-        for (int i = 0; i < length; i++)
+        for (int i = 0; i < numBolts; i++)
         {
-            childAnimatiors[i].gameObject.SetActive(list[i]);
+            childAnimatiors[i].gameObject.SetActive(activeBolts[i]);
         }
     }
 }
