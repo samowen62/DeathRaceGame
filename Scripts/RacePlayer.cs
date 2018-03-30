@@ -890,7 +890,7 @@ public class RacePlayer : PausableBehaviour
     private void boostEffects()
     {
         boostSound.Play();
-                electricalEffect.Activate();
+        electricalEffect.Activate();
     }
 
     /**
