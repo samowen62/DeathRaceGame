@@ -1,0 +1,121 @@
+fileFormatVersion: 2
+guid: edb20c4d40c131442a63c72de8acb019
+timeCreated: 1522532473
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: Cylinder
+    100002: //RootNode
+    100004: Icosphere_001
+    100006: LowerPart
+    100008: MainPart
+    100010: MiddlePart
+    100012: Plane
+    100014: RoundBuildingMiddle
+    100016: RoundBuildingSides
+    400000: Cylinder
+    400002: //RootNode
+    400004: Icosphere_001
+    400006: LowerPart
+    400008: MainPart
+    400010: MiddlePart
+    400012: Plane
+    400014: RoundBuildingMiddle
+    400016: RoundBuildingSides
+    2300000: Cylinder
+    2300002: Icosphere_001
+    2300004: LowerPart
+    2300006: MainPart
+    2300008: MiddlePart
+    2300010: Plane
+    2300012: RoundBuildingMiddle
+    2300014: RoundBuildingSides
+    3300000: Cylinder
+    3300002: Icosphere_001
+    3300004: LowerPart
+    3300006: MainPart
+    3300008: MiddlePart
+    3300010: Plane
+    3300012: RoundBuildingMiddle
+    3300014: RoundBuildingSides
+    4300000: RoundBuildingMiddle
+    4300002: Cylinder
+    4300004: Icosphere_001
+    4300006: RoundBuildingSides
+    4300008: Plane
+    4300010: MainPart
+    4300012: MiddlePart
+    4300014: LowerPart
+    7400000: Default Take
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
