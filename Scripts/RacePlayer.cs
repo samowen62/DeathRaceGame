@@ -89,9 +89,9 @@ public class RacePlayer : PausableBehaviour
     public float pitch_decel = 10f;
 
     /* Related to player effects */
-    public Explosion explosion;
-    public SwipeTrail swipeTrail;
-    public ElectricalEffect electricalEffect;
+    private Explosion explosion;
+    private SwipeTrail swipeTrail;
+    private ElectricalEffect electricalEffect;
 
     private Dictionary<string, RacePlayer> playersToAttack;
     private Vector3 attack_velocity = Vector3.zero;
@@ -186,6 +186,7 @@ public class RacePlayer : PausableBehaviour
 
     //TODO: make this some kind of game constant
     private Vector3 _playerToCamera = new Vector3(0, 10, -20);
+    public BezierSpline CameraPath { get; set; }
     public Quaternion cameraRotation { get { return Quaternion.Euler(6, 0, 0); }}
     public Vector3 playerToCamera
     {
@@ -251,10 +252,16 @@ public class RacePlayer : PausableBehaviour
         shipMaterial.SetColor("_Tint", baseTint);      
         redMaterial = new Material(Shader.Find("Transparent/Diffuse"));
         redMaterial.color = new Color32(1, 0, 0, 1);
+
+        //TODO: do this for all subobjects so we don't have to manually set them and potentially mix them up between racers
         playerTrail = shipRenderer.transform.Find("Light").GetComponent<Light>();
+        CameraPath = transform.Find("CameraPath").GetComponent<BezierSpline>();
+        explosion = transform.Find("explosion").GetComponent<Explosion>();
+        swipeTrail = shipRenderer.transform.Find("AttackTrail").GetComponent<SwipeTrail>();
+        electricalEffect = transform.Find("ElectricEffect").GetComponent<ElectricalEffect>();
+
         tilt = Quaternion.identity;
 
-        //TODO: Fix this to avoid jumping the rotation on start. Maybe just give current speed on start?
         if (Physics.Raycast(transform.position, -transform.up, out downHit, rayCastDistance, AppConfig.groundMask))
         { 
             transform.position = downHit.point + hover_height * transform.up;

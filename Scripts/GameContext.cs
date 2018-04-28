@@ -69,7 +69,6 @@ public class GameContext : MonoBehaviour {
                 canvas.transform.Find("Speed").GetComponent<MPHUI>().player = player;
                 canvas.transform.Find("CenterTextBG").GetComponent<CenterTextUI>().player = player;
 
-                AppConfig.changeParent(player.gameObject, GameObject.Find("CameraPath"));
                 AppConfig.changeParent(player.gameObject, Camera.main.gameObject);
             }
             else

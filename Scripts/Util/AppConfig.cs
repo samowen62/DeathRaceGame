@@ -62,7 +62,8 @@ public static class AppConfig {
     {
         {"Player 1", "Sharp Ship" },
         {"Player 2", "Red Racer" },
-        {"Player 3", "Green Machine" }
+        {"Player 3", "Green Machine" },
+        {"Player 4", "Penetrator" }
     };
 
     /**

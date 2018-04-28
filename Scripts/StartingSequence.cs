@@ -14,8 +14,6 @@ public class StartingSequence : PausableBehaviour
 
     public AudioObject boostSound;
 
-    public BezierSpline cameraPath;
-
     public RacePlayer mainRacer;
 
     public bool finished { get; set; } 
@@ -41,7 +39,7 @@ public class StartingSequence : PausableBehaviour
         if(progress <= scriptBegin)
         {
             float t = 0.98f - progress / scriptBegin;
-            Vector3 cameraPt = cameraPath.GetPoint(t);
+            Vector3 cameraPt = mainRacer.CameraPath.GetPoint(t);
             Camera.main.transform.position = cameraPt;
 
             Vector3 cameraDir = mainRacer.transform.position - cameraPt;
