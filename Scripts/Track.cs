@@ -186,14 +186,20 @@ public class Track : MonoBehaviour {
         points.AddRange(trackPoints.ToList());
 
         TrackPoint track_point = findClosestTrackPointTo(starting_point, pathChoice);
-        int point_num = 1;
+        int point_num = isTrackReversed ? 1 : trackPoints.Count();
 
         while (track_point.num_in_seq == -1)
         {
             track_point.num_in_seq = point_num;
             track_point.name = "TrackPoint " + point_num;
             track_point = track_point.next;
-            point_num++;
+            if (isTrackReversed)
+            {
+                point_num++;
+            }
+            else {
+                point_num--;
+            }
         }
     }
 

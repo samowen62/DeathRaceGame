@@ -17,6 +17,8 @@ ModelImporter:
     100018: Track1
     100020: Track1_001
     100022: Track2_001
+    100024: BezierCurveAPoints
+    100026: BezierCurveBPoints
     400000: //RootNode
     400002: BezierCurveA
     400004: BezierCurveB
@@ -29,6 +31,8 @@ ModelImporter:
     400018: Track1
     400020: Track1_001
     400022: Track2_001
+    400024: BezierCurveAPoints
+    400026: BezierCurveBPoints
     2300000: //RootNode
     2300002: BezierCurveA
     2300004: BezierCurveB
@@ -41,6 +45,8 @@ ModelImporter:
     2300018: Track1
     2300020: Track1_001
     2300022: Track2_001
+    2300024: BezierCurveAPoints
+    2300026: BezierCurveBPoints
     3300000: //RootNode
     3300002: BezierCurveA
     3300004: BezierCurveB
@@ -53,6 +59,8 @@ ModelImporter:
     3300018: Track1
     3300020: Track1_001
     3300022: Track2_001
+    3300024: BezierCurveAPoints
+    3300026: BezierCurveBPoints
     4300000: BezierCurve
     4300002: Plane
     4300004: BezierCurveA
@@ -65,6 +73,8 @@ ModelImporter:
     4300018: Track1_001
     4300020: Track2_001
     4300022: Track1
+    4300024: BezierCurveBPoints
+    4300026: BezierCurveAPoints
     7400000: Default Take
     9500000: //RootNode
   materials:
