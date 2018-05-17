@@ -572,6 +572,7 @@ public class RacePlayer : PausableBehaviour
 
         returningToTrackRotationBegin = transform.rotation;
         returningToTrackPositionBegin = transform.position;
+        //TODO: sometimes lastCheckPoint isn't set which leads to NPE here
         returningToTrackRotationEnd = Quaternion.LookRotation(lastCheckPoint.tangent, lastCheckPointUp);
         returningToTrackPositionEnd = lastCheckPointPosition;
     }
