@@ -82,11 +82,11 @@ public class RacePlayer : PausableBehaviour
     /* Related to player gliding */
     private bool inFreefall;
     private float totalPitch;
-    public float max_pitch = 60;
-    public float min_pitch = -30;
-    public float pitch_per_vert = 5f;
-    public float air_speed_damping = 0.6f;
-    public float pitch_decel = 10f;
+    private float max_pitch = 40;
+    private float min_pitch = -20;
+    private float pitch_per_vert = 2f;
+    private float air_speed_damping = 0.6f;
+    private float pitch_decel = 10f;
 
     /* Related to player effects */
     private Explosion explosion;
@@ -354,7 +354,7 @@ public class RacePlayer : PausableBehaviour
                 current_speed = 0f;
             }
 
-            turnShip(false);         
+            turnShip();         
 
             Vector3 desired_up = Vector3.Lerp(prev_up, downHit.normal, Time.deltaTime * pitch_smooth);
             tilt.SetLookRotation(transform.forward - Vector3.Project(transform.forward, desired_up), desired_up);
@@ -394,7 +394,7 @@ public class RacePlayer : PausableBehaviour
             /* Player moving in air */
             else
             {
-                turnShip(true);
+                turnShip();
 
                 transform.rotation = tilt * global_orientation ;
                 if (totalPitch != 0f)
@@ -761,7 +761,7 @@ public class RacePlayer : PausableBehaviour
         player_inputs = _player_inputs;
     }
 
-    private void turnShip(bool inAir)
+    private void turnShip()
     {
         //Find horizonal input 
         float horizontal_input;
@@ -790,9 +790,19 @@ public class RacePlayer : PausableBehaviour
    
         //calculate turn angle
         float turn_angle = 0f;
-        if (inAir)
+        if (status == PlayerStatus.INAIR)
         {
             turn_angle = air_turn_speed * horizontal_input;
+
+            //calculate vertical axis for nose diving
+            if (vertical_input < 0)
+            {
+                totalPitch = Mathf.Min(totalPitch + pitch_per_vert, max_pitch);
+            }
+            else if (vertical_input > 0)
+            {
+                totalPitch = Mathf.Max(totalPitch - pitch_per_vert, min_pitch);
+            }
         }
         else
         {
@@ -810,19 +820,6 @@ public class RacePlayer : PausableBehaviour
             else
             {
                 shipRenderer.transform.localRotation = Quaternion.AngleAxis((spaceBar ? ship_mesh_tilt_hard_turn : ship_mesh_tilt) * turn_angle, shipRenderer.transform.forward) * base_ship_rotation;
-            }
-        }
-
-        //calculate vertical axis for nose diving
-        if (status == PlayerStatus.INAIR)
-        {
-            if (vertical_input > 0)
-            {
-                totalPitch = Mathf.Min(totalPitch + pitch_per_vert, max_pitch);
-            }
-            else if (vertical_input < 0)
-            {
-                totalPitch = Mathf.Max(totalPitch - pitch_per_vert, min_pitch);
             }
         }
 
