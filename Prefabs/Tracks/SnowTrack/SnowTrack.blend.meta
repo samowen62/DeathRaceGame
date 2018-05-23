@@ -23,6 +23,9 @@ ModelImporter:
     100030: BezierCurveMiddle
     100032: Cylinder
     100034: Tube
+    100036: Tube2
+    100038: TrackUpside
+    100040: TrackUpsideDown
     400000: //RootNode
     400002: BezierCurveA
     400004: BezierCurveB
@@ -41,6 +44,9 @@ ModelImporter:
     400030: BezierCurveMiddle
     400032: Cylinder
     400034: Tube
+    400036: Tube2
+    400038: TrackUpside
+    400040: TrackUpsideDown
     2300000: //RootNode
     2300002: BezierCurveA
     2300004: BezierCurveB
@@ -59,6 +65,9 @@ ModelImporter:
     2300030: BezierCurveMiddle
     2300032: Cylinder
     2300034: Tube
+    2300036: Tube2
+    2300038: TrackUpside
+    2300040: TrackUpsideDown
     3300000: //RootNode
     3300002: BezierCurveA
     3300004: BezierCurveB
@@ -77,6 +86,9 @@ ModelImporter:
     3300030: BezierCurveMiddle
     3300032: Cylinder
     3300034: Tube
+    3300036: Tube2
+    3300038: TrackUpside
+    3300040: TrackUpsideDown
     4300000: BezierCurve
     4300002: Plane
     4300004: BezierCurveA
@@ -95,6 +107,9 @@ ModelImporter:
     4300030: Cylinder
     4300032: BezierCurveMiddle
     4300034: Tube
+    4300036: Tube2
+    4300038: TrackUpside
+    4300040: TrackUpsideDown
     7400000: Default Take
     9500000: //RootNode
   materials:
