@@ -4,7 +4,7 @@ using System.Collections;
 public class HealingPlatform : MonoBehaviour
 {
 
-    public float Speed = 1;
+    public float Speed = 0.1f;
     public Material ChosenMaterial; //In case the mesh has more than 1 material
     private Renderer rend;
 

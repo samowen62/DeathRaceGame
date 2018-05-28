@@ -33,6 +33,7 @@ ModelImporter:
     100050: Track
     100052: //RootNode
     100054: Wall
+    100056: NewWalls
     400000: BezierCurve
     400002: BezierCurve_001
     400004: BezierCurveFine
@@ -61,6 +62,7 @@ ModelImporter:
     400050: Track
     400052: //RootNode
     400054: Wall
+    400056: NewWalls
     2300000: BezierCurve
     2300002: BezierCurve_001
     2300004: BezierCurveFine
@@ -88,6 +90,7 @@ ModelImporter:
     2300048: Plane_015
     2300050: Track
     2300052: Wall
+    2300054: NewWalls
     3300000: BezierCurve
     3300002: BezierCurve_001
     3300004: BezierCurveFine
@@ -115,6 +118,7 @@ ModelImporter:
     3300048: Plane_015
     3300050: Track
     3300052: Wall
+    3300054: NewWalls
     4300000: BezierCurveFine_001
     4300002: Plane_013
     4300004: Plane_012
@@ -142,6 +146,7 @@ ModelImporter:
     4300048: Track
     4300050: Wall
     4300052: Plane_001
+    4300054: NewWalls
     7400000: Default Take
     9500000: //RootNode
   materials:
@@ -154,6 +159,8 @@ ModelImporter:
     resampleCurves: 1
     optimizeGameObjects: 0
     motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -190,6 +197,7 @@ ModelImporter:
   importAnimation: 1
   copyAvatar: 0
   humanDescription:
+    serializedVersion: 2
     human: []
     skeleton: []
     armTwist: 0.5
@@ -200,7 +208,10 @@ ModelImporter:
     legStretch: 0.05
     feetSpacing: 0
     rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
     hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 0
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   animationType: 2
   humanoidOversampling: 1

@@ -26,6 +26,8 @@ ModelImporter:
     100036: Tube2
     100038: TrackUpside
     100040: TrackUpsideDown
+    100042: HealingPanel
+    100044: HealingPath
     400000: //RootNode
     400002: BezierCurveA
     400004: BezierCurveB
@@ -47,6 +49,8 @@ ModelImporter:
     400036: Tube2
     400038: TrackUpside
     400040: TrackUpsideDown
+    400042: HealingPanel
+    400044: HealingPath
     2300000: //RootNode
     2300002: BezierCurveA
     2300004: BezierCurveB
@@ -68,6 +72,8 @@ ModelImporter:
     2300036: Tube2
     2300038: TrackUpside
     2300040: TrackUpsideDown
+    2300042: HealingPanel
+    2300044: HealingPath
     3300000: //RootNode
     3300002: BezierCurveA
     3300004: BezierCurveB
@@ -89,6 +95,8 @@ ModelImporter:
     3300036: Tube2
     3300038: TrackUpside
     3300040: TrackUpsideDown
+    3300042: HealingPanel
+    3300044: HealingPath
     4300000: BezierCurve
     4300002: Plane
     4300004: BezierCurveA
@@ -110,6 +118,8 @@ ModelImporter:
     4300036: Tube2
     4300038: TrackUpside
     4300040: TrackUpsideDown
+    4300042: HealingPanel
+    4300044: HealingPath
     7400000: Default Take
     9500000: //RootNode
   materials:
