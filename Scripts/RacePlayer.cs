@@ -851,6 +851,7 @@ public class RacePlayer : PausableBehaviour
         }
 
         // Look a few trackpoints ahead if we are on a track with many sharp turns.
+        // TODO: bug, somehow current_TrackPoint can be set to the stupid "Initial TrackPoint" if it exists
         float h3 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next.next.next);
         float h2 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next.next);
         float h1 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next);
