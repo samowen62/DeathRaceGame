@@ -19,14 +19,16 @@ public class GameData : PausableBehaviour
     public string[] PlayerNames =
     {
         "Player 1",
-        "Player 2"
+        "Player 2",
+        "Player 3",
+        "Player 4"
     };
-
-    /* This will define the main player in this race */
-    public string mainPlayer = "Player 1";
 
     //map of player names to Data objects
     private Dictionary<string, DataDTO> playerData;
+
+    //stores main player
+    public string mainPlayer { get; set; }
 
     public object async;
 
@@ -119,6 +121,19 @@ public class GameData : PausableBehaviour
             .ToList();
     }
 
+    public bool TrySaveRaceRecords(string playerMainName)
+    {
+        var bestLapTime = playerData[playerMainName].lapTimes[currentTrack].Min();
+        var totalLapTime = playerData[playerMainName].lapTimes[currentTrack].Sum();
+
+        var playerRecord = new SavedData.TrackRecord
+        {
+            BestLapTime = bestLapTime,
+            BestTotalTime = totalLapTime
+        };
+
+        return DataLoader.SaveBestTimeRecord(playerRecord, playerMainName);
+    }
 
     public void loadNextTrack()
     {

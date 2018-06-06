@@ -201,6 +201,9 @@ public class GameContext : MonoBehaviour {
                 }
             }
 
+            //TODO: show "New Record!" if player set a record
+            gameData.TrySaveRaceRecords(playerMain.name);
+
             RacePlayer[] allPlayersOrdered = allPlayers.OrderBy(e => gameData.getPlacement(e.name)).ToArray();
             for (int i = 0; i < allPlayersOrdered.Length; i++)
             {

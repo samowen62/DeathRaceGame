@@ -66,6 +66,16 @@ public static class AppConfig {
         {"Player 4", "Penetrator" }
     };
 
+    /* Map of track names to display names*/
+    public static Dictionary<string, string> trackNameMap = new Dictionary<string, string>()
+    {
+        {"HalfPipe", "Track 1" },
+        {"SimpleTrack", "Track 2" },
+        {"paperEngine", "Track 3" },
+        {"SnowTrack", "Track 4" },
+        {"SpiralTrack", "Track 5" }
+    };
+
     /**
      * gets the racer's display name given the internally used game 
      * (i.e.) "Player 1" -> "Sharp Racer"
