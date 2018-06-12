@@ -13,17 +13,18 @@ public static class DataLoader {
     /// </summary>
     /// <param name="record"></param>
     /// <returns></returns>
-    public static bool SaveBestTimeRecord(SavedData.TrackRecord record, string racerName)
+    public static bool SaveBestTimeRecord(SavedData.TrackRecord record, string racerName, string trackName)
     {
         var didSaveData = false;
         var savedData = LoadSavedData() ?? new SavedData();
 
-        if (savedData.TrackRecords.ContainsKey(racerName))
+        //TODO: USE trackName instead!!!!
+        if (savedData.TrackRecords.ContainsKey(trackName))
         {
-            var currentRecord = savedData.TrackRecords[racerName];
+            var currentRecord = savedData.TrackRecords[trackName];
             var dirty = false;
 
-            if(currentRecord.BestLapTime == null || record.BestLapTime > currentRecord.BestLapTime)
+            if(currentRecord.BestLapTime == null || record.BestLapTime.Value < currentRecord.BestLapTime.Value)
             {
                 //new best lap time
                 currentRecord.BestLapTime = record.BestLapTime;
@@ -31,7 +32,7 @@ public static class DataLoader {
                 dirty = true;
             }
 
-            if (currentRecord.BestTotalTime == null || record.BestTotalTime > currentRecord.BestTotalTime)
+            if (currentRecord.BestTotalTime == null || record.BestTotalTime.Value < currentRecord.BestTotalTime.Value)
             {
                 //new total lap time
                 currentRecord.BestTotalTime = record.BestTotalTime;
@@ -41,7 +42,7 @@ public static class DataLoader {
 
             if (dirty)
             {
-                savedData.TrackRecords[racerName] = currentRecord;
+                savedData.TrackRecords[trackName] = currentRecord;
                 Save(savedData);
                 didSaveData = true;
             }
@@ -50,7 +51,7 @@ public static class DataLoader {
         {
             record.BestTotalTimeRacerName = racerName;
             record.BestLapTimeRacerName = racerName;
-            savedData.TrackRecords[racerName] = record;
+            savedData.TrackRecords[trackName] = record;
             Save(savedData);
             didSaveData = true;
         }

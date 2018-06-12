@@ -28,7 +28,7 @@ public class GameData : PausableBehaviour
     private Dictionary<string, DataDTO> playerData;
 
     //stores main player
-    public string mainPlayer { get; set; }
+    public string mainPlayer;
 
     public object async;
 
@@ -132,7 +132,8 @@ public class GameData : PausableBehaviour
             BestTotalTime = totalLapTime
         };
 
-        return DataLoader.SaveBestTimeRecord(playerRecord, playerMainName);
+        //TODO: put actual names of tracks here. Map number to track string name
+        return DataLoader.SaveBestTimeRecord(playerRecord, playerMainName, "Track " + currentTrack);
     }
 
     public void loadNextTrack()

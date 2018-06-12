@@ -14,6 +14,7 @@ public class GameContext : MonoBehaviour {
     public PlacementFinishUI initialPlacementFinishUI;
     public Canvas canvas;
     public ProceedUI proceedUI;
+    public NewRecordUI newRecordUI;
 
     public bool skipStart = false;
 
@@ -201,8 +202,11 @@ public class GameContext : MonoBehaviour {
                 }
             }
 
-            //TODO: show "New Record!" if player set a record
-            gameData.TrySaveRaceRecords(playerMain.name);
+            // show "New Record!" if player set a record
+            if (gameData.TrySaveRaceRecords(playerMain.name))
+            {
+                newRecordUI.Activate();
+            }
 
             RacePlayer[] allPlayersOrdered = allPlayers.OrderBy(e => gameData.getPlacement(e.name)).ToArray();
             for (int i = 0; i < allPlayersOrdered.Length; i++)
