@@ -268,6 +268,11 @@ public class RacePlayer : PausableBehaviour
             transform.rotation = Quaternion.FromToRotation(transform.up, downHit.normal) * transform.rotation;
             global_orientation = transform.rotation;
             previousGravity = -downHit.normal;
+
+            // set last checkpoint on startup in case we immediately die
+            lastCheckPoint = placementManager.firstCheckPoint_A;
+            lastCheckPointUp = transform.up;
+            lastCheckPointPosition = transform.position + (AppConfig.hoverHeight) * lastCheckPointUp;
         } else
         {
             Debug.LogError(name + " not above track!");
@@ -572,7 +577,6 @@ public class RacePlayer : PausableBehaviour
 
         returningToTrackRotationBegin = transform.rotation;
         returningToTrackPositionBegin = transform.position;
-        //TODO: sometimes lastCheckPoint isn't set which leads to NPE here
         returningToTrackRotationEnd = Quaternion.LookRotation(lastCheckPoint.tangent, lastCheckPointUp);
         returningToTrackPositionEnd = lastCheckPointPosition;
     }
