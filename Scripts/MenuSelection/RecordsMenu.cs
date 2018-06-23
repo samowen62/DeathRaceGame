@@ -20,17 +20,17 @@ public class RecordsMenu : MonoBehaviour
         _backButton.onClick.AddListener(delegate () { backButtonClicked(); });
         UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, _backButton, gameObject);
 
-        _recordTemplate = GameObject.Find("Record").GetComponent<TrackRecordItem>();
+        _recordTemplate = GameObject.Find("ScrollRect/RecordContainer/Record").GetComponent<TrackRecordItem>();
         var records = DataLoader.LoadSavedData();
 
         //TODO:test this (disable the Record)
-        //TODO:put all of these in a scrollable list
         if(records.TrackRecords.Count < 1)
         {
             Destroy(_recordTemplate);
             return;
         }
         Debug.Log(records.TrackRecords.Count + " Records");
+        //TODO:if too few disable scroll
 
         int i = 0;
         foreach (var record in records.TrackRecords)
@@ -41,7 +41,7 @@ public class RecordsMenu : MonoBehaviour
             }
             else
             {
-                addTrackRecordItem(record.Key, record.Value, i * -100);
+                addTrackRecordItem(record.Key, record.Value, 250 + i * -100);
             }
 
             i++;
@@ -53,9 +53,10 @@ public class RecordsMenu : MonoBehaviour
     {
         TrackRecordItem newRecordItem = Instantiate(
             _recordTemplate,
-            _recordTemplate.transform.position + new Vector3(0, downwardDistance, 0),
+            _recordTemplate.transform.position,
             Quaternion.identity) as TrackRecordItem;
-        newRecordItem.transform.parent = transform;
+        newRecordItem.transform.parent = _recordTemplate.transform.parent;
+        newRecordItem.transform.localPosition = new Vector3(0, downwardDistance, 0);
         newRecordItem.updateWith(trackName, trackRecord);
     }
 

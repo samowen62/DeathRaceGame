@@ -92,4 +92,20 @@ public static class AppConfig {
         Debug.Log("no display name found for player: " + playername + "!!");
         return displayName;
     }
+
+    /**
+     * gets the track's display name given the internally used game 
+     * (i.e.) "Track 1" -> "HalfPipe"
+     */
+    public static string getTrackDisplayName(string playername)
+    {
+        string displayName = "No displayName!";
+        if (trackNameMap.TryGetValue(playername, out displayName))
+        {
+            return displayName;
+        }
+
+        Debug.Log("no display name found for player: " + playername + "!!");
+        return displayName;
+    }
 }

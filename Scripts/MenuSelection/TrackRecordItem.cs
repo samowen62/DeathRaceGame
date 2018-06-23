@@ -23,7 +23,7 @@ public class TrackRecordItem : MonoBehaviour {
         {
             load();
         }
-        _trackName.text = trackName;
+        _trackName.text = AppConfig.getTrackDisplayName(trackName);
         _bestLapRacer.text = trackData.BestLapTimeRacerName;
         _bestOverallRacer.text = trackData.BestTotalTimeRacerName;
         //TODO:images for racers
