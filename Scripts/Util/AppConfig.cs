@@ -9,6 +9,7 @@ public static class AppConfig {
 
     public static readonly string MENU_MAIN = "MainMenu";
     public static readonly string MENU_TRACK = "TrackMenu";
+    public static readonly string MENU_RECORDS = "RecordsMenu";
 
     public static readonly string TRACK_PAPER_ENGINE = "paperEngine";
     public static readonly string TRACK_STAIRS = "StairsTrack";

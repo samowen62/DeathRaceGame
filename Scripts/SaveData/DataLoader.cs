@@ -59,7 +59,7 @@ public static class DataLoader {
         return didSaveData;
     }
 
-    private static SavedData LoadSavedData()
+    public static SavedData LoadSavedData()
     {
         if (File.Exists(Application.persistentDataPath + "/savedGameData.gd"))
         {

@@ -13,11 +13,11 @@ public class MainMenu : MonoBehaviour {
     public SceneFade scenefade;
 
     private Button startGameButton;
-    private Button optionsGameButton;
+    private Button recordsGameButton;
     private Button exitGameButton;
 
     private const string START_GAME_BUTTON = "StartGame";
-    private const string OPTIONS_NAME = "Options";
+    private const string RECORDS_NAME = "Records";
     private const string END_GAME_BUTTON = "EndGame";
 
     private bool startBlocked = false;
@@ -37,10 +37,10 @@ public class MainMenu : MonoBehaviour {
                     startGameButton.onClick.AddListener(delegate () { startButtonClicked(); });
                     UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, startGameButton, gameObject);
                     break;
-                case OPTIONS_NAME:
-                    optionsGameButton = button;
-                    optionsGameButton.onClick.AddListener(delegate () { optionsButtonClicked(); });
-                    UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, optionsGameButton, gameObject);
+                case RECORDS_NAME:
+                    recordsGameButton = button;
+                    recordsGameButton.onClick.AddListener(delegate () { recordsButtonClicked(); });
+                    UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, recordsGameButton, gameObject);
                     break;
                 case END_GAME_BUTTON:
                     exitGameButton = button;
@@ -66,9 +66,13 @@ public class MainMenu : MonoBehaviour {
         }
     }
 
-    private void optionsButtonClicked()
+    private void recordsButtonClicked()
     {
-        Debug.Log("Options clicked");
+        selectSound.Play();
+        startBlocked = true;
+        Debug.Log("Records Clicked");
+
+        SyncLoadLevel(AppConfig.MENU_RECORDS);
     }
 
     public void endGameButtonClicked()

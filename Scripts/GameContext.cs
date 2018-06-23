@@ -212,14 +212,15 @@ public class GameContext : MonoBehaviour {
             for (int i = 0; i < allPlayersOrdered.Length; i++)
             {
                 string playerName = allPlayersOrdered[i].name;
-                PlacementFinishUI newFinishUI = createPlacementFinishUI(
+                var newFinishUI = createPlacementFinishUI(
                     AppConfig.getRacerDisplayName(playerName),
                     gameData.getTotalTime(playerName),
                     gameData.getPlacement(playerName),
                     (i + 1) * -50);
-                //TODO:add these in pauseable array menu
-                pauseUIComponents.Concat(new GameObject[] { newFinishUI.gameObject });
-                pausableComponents.Concat(new PausableBehaviour[] { newFinishUI });
+
+                //TODO:verify pause works
+                pauseUIComponents = pauseUIComponents.Concat(new GameObject[] { newFinishUI.gameObject }).ToArray();
+                pausableComponents = pausableComponents.Concat(new PausableBehaviour[] { newFinishUI }).ToArray();
                 newFinishUI.startAnimation();
             }
 
@@ -233,7 +234,6 @@ public class GameContext : MonoBehaviour {
     private PlacementFinishUI createPlacementFinishUI(string _playerTxt, string _lapTimeTxt,
         string _placementNumberTxt, float _downwardDistance)
     {
-        //TODO:add this new prefab to the pausable prefab list
         PlacementFinishUI placFinishUI = Instantiate(
             initialPlacementFinishUI, 
             canvas.transform.position + new Vector3(40, 20, 0), 
