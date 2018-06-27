@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -9,6 +10,16 @@ public class RecordsMenu : MonoBehaviour
 {
 
     public AudioObject hoverSound;
+
+    [Serializable]
+    public struct RacerPicture
+    {
+        public string racerName;
+        public Texture2D racerImage;
+    }
+
+    public RacerPicture[] racerPictures;
+    private Dictionary<string, Texture2D> racerPictureMap = new Dictionary<string, Texture2D>();
 
     private TrackRecordItem _recordTemplate;
     private Button _backButton;
@@ -22,6 +33,13 @@ public class RecordsMenu : MonoBehaviour
 
         _recordTemplate = GameObject.Find("ScrollRect/RecordContainer/Record").GetComponent<TrackRecordItem>();
         var records = DataLoader.LoadSavedData();
+
+        // map of player names to pictures
+        foreach (var picture in racerPictures)
+        {
+            racerPictureMap.Add(picture.racerName, picture.racerImage);
+        }
+
 
         //TODO:test this (disable the Record)
         if(records.TrackRecords.Count < 1)
@@ -37,7 +55,8 @@ public class RecordsMenu : MonoBehaviour
         {
             if(i == 0)
             {
-                _recordTemplate.updateWith(record.Key, record.Value);
+                _recordTemplate.UpdateWith(record.Key, record.Value,
+                    racerPictureMap[record.Value.BestTotalTimeRacerName], racerPictureMap[record.Value.BestLapTimeRacerName]);
             }
             else
             {
@@ -57,7 +76,8 @@ public class RecordsMenu : MonoBehaviour
             Quaternion.identity) as TrackRecordItem;
         newRecordItem.transform.parent = _recordTemplate.transform.parent;
         newRecordItem.transform.localPosition = new Vector3(0, downwardDistance, 0);
-        newRecordItem.updateWith(trackName, trackRecord);
+        newRecordItem.UpdateWith(trackName, trackRecord,
+            racerPictureMap[trackRecord.BestTotalTimeRacerName], racerPictureMap[trackRecord.BestLapTimeRacerName]);
     }
 
     private void backButtonClicked()
