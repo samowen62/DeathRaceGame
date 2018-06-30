@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public static class AppConfig {
 
@@ -107,5 +108,16 @@ public static class AppConfig {
 
         Debug.Log("no display name found for player: " + playername + "!!");
         return displayName;
+    }
+
+    public static void SyncLoadLevel(this MonoBehaviour sceneScript, string levelName)
+    {
+        sceneScript.StartCoroutine(Load(levelName));
+    }
+
+    public static IEnumerator Load(string levelName)
+    {
+        var async = SceneManager.LoadSceneAsync(levelName);
+        yield return async;
     }
 }

@@ -113,7 +113,7 @@ public class GameData : PausableBehaviour
     /*
      * Used to get all player data
      */
-    public List<string> getPlayersByPlacement()//TODO:also return total lap times
+    public List<string> getPlayersByPlacement()
     {
         return playerData
             .OrderBy(e => e.Value.placements.ToList().Sum())
@@ -132,7 +132,6 @@ public class GameData : PausableBehaviour
             BestTotalTime = totalLapTime
         };
 
-        //TODO: put actual names of tracks here. Map number to track string name
         return DataLoader.SaveBestTimeRecord(playerRecord, playerMainName, "Track " + currentTrack);
     }
 

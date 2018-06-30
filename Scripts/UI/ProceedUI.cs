@@ -44,7 +44,7 @@ public class ProceedUI : PausableBehaviour {
         sceneFade.fade();
         callAfterSeconds(sceneFade.duration, () =>
         {
-            SyncLoadLevel("MainMenu");
+            LoadLevel("MainMenu");
         });
     }
 
@@ -101,17 +101,15 @@ public class ProceedUI : PausableBehaviour {
         });
     }
 
-    //TODO:put both of these in a util method
-    private void SyncLoadLevel(string levelName)
+    private void LoadLevel(string levelName)
     {
-        StartCoroutine(Load(levelName));
+        StartCoroutine(PerformLoad(levelName));
     }
 
-    IEnumerator Load(string levelName)
+    IEnumerator PerformLoad(string levelName)
     {
         sceneFade.fade();
         yield return new WaitForSeconds(sceneFade.duration);
-        async = SceneManager.LoadSceneAsync(levelName);
-        yield return async;
+        yield return AppConfig.Load(levelName);
     }
 }

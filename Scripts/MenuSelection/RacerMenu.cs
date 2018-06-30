@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class RacerMenu : MonoBehaviour {
@@ -94,21 +93,19 @@ public class RacerMenu : MonoBehaviour {
             loadingBlocked = true;
             Debug.Log("Back to main");
 
-            SyncLoadLevel(AppConfig.MENU_MAIN);
+            LoadLevel(AppConfig.MENU_MAIN);
         }
     }
 
-    //TODO:put both of these in a util method
-    private void SyncLoadLevel(string levelName)
+    private void LoadLevel(string levelName)
     {
-        StartCoroutine(Load(levelName));
+        StartCoroutine(PerformLoad(levelName));
     }
 
-    IEnumerator Load(string levelName)
+    IEnumerator PerformLoad(string levelName)
     {
         sceneFade.fade();
         yield return new WaitForSeconds(sceneFade.duration);
-        async = SceneManager.LoadSceneAsync(levelName);
-        yield return async;
+        yield return AppConfig.Load(levelName);
     }
 }

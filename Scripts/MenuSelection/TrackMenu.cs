@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
-using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 
 public class TrackMenu : MonoBehaviour
@@ -11,8 +9,7 @@ public class TrackMenu : MonoBehaviour
     public AudioObject hoverSound;
 
     public GameData gameData;
-
-    //TODO: use array of buttons with enum class specifying string
+    
     private Button track_1_button;
     private Button track_2_button;
     private Button backButton;
@@ -74,7 +71,7 @@ public class TrackMenu : MonoBehaviour
             loadingBlocked = true;
             Debug.Log("Started Test Track sequence");
 
-            SyncLoadLevel(AppConfig.TRACK_STAIRS);
+            LoadLevel(AppConfig.TRACK_STAIRS);
         }
     }
 
@@ -86,19 +83,12 @@ public class TrackMenu : MonoBehaviour
             loadingBlocked = true;
             Debug.Log("Back to main");
 
-            SyncLoadLevel(AppConfig.MENU_MAIN);
+            LoadLevel(AppConfig.MENU_MAIN);
         }
     }
-
-    //TODO:put both of these in a util method
-    private void SyncLoadLevel(string levelName)
+    
+    private void LoadLevel(string levelName)
     {
-        StartCoroutine(Load(levelName));
-    }
-
-    IEnumerator Load(string levelName)
-    {
-        async = SceneManager.LoadSceneAsync(levelName);
-        yield return async;
+        this.SyncLoadLevel(levelName);
     }
 }

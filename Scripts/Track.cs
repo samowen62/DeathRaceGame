@@ -50,7 +50,6 @@ public class Track : MonoBehaviour {
 
     public TrackPoint findClosestTrackPointTo(Vector3 target, TrackPoint.PathChoice pathChoice)
     {
-        //TODO maybe avoid Linq if too much linking overhead
         return points
             .Where(point => point.pathChoice == pathChoice)
             .OrderByDescending(point => (point.transform.position - target).sqrMagnitude)

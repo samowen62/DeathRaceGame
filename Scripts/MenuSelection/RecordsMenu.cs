@@ -83,18 +83,11 @@ public class RecordsMenu : MonoBehaviour
     private void backButtonClicked()
     {
         Debug.Log("Back to main");
-        SyncLoadLevel(AppConfig.MENU_MAIN);
+        LoadLevel(AppConfig.MENU_MAIN);
     }
 
-    //TODO:put both of these in a util method
-    private void SyncLoadLevel(string levelName)
+    private void LoadLevel(string levelName)
     {
-        StartCoroutine(Load(levelName));
-    }
-
-    IEnumerator Load(string levelName)
-    {
-        async = SceneManager.LoadSceneAsync(levelName);
-        yield return async;
+        this.SyncLoadLevel(levelName);
     }
 }

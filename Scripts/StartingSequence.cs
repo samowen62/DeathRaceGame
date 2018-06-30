@@ -51,7 +51,6 @@ public class StartingSequence : PausableBehaviour
         }
         else if (progress > scriptBegin && progress < scriptEnd)
         {
-            //TODO:adjust timing on boost sound
             if (!boostSound.started)
             {
                 Camera.main.transform.localPosition = mainRacer.playerToCamera;

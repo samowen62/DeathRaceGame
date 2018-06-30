@@ -12,8 +12,7 @@ public class PauseMenu : MonoBehaviour
     public AudioObject selectSound;
 
     public AudioObject hoverSound;
-
-    //TODO: use array of buttons with enum class specifying string
+    
     private Button resumeButton;
     private Button exitGameButton;
 

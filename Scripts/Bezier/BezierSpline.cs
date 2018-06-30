@@ -32,7 +32,7 @@ public class BezierSpline : MonoBehaviour
         set
         {
             loop = value;
-            //TODO:fix
+            //NOTE:could fix if needed
            /* if (value == true)
             {
                 modes[modes.Length - 1] = modes[0];
@@ -145,7 +145,7 @@ public class BezierSpline : MonoBehaviour
         return GetVelocity(t).normalized;
     }
 
-    //TODO: need to correct issue of finding the normals at the beginning and end of the segments
+    //NOTE: could correct issue of finding the normals at the beginning and end of the segments
     public Vector3 GetNormal(float t)
     {
         int i;

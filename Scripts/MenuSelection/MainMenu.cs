@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
-using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 
 public class MainMenu : MonoBehaviour {
@@ -10,7 +9,7 @@ public class MainMenu : MonoBehaviour {
 
     public AudioObject hoverSound;
 
-    public SceneFade scenefade;
+    public SceneFade sceneFade;
 
     private Button startGameButton;
     private Button recordsGameButton;
@@ -62,7 +61,7 @@ public class MainMenu : MonoBehaviour {
             startBlocked = true;
             Debug.Log("Started Test Track sequence");
 
-            SyncLoadLevel(AppConfig.MENU_TRACK);
+            LoadLevel(AppConfig.MENU_TRACK);
         }
     }
 
@@ -72,7 +71,7 @@ public class MainMenu : MonoBehaviour {
         startBlocked = true;
         Debug.Log("Records Clicked");
 
-        SyncLoadLevel(AppConfig.MENU_RECORDS);
+        LoadLevel(AppConfig.MENU_RECORDS);
     }
 
     public void endGameButtonClicked()
@@ -81,16 +80,15 @@ public class MainMenu : MonoBehaviour {
         Application.Quit();
     }
 
-    private void SyncLoadLevel(string levelName)
-    { 
-        StartCoroutine(Load(levelName));
+    private void LoadLevel(string levelName)
+    {
+        StartCoroutine(PerformLoad(levelName));
     }
 
-    //TODO: fix this!! and in TrackMenu.cs
-    IEnumerator Load(string levelName)
+    IEnumerator PerformLoad(string levelName)
     {
-        scenefade.fade();
-        yield return new WaitForSeconds(scenefade.duration);
-        SceneManager.LoadSceneAsync(levelName);
+        sceneFade.fade();
+        yield return new WaitForSeconds(sceneFade.duration);
+        yield return AppConfig.Load(levelName);
     }
 }

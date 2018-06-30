@@ -10,8 +10,7 @@ public class SwipeTrail : PausableBehaviour
 
     private float swipeStartTime = 0f;
     private float swipeTime = 0.1f;
-    private float swipeDistance = -6f; //TODO: replace with swipeSpeed = swipeDistance/swipeTime
-
+    private float swipeDistance = -6f; 
     private Vector3 startVec;
 
     private TrailRenderer trail;

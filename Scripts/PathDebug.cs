@@ -6,8 +6,7 @@ using System.Collections;
  * 
  * It is used to track the movement of a given entity by displaying a path of its position over time
  */
-
- //TODO could add option to also display orientation etc.
+ 
 public class PathDebug : MonoBehaviour {
 
     public GameObject target;
@@ -22,9 +21,6 @@ public class PathDebug : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         AppConfig.DrawLine(previousSpot, target.transform.position, Color.blue);
-
-        //Debug.Log((previousSpot - target.transform.position).magnitude);
-
         previousSpot = target.transform.position;
     }
 

@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-//TODO: make pool of these to be used by multiple racers
 public class Explosion : PausableBehaviour
 {
     private Animator animation;

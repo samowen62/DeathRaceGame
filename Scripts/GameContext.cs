@@ -10,7 +10,7 @@ public class GameContext : MonoBehaviour {
     public PlacementManager placementManager;
     public GameData gameData;
 
-    //TODO:Resources.Load doesn't work so I'm doing this instead in the meantime
+    //NOTE:Resources.Load doesn't work so I'm doing this instead in the meantime
     public PlacementFinishUI initialPlacementFinishUI;
     public Canvas canvas;
     public ProceedUI proceedUI;
@@ -63,7 +63,6 @@ public class GameContext : MonoBehaviour {
                 playerMain = player;
                 startingSequence.mainRacer = player;
 
-                //TODO:find neater way of doing this!!!
                 canvas.transform.Find("Placement").GetComponent<PlacementUI>().player = player;
                 canvas.transform.Find("HealthBar").GetComponent<HealthUI>().player = player;
                 canvas.transform.Find("LapTimes").GetComponent<LapsUI>().player = player;

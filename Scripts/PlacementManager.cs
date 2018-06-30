@@ -7,8 +7,7 @@ public class PlacementManager : PausableBehaviour
 {
     private GameContext gameContext;
     private GameEventsUI gameEventsUI;
-
-    //TODO:restrict these to only be able to set to checkpoints
+    
     //also these should have the largest num_in_seq. that number goes down to 0
     public TrackPoint firstCheckPoint_A;
 
@@ -276,7 +275,6 @@ public class PlacementManager : PausableBehaviour
             lap++;
         }
 
-        //TODO: make this method a little better. it's just a mess now
         public void forcePlayerFinish()
         {
             float lastLapTime = 0f;
@@ -289,7 +287,6 @@ public class PlacementManager : PausableBehaviour
                 }
             }
 
-            //TODO may want to factor in distance from finish line instead of just adding 5 seconds [i.e. trackpoint num]
             float lapTime = lastLapTime + 5f;
             for (int i = lapTimes.Length - 1; i >= 0; i--)
             {

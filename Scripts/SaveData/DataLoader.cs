@@ -5,8 +5,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
 public static class DataLoader {
-
-    //TODO: verify!
+    
     /// <summary>
     /// Attempts to save this track record in the record books.
     /// Returns a bool if a record was set and data was saved.
@@ -17,8 +16,7 @@ public static class DataLoader {
     {
         var didSaveData = false;
         var savedData = LoadSavedData() ?? new SavedData();
-
-        //TODO: USE trackName instead!!!!
+        
         if (savedData.TrackRecords.ContainsKey(trackName))
         {
             var currentRecord = savedData.TrackRecords[trackName];
@@ -67,7 +65,6 @@ public static class DataLoader {
             var file = File.Open(Application.persistentDataPath + "/savedGameData.gd", FileMode.Open);
             var gameData = (SavedData)bf.Deserialize(file);
             file.Close();
-            //TODO: handle IO errors here
             return gameData;
         }
 

@@ -63,7 +63,6 @@ public class RacePlayer : PausableBehaviour
     private float current_speed;
     private float downward_speed = 0f;
 
-    //TODO: get more accurate reading of actual speed by measuring points
     public float speed
     {
         get
@@ -183,8 +182,7 @@ public class RacePlayer : PausableBehaviour
     private float boostPlayerToCamera_Z = 6f; //how much farther away the camera is during boost
     private float boostCameraSpeed = 0.7f;
     private float boostCameraDistance = 0f;
-
-    //TODO: make this some kind of game constant
+    
     private Vector3 _playerToCamera = new Vector3(0, 10, -20);
     public BezierSpline CameraPath { get; set; }
     public Quaternion cameraRotation { get { return Quaternion.Euler(6, 0, 0); }}
@@ -694,7 +692,6 @@ public class RacePlayer : PausableBehaviour
                 {
                     if (Physics.Raycast(transform.position -5 * transform.forward, transform.forward, out downHit, 15, AppConfig.groundMask))
                     {
-                        //TODO:test more, but pretty good!
                         float rho = Vector3.Dot(transform.forward, downHit.normal);
                         status = PlayerStatus.ONTRACK;
                         transform.position = downHit.point + downHit.normal * hover_height;
@@ -855,7 +852,7 @@ public class RacePlayer : PausableBehaviour
         }
 
         // Look a few trackpoints ahead if we are on a track with many sharp turns.
-        // TODO: bug, somehow current_TrackPoint can be set to the stupid "Initial TrackPoint" if it exists
+        // NOTE: somehow current_TrackPoint can be set to the stupid "Initial TrackPoint" if it exists
         float h3 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next.next.next);
         float h2 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next.next);
         float h1 = AIUtil.getHorizontal(transform.position, transform.forward, current_speed, current_TrackPoint.next);
