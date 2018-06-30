@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class RaceResults : MonoBehaviour {
@@ -13,7 +12,7 @@ public class RaceResults : MonoBehaviour {
     private RaceResultFinishUI placementDisplayContainer;
     private Image winnerPicture;
 
-    public SceneFade scenefade;
+    public SceneFade sceneFade;
 
     public AudioObject hoverSound;
 
@@ -32,7 +31,7 @@ public class RaceResults : MonoBehaviour {
             .gameObject.GetComponent<RaceResultFinishUI>();
 
         Button menuButton = GameObject.Find("BackToMenuText").GetComponent<Button>();
-        menuButton.onClick.AddListener(delegate () { SyncLoadLevel("MainMenu"); });
+        menuButton.onClick.AddListener(delegate () { LoadLevel("MainMenu"); });
         UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, menuButton, gameObject);
 
 
@@ -52,17 +51,15 @@ public class RaceResults : MonoBehaviour {
         });
     }
 
-    private void SyncLoadLevel(string levelName)
+    private void LoadLevel(string levelName)
     {
-        StartCoroutine(Load(levelName));
+        StartCoroutine(PerformLoad(levelName));
     }
 
-    //TODO: fix this!! and in TrackMenu.cs
-    IEnumerator Load(string levelName)
+    IEnumerator PerformLoad(string levelName)
     {
-        scenefade.fade();
-        yield return new WaitForSeconds(scenefade.duration);
-        SceneManager.LoadSceneAsync(levelName);
+        sceneFade.fade();
+        yield return new WaitForSeconds(sceneFade.duration);
+        yield return AppConfig.Load(levelName);
     }
-
 }

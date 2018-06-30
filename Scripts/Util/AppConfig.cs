@@ -71,11 +71,11 @@ public static class AppConfig {
     /* Map of track names to display names*/
     public static Dictionary<string, string> trackNameMap = new Dictionary<string, string>()
     {
-        {"HalfPipe", "Track 1" },
-        {"SimpleTrack", "Track 2" },
-        {"paperEngine", "Track 3" },
-        {"SnowTrack", "Track 4" },
-        {"SpiralTrack", "Track 5" }
+        {"HalfPipe", "Track 0" },
+        {"SimpleTrack", "Track 1" },
+        {"paperEngine", "Track 2" },
+        {"SnowTrack", "Track 3" },
+        {"SpiralTrack", "Track 4" }
     };
 
     /**
@@ -106,7 +106,7 @@ public static class AppConfig {
             return displayName;
         }
 
-        Debug.Log("no display name found for player: " + playername + "!!");
+        Debug.Log("no display name found for track: " + playername + "!!");
         return displayName;
     }
 

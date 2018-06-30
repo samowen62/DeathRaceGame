@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System;
 
 public class LapsUI : PausableBehaviour {
 
@@ -14,7 +15,6 @@ public class LapsUI : PausableBehaviour {
     private const string CURRENT_LAP = "Current: ";
     private const string COLON = ": ";
     private const string NEW_LINE = "\n";
-    private const string FORMAT = "{0:0.##}";
 
     protected override void _awake () {
         textComponent = GetComponent<Text>();
@@ -28,22 +28,29 @@ public class LapsUI : PausableBehaviour {
         string text = "";
         float[] lapTimes = placementManager.getLapTimesForPlayer(player);
         float lastLapStart = placementManager.getLastLapStart(player);
-
-        //TODO:format for minutes not just seconds
+        
         for(int i = lapTimes.Length - 1; i >= 0; i--)
         {
             if (lapTimes[i] != 0f)
             {
                 text += LAP + (i + 1) + COLON +
-                    string.Format(FORMAT, lapTimes[i]) + NEW_LINE;
+                    formatSecondsToTime(lapTimes[i]) + NEW_LINE;
             }
         }
 
         if (!player.finished)
         {
-            text += CURRENT_LAP + string.Format(FORMAT, pauseInvariantTime - lastLapStart);
+            text += CURRENT_LAP + formatSecondsToTime(pauseInvariantTime - lastLapStart);
         }
 
         textComponent.text = text;
+    }
+
+    private string formatSecondsToTime(float seconds)
+    {
+        var span = TimeSpan.FromSeconds(seconds);
+        return span.Minutes.ToString("00") + ":" +
+            span.Seconds.ToString("00") + "." +
+            span.Milliseconds.ToString("00");
     }
 }

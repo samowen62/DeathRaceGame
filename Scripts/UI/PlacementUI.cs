@@ -30,8 +30,7 @@ public class PlacementUI : PausableBehaviour
             textComponent.text = "";
         }
     }
-
-    //TODO: don't allow this to change too often
+    
     private string getPlacementString(int placement)
     {
         switch (placement)

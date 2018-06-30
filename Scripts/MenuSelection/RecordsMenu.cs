@@ -41,14 +41,19 @@ public class RecordsMenu : MonoBehaviour
         }
 
 
-        //TODO:test this (disable the Record)
+        // no records to display
+        //TODO: display something indicating that
         if(records.TrackRecords.Count < 1)
         {
-            Destroy(_recordTemplate);
+            Destroy(GameObject.Find("ScrollRect/RecordContainer/Record"));
             return;
         }
-        Debug.Log(records.TrackRecords.Count + " Records");
-        //TODO:if too few disable scroll
+
+        if(records.TrackRecords.Count < 3)
+        {
+            GameObject.Find("ScrollRect").GetComponent<ScrollRect>().vertical = false;
+        }
+
 
         int i = 0;
         foreach (var record in records.TrackRecords)
