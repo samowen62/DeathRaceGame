@@ -7,7 +7,6 @@ using UnityEngine.UI;
 public class RaceResults : MonoBehaviour {
 
     private GameData gameData;
-
     private GameObject placementDisplay;
     private RaceResultFinishUI placementDisplayContainer;
     private Image winnerPicture;
@@ -17,7 +16,6 @@ public class RaceResults : MonoBehaviour {
     public AudioObject hoverSound;
 
     void Awake () {
-        //TODO: do something for the winner picture
         gameData = FindObjectOfType<GameData>();
 
         if (gameData == null)

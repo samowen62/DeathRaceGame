@@ -36,7 +36,7 @@
              "Queue" = "Transparent"
              "RenderType" = "Transparent"
          }
-         // TODO: Seems like "#pragma target 3.0 _TERRAIN_NORMAL_MAP" can't fallback correctly on less capable devices?
+         // NOTE: Seems like "#pragma target 3.0 _TERRAIN_NORMAL_MAP" can't fallback correctly on less capable devices?
          // Use two sub-shaders to simulate different features for different targets and still fallback correctly.
          SubShader { // for sm3.0+ targets
              CGPROGRAM

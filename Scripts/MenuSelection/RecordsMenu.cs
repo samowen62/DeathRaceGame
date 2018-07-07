@@ -42,7 +42,7 @@ public class RecordsMenu : MonoBehaviour
 
 
         // no records to display
-        //TODO: display something indicating that
+        //TODO: display something indicating that there are no records to display
         if(records.TrackRecords.Count < 1)
         {
             Destroy(GameObject.Find("ScrollRect/RecordContainer/Record"));
