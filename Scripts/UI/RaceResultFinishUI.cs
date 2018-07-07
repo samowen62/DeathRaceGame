@@ -20,7 +20,7 @@ public class RaceResultFinishUI : MonoBehaviour {
 
     public void startAnimation(float seconds, string text, int placement, int ending_y_pos)
     {
-        racerText.text = placement + " " + text;//TODO: maybe spruce this up        
+        racerText.text = placement + " " + text;//NOTE: add racer pictures later if decide to go back to curcuits. Also re open old issues     
         finalPosition = new Vector3(ending_x_pos, ending_y_pos, 0);
         StartCoroutine(_startAnimation(seconds));
     }

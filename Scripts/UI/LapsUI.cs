@@ -34,23 +34,15 @@ public class LapsUI : PausableBehaviour {
             if (lapTimes[i] != 0f)
             {
                 text += LAP + (i + 1) + COLON +
-                    formatSecondsToTime(lapTimes[i]) + NEW_LINE;
+                    AppConfig.formatSecondsToTime(lapTimes[i]) + NEW_LINE;
             }
         }
 
         if (!player.finished)
         {
-            text += CURRENT_LAP + formatSecondsToTime(pauseInvariantTime - lastLapStart);
+            text += CURRENT_LAP + AppConfig.formatSecondsToTime(pauseInvariantTime - lastLapStart);
         }
 
         textComponent.text = text;
-    }
-
-    private string formatSecondsToTime(float seconds)
-    {
-        var span = TimeSpan.FromSeconds(seconds);
-        return span.Minutes.ToString("00") + ":" +
-            span.Seconds.ToString("00") + "." +
-            span.Milliseconds.ToString("00");
     }
 }

@@ -28,8 +28,8 @@ public class TrackRecordItem : MonoBehaviour {
             load();
         }
         _trackName.text = AppConfig.getTrackDisplayName(trackName);
-        _bestLapRacer.text = trackData.BestLapTimeRacerName;
-        _bestOverallRacer.text = trackData.BestTotalTimeRacerName;
+        _bestLapRacer.text = "Best Lap Time:\n" + AppConfig.formatSecondsToTime(trackData.BestLapTime ?? 0);
+        _bestOverallRacer.text = "Best Overall Time:\n" + AppConfig.formatSecondsToTime(trackData.BestTotalTime ?? 0);
 
         if (bestOverallRacerImage != null)
         {

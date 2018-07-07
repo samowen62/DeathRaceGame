@@ -110,6 +110,14 @@ public static class AppConfig {
         return displayName;
     }
 
+    public static string formatSecondsToTime(float seconds)
+    {
+        var span = System.TimeSpan.FromSeconds(seconds);
+        return span.Minutes.ToString("00") + ":" +
+            span.Seconds.ToString("00") + "." +
+            span.Milliseconds.ToString("00");
+    }
+
     public static void SyncLoadLevel(this MonoBehaviour sceneScript, string levelName)
     {
         sceneScript.StartCoroutine(Load(levelName));

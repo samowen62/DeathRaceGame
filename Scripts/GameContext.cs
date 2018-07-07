@@ -216,9 +216,8 @@ public class GameContext : MonoBehaviour {
                     gameData.getTotalTime(playerName),
                     gameData.getPlacement(playerName),
                     (i + 1) * -50);
-
-                //TODO:verify pause works
-                pauseUIComponents = pauseUIComponents.Concat(new GameObject[] { newFinishUI.gameObject }).ToArray();
+                
+                // add to pausable components
                 pausableComponents = pausableComponents.Concat(new PausableBehaviour[] { newFinishUI }).ToArray();
                 newFinishUI.startAnimation();
             }
