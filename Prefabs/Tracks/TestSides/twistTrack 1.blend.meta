@@ -34,6 +34,7 @@ ModelImporter:
     100052: //RootNode
     100054: Wall
     100056: NewWalls
+    100058: SmoothTrack
     400000: BezierCurve
     400002: BezierCurve_001
     400004: BezierCurveFine
@@ -63,6 +64,7 @@ ModelImporter:
     400052: //RootNode
     400054: Wall
     400056: NewWalls
+    400058: SmoothTrack
     2300000: BezierCurve
     2300002: BezierCurve_001
     2300004: BezierCurveFine
@@ -91,6 +93,7 @@ ModelImporter:
     2300050: Track
     2300052: Wall
     2300054: NewWalls
+    2300056: SmoothTrack
     3300000: BezierCurve
     3300002: BezierCurve_001
     3300004: BezierCurveFine
@@ -119,6 +122,7 @@ ModelImporter:
     3300050: Track
     3300052: Wall
     3300054: NewWalls
+    3300056: SmoothTrack
     4300000: BezierCurveFine_001
     4300002: Plane_013
     4300004: Plane_012
@@ -147,6 +151,7 @@ ModelImporter:
     4300050: Wall
     4300052: Plane_001
     4300054: NewWalls
+    4300056: SmoothTrack
     7400000: Default Take
     9500000: //RootNode
   materials:
@@ -192,7 +197,7 @@ ModelImporter:
     useFileScale: 1
   tangentSpace:
     normalSmoothAngle: 60
-    normalImportMode: 0
+    normalImportMode: 1
     tangentImportMode: 3
   importAnimation: 1
   copyAvatar: 0
