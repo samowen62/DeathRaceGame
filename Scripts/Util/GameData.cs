@@ -34,8 +34,14 @@ public class GameData : PausableBehaviour
 
     // Use this for initialization
     protected override void _awake () {
+        initialize();
+    }
+
+    private void initialize()
+    {
         numTracks = sceneSequence.Length;
-        if (sceneSequence.Length == 0){
+        if (sceneSequence.Length == 0)
+        {
             Debug.LogError("No valid scenes to turn to!");
         }
 
@@ -44,6 +50,23 @@ public class GameData : PausableBehaviour
         {
             playerData.Add(player, new DataDTO(numTracks));
         }
+    }
+
+    /*
+     * Re-initializes the object with the given track only
+     */
+    public void ReInitialize(string trackName)
+    {
+        ReInitialize(new string[] { trackName });
+    }
+
+    /*
+     * Re-initializes the object with the given track sequence
+     */
+    public void ReInitialize(string[] trackNames)
+    {
+        sceneSequence = trackNames;
+        initialize();
     }
 
     /*
