@@ -3,10 +3,11 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Text;
 
-public class SelectTrackOption : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class SelectTrackOption : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
 
     private Text thisText;
+    private MovieTexture gif;
     private Color initialColor;
     private Color disableColor = Color.gray;
     private int initialSize;
@@ -22,6 +23,12 @@ public class SelectTrackOption : MonoBehaviour, IPointerEnterHandler, IPointerEx
         initialColor = thisText.color;
         initialSize = thisText.fontSize;
         hoverSize = initialSize + 2;
+
+        // get gif texture
+        //var rim = GetComponent<RawImage>();
+        //gif = (MovieTexture)rim.mainTexture;
+        // gif = (MovieTexture)(GetComponent<Renderer>().material.mainTexture); // for planes. might have to do
+        //gif.Play();
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -45,9 +52,8 @@ public class SelectTrackOption : MonoBehaviour, IPointerEnterHandler, IPointerEx
         thisText.fontSize = initialSize;
     }
 
-    public void OnPointerDown(PointerEventData eventData)
+    public void OnPointerClick(PointerEventData eventData)
     {
-        Debug.Log("Not orking");
         if (Click != null)
             Click.Invoke();
     }
