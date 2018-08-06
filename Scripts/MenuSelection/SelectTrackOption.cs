@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Video;
 using UnityEngine.EventSystems;
 using System.Text;
 
@@ -7,7 +8,7 @@ public class SelectTrackOption : MonoBehaviour, IPointerEnterHandler, IPointerEx
 {
 
     private Text thisText;
-    private MovieTexture gif;
+    private VideoPlayer gif;
     private Color initialColor;
     private Color disableColor = Color.gray;
     private int initialSize;
@@ -20,15 +21,10 @@ public class SelectTrackOption : MonoBehaviour, IPointerEnterHandler, IPointerEx
     void Start()
     {
         thisText = transform.Find("Text").GetComponent<Text>();
+        gif = transform.Find("Video").GetComponent<VideoPlayer>();
         initialColor = thisText.color;
         initialSize = thisText.fontSize;
         hoverSize = initialSize + 2;
-
-        // get gif texture
-        //var rim = GetComponent<RawImage>();
-        //gif = (MovieTexture)rim.mainTexture;
-        // gif = (MovieTexture)(GetComponent<Renderer>().material.mainTexture); // for planes. might have to do
-        //gif.Play();
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -39,6 +35,7 @@ public class SelectTrackOption : MonoBehaviour, IPointerEnterHandler, IPointerEx
             MouseEnter.Invoke();
         //TODO:enlarge gif here
 
+        gif.Play();
         thisText.color = hoverColor;
         thisText.fontSize = hoverSize;
     }
@@ -48,6 +45,7 @@ public class SelectTrackOption : MonoBehaviour, IPointerEnterHandler, IPointerEx
         if (disabled) return;
         //TODO:retract gif here
 
+        gif.Stop();
         thisText.color = initialColor;
         thisText.fontSize = initialSize;
     }

@@ -6,7 +6,7 @@ VideoClipImporter:
   serializedVersion: 2
   useLegacyImporter: 0
   quality: 0.5
-  isColorLinear: 0
+  isColorLinear: 1
   originalWidth: 360
   originalHeight: 190
   frameRange: 0
@@ -24,7 +24,16 @@ VideoClipImporter:
   importAudio: 0
   sourceAudioChannelCount: 
   sourceAudioSampleRate: 
-  targetSettings: {}
+  targetSettings:
+    0:
+      enableTranscoding: 0
+      codec: 0
+      resizeFormat: 0
+      aspectRatio: 0
+      customWidth: 360
+      customHeight: 190
+      bitrateMode: 2
+      spatialQuality: 2
   output:
     format: 1
     settings:
