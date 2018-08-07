@@ -3,74 +3,74 @@ using UnityEngine.UI;
 using UnityEngine.Video;
 using UnityEngine.EventSystems;
 using System.Text;
+using System;
 
 public class SelectTrackOption : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
 
-    private Text thisText;
+    private Text text;
     private VideoPlayer gif;
+    private Material planeMaterial;
+
     private Color initialColor;
-    private Color disableColor = Color.gray;
+    private Color greyedColor = new Color(0.25f, 0.25f, 0.25f);
+
+    private Vector3 initialScale;
+    private Vector3 largerScale = new Vector3(1.2f, 1.2f, 1.2f);
+
     private int initialSize;
     private int hoverSize;
 
-    private bool disabled = false;
-
-    public Color hoverColor;
+    private float timeLastInteraction = 0f;
 
     void Start()
     {
-        thisText = transform.Find("Text").GetComponent<Text>();
+        text = GetComponent<Text>();
+        initialScale = transform.localScale;
+        planeMaterial = transform.Find("Plane").GetComponent<Renderer>().material;
+        planeMaterial.color = greyedColor;
+        planeMaterial.SetColor("_EmissionColor", greyedColor);
+
         gif = transform.Find("Video").GetComponent<VideoPlayer>();
-        initialColor = thisText.color;
-        initialSize = thisText.fontSize;
+        gif.Stop();
+
+        initialColor = text.color;
+        initialSize = text.fontSize;
         hoverSize = initialSize + 2;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (disabled) return;
+        // to avoid flicker
+        if (Math.Abs(Time.fixedTime - timeLastInteraction) < 0.1)
+            return;
+        timeLastInteraction = Time.fixedTime;
 
         if (MouseEnter != null)
             MouseEnter.Invoke();
-        //TODO:enlarge gif here
+
+        planeMaterial.color = Color.white;
+        planeMaterial.SetColor("_EmissionColor", Color.white);
 
         gif.Play();
-        thisText.color = hoverColor;
-        thisText.fontSize = hoverSize;
+        text.fontSize = hoverSize;
+        transform.localScale = largerScale;
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (disabled) return;
-        //TODO:retract gif here
+        planeMaterial.color = greyedColor;
+        planeMaterial.SetColor("_EmissionColor", greyedColor);
 
         gif.Stop();
-        thisText.color = initialColor;
-        thisText.fontSize = initialSize;
+        text.fontSize = initialSize;
+        transform.localScale = initialScale;
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
         if (Click != null)
             Click.Invoke();
-    }
-
-    public void disable()
-    {
-        disabled = true;
-        thisText.color = disableColor;
-        thisText.fontSize = initialSize;
-    }
-
-    public void enable()
-    {
-        if (disabled)
-        {
-            disabled = false;
-            thisText.color = initialColor;
-            thisText.fontSize = initialSize;
-        }
     }
 
     public delegate void ClickHandler();
