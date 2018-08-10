@@ -26,13 +26,14 @@ public class SelectTrackOption : MonoBehaviour, IPointerEnterHandler, IPointerEx
     void Start()
     {
         text = GetComponent<Text>();
+        text.text = AppConfig.getTrackDisplayName(name);
         initialScale = transform.localScale;
         planeMaterial = transform.Find("Plane").GetComponent<Renderer>().material;
         planeMaterial.color = greyedColor;
         planeMaterial.SetColor("_EmissionColor", greyedColor);
 
         gif = transform.Find("Video").GetComponent<VideoPlayer>();
-        gif.Stop();
+        gif.waitForFirstFrame = true;
 
         initialColor = text.color;
         initialSize = text.fontSize;
@@ -62,7 +63,7 @@ public class SelectTrackOption : MonoBehaviour, IPointerEnterHandler, IPointerEx
         planeMaterial.color = greyedColor;
         planeMaterial.SetColor("_EmissionColor", greyedColor);
 
-        gif.Stop();
+        gif.Pause();
         text.fontSize = initialSize;
         transform.localScale = initialScale;
     }
