@@ -130,6 +130,7 @@ public class RacePlayer : PausableBehaviour
     public float max_bonus_health = 150f;
     public float health_per_frame_healing = 0.2f;
     public float health_blink_speed = 20f;
+    public bool cheat_infinite_boost = false;
     private bool over_healing_area = false;
     private float health_warning_thresh = 25f;
     private float player_health;
@@ -526,7 +527,9 @@ public class RacePlayer : PausableBehaviour
             current_speed += boost_factor * (fwd_boost_speed - current_speed);
             boostEffects();
             lastTimeBoostPower = pauseInvariantTime;
-            slowlyDamage((int)(boost_factor * boost_cost));
+
+            if(!cheat_infinite_boost)
+                slowlyDamage((int)(boost_factor * boost_cost));
         }
 
         if (!isAI && current_speed >= fwd_max_speed)
