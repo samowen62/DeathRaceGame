@@ -1,0 +1,155 @@
+fileFormatVersion: 2
+guid: 4d428f430c139c2439c23e9cb6c83b46
+timeCreated: 1535595500
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: BallChamber
+    100002: BallChamber_001
+    100004: //RootNode
+    100006: ElectricBall1
+    100008: ElectricBall1_001
+    100010: ElectricBall2
+    100012: ElectricBall2_001
+    100014: LargeTower
+    100016: SmallTower
+    100018: TowerBottom
+    100020: TowerBottom_001
+    100022: TowerBottomDisc
+    100024: TowerBottomDisc_001
+    100026: TowerTop
+    100028: TowerTop_001
+    100030: TowerTopDisc
+    100032: TowerTopDisc_001
+    400000: BallChamber
+    400002: BallChamber_001
+    400004: //RootNode
+    400006: ElectricBall1
+    400008: ElectricBall1_001
+    400010: ElectricBall2
+    400012: ElectricBall2_001
+    400014: LargeTower
+    400016: SmallTower
+    400018: TowerBottom
+    400020: TowerBottom_001
+    400022: TowerBottomDisc
+    400024: TowerBottomDisc_001
+    400026: TowerTop
+    400028: TowerTop_001
+    400030: TowerTopDisc
+    400032: TowerTopDisc_001
+    2300000: BallChamber
+    2300002: BallChamber_001
+    2300004: ElectricBall1
+    2300006: ElectricBall1_001
+    2300008: ElectricBall2
+    2300010: ElectricBall2_001
+    2300012: TowerBottom
+    2300014: TowerBottom_001
+    2300016: TowerBottomDisc
+    2300018: TowerBottomDisc_001
+    2300020: TowerTop
+    2300022: TowerTop_001
+    2300024: TowerTopDisc
+    2300026: TowerTopDisc_001
+    3300000: BallChamber
+    3300002: BallChamber_001
+    3300004: ElectricBall1
+    3300006: ElectricBall1_001
+    3300008: ElectricBall2
+    3300010: ElectricBall2_001
+    3300012: TowerBottom
+    3300014: TowerBottom_001
+    3300016: TowerBottomDisc
+    3300018: TowerBottomDisc_001
+    3300020: TowerTop
+    3300022: TowerTop_001
+    3300024: TowerTopDisc
+    3300026: TowerTopDisc_001
+    4300000: BallChamber_001
+    4300002: TowerBottom_001
+    4300004: TowerBottomDisc_001
+    4300006: TowerTopDisc_001
+    4300008: TowerTop_001
+    4300010: ElectricBall1_001
+    4300012: ElectricBall2_001
+    4300014: ElectricBall2
+    4300016: ElectricBall1
+    4300018: TowerTop
+    4300020: TowerTopDisc
+    4300022: TowerBottomDisc
+    4300024: TowerBottom
+    4300026: BallChamber
+    7400000: Default Take
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 1
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
