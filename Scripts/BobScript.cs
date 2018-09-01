@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEditor;
 
 public class BobScript : PausableBehaviour {
 
@@ -11,12 +12,25 @@ public class BobScript : PausableBehaviour {
 
     protected override void _awake()
     {
-        initialPosition = transform.localPosition;
+        initialPosition = transform.position;
     }
 
     protected override void _update()
     {
-        transform.localPosition = initialPosition + new Vector3(0, distance * Mathf.Sin(speed * pauseInvariantTime + offset));
+        transform.position = initialPosition + new Vector3(0, distance * Mathf.Sin(speed * pauseInvariantTime + offset));
     }
 
+}
+
+[CustomEditor(typeof(BobScript))]
+public class EditorRaycastEditor : Editor
+{
+    // draws a line where this gameobject will bob
+    void OnSceneGUI()
+    {
+        var t = target as BobScript;
+        Handles.color = Color.cyan;
+        Handles.DrawLine(t.transform.position + new Vector3(0, t.distance),
+            t.transform.position + new Vector3(0, -t.distance));
+    }
 }
