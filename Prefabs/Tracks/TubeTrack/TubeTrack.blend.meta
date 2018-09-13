@@ -12,6 +12,8 @@ ModelImporter:
     100008: Track_MeshPart1
     100010: //RootNode
     100012: CurvePoints
+    100014: HealingPanels
+    100016: HealingTrack
     400000: BezierCurve
     400002: CrossSection
     400004: Track
@@ -19,24 +21,32 @@ ModelImporter:
     400008: Track_MeshPart1
     400010: //RootNode
     400012: CurvePoints
+    400014: HealingPanels
+    400016: HealingTrack
     2300000: BezierCurve
     2300002: CrossSection
     2300004: Track_MeshPart0
     2300006: Track_MeshPart1
     2300008: CurvePoints
     2300010: Track
+    2300012: HealingPanels
+    2300014: HealingTrack
     3300000: BezierCurve
     3300002: CrossSection
     3300004: Track_MeshPart0
     3300006: Track_MeshPart1
     3300008: CurvePoints
     3300010: Track
+    3300012: HealingPanels
+    3300014: HealingTrack
     4300000: CrossSection
     4300002: BezierCurve
     4300004: Track_MeshPart0
     4300006: Track_MeshPart1
     4300008: CurvePoints
     4300010: Track
+    4300012: HealingPanels
+    4300014: HealingTrack
     7400000: Default Take
     9500000: //RootNode
   materials:
