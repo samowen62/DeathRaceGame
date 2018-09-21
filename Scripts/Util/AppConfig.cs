@@ -9,7 +9,7 @@ public static class AppConfig {
     public static readonly int wallMask = 1 << 11;
 
     public static readonly string MENU_MAIN = "MainMenu";
-    public static readonly string MENU_TRACK = "TrackMenu";
+    public static readonly string MENU_TRACK = "SixTrackMenu";
     public static readonly string MENU_RECORDS = "RecordsMenu";
 
     public static readonly string TRACK_PAPER_ENGINE = "paperEngine";
@@ -75,7 +75,8 @@ public static class AppConfig {
         {"SimpleTrack", "Track 1" },
         {"paperEngine", "Track 2" },
         {"SnowTrack", "Track 3" },
-        {"SpiralTrack", "Track 4" }
+        {"SpiralTrack", "Track 4" },
+        {"TubeTrack", "Track 5" }
     };
 
     /**
