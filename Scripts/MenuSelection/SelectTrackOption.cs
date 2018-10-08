@@ -33,7 +33,7 @@ public class SelectTrackOption : MonoBehaviour, IPointerEnterHandler, IPointerEx
         planeMaterial.SetColor("_EmissionColor", greyedColor);
 
         gif = transform.Find("Video").GetComponent<VideoPlayer>();
-        gif.waitForFirstFrame = true;
+        //gif.waitForFirstFrame = true;
 
         initialColor = text.color;
         initialSize = text.fontSize;
