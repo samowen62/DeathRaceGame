@@ -11,11 +11,8 @@ public class MainMenu : MonoBehaviour {
 
     public SceneFade sceneFade;
 
-    private Button startGameButton;
-    private Button recordsGameButton;
-    private Button exitGameButton;
-
     private const string START_GAME_BUTTON = "StartGame";
+    private const string HOW_TO_PLAY = "HowToPlay";
     private const string RECORDS_NAME = "Records";
     private const string END_GAME_BUTTON = "EndGame";
 
@@ -32,19 +29,20 @@ public class MainMenu : MonoBehaviour {
             switch (button.name)
             {
                 case START_GAME_BUTTON:
-                    startGameButton = button;
-                    startGameButton.onClick.AddListener(delegate () { startButtonClicked(); });
-                    UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, startGameButton, gameObject);
+                    button.onClick.AddListener(delegate () { startButtonClicked(); });
+                    UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, button, gameObject);
+                    break;
+                case HOW_TO_PLAY:
+                    button.onClick.AddListener(delegate () { howToPlayButtonClicked(); });
+                    UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, button, gameObject);
                     break;
                 case RECORDS_NAME:
-                    recordsGameButton = button;
-                    recordsGameButton.onClick.AddListener(delegate () { recordsButtonClicked(); });
-                    UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, recordsGameButton, gameObject);
+                    button.onClick.AddListener(delegate () { recordsButtonClicked(); });
+                    UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, button, gameObject);
                     break;
                 case END_GAME_BUTTON:
-                    exitGameButton = button;
-                    exitGameButton.onClick.AddListener(delegate () { endGameButtonClicked(); });
-                    UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, exitGameButton, gameObject);
+                    button.onClick.AddListener(delegate () { endGameButtonClicked(); });
+                    UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, button, gameObject);
                     break;
                 default:
                     Debug.LogWarning("unused button component: " + button.name);
@@ -63,6 +61,15 @@ public class MainMenu : MonoBehaviour {
 
             LoadLevel(AppConfig.MENU_TRACK);
         }
+    }
+
+    private void howToPlayButtonClicked()
+    {
+        selectSound.Play();
+        startBlocked = true;
+        Debug.Log("How To Play Clicked");
+
+        LoadLevel(AppConfig.MENU_HOWTOPLAY);
     }
 
     private void recordsButtonClicked()
