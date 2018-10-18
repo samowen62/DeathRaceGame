@@ -2,8 +2,8 @@
 using UnityEngine.UI;
 using UnityEngine.Video;
 using UnityEngine.EventSystems;
-using System.Text;
 using System;
+using System.Collections;
 
 public class SelectTrackOption : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
@@ -33,7 +33,11 @@ public class SelectTrackOption : MonoBehaviour, IPointerEnterHandler, IPointerEx
         planeMaterial.SetColor("_EmissionColor", greyedColor);
 
         gif = transform.Find("Video").GetComponent<VideoPlayer>();
-        gif.frame = 2;
+        gif.Prepare();
+        gif.prepareCompleted += e => {
+            e.Play();
+            StartCoroutine(pauseWhenLoaded());
+        };
 
         initialColor = text.color;
         initialSize = text.fontSize;
@@ -49,8 +53,7 @@ public class SelectTrackOption : MonoBehaviour, IPointerEnterHandler, IPointerEx
 
         if (MouseEnter != null)
             MouseEnter.Invoke();
-
-        //planeMaterial.color = Color.white;
+        
         planeMaterial.SetColor("_EmissionColor", Color.white);
 
         gif.Play();
@@ -72,6 +75,12 @@ public class SelectTrackOption : MonoBehaviour, IPointerEnterHandler, IPointerEx
     {
         if (Click != null)
             Click.Invoke();
+    }
+
+    private IEnumerator pauseWhenLoaded()
+    {
+        yield return new WaitUntil(() => gif.frame > 4);
+        gif.Pause();
     }
 
     public delegate void ClickHandler();
