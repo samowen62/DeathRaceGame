@@ -1,57 +1,195 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections.Generic;
-using System;
-using UnityEngine.EventSystems;
+using UnityEngine;
 
 public class RacePlayer : PausableBehaviour
 {
-    //TODO: to organize these private varibles:
-    // 1) organize and indent based on section
-    // 2) change some to const or private. Waaay too many publics
-    // 3) change some to private set with public get where needed
+    #region Enums
+    public enum Handling { Versatile, Normal, Poor }
+    public enum Speed { HighTopLowAcc, Normal, LowTopHighAcc }
+    public enum Power { High, Normal, Low }
+    public enum Health { Resilient, Normal, Weak }
 
+    [SerializeField]
+    private Handling _handlingGrade = Handling.Normal;
+    public Handling HandlingGrade
+    {
+        get
+        {
+            return HandlingGrade;
+        }
+        set
+        {
+            switch (value)
+            {
+                case Handling.Versatile:
+                    turn_speed = 87f;
+                    hard_turn_multiplier = 2.3f;
+                    air_turn_speed = 15f;
+                    break;
 
+                case Handling.Normal:
+                    turn_speed = 80f;
+                    hard_turn_multiplier = 2.2f;
+                    air_turn_speed = 10f;
+                    break;
+
+                case Handling.Poor:
+                    turn_speed = 68f;
+                    hard_turn_multiplier = 2.0f;
+                    air_turn_speed = 8f;
+                    break;
+            }
+            HandlingGrade = value;
+        }
+    }
+
+    [SerializeField]
+    private Speed _speedGrade = Speed.Normal;
+    public Speed SpeedGrade
+    {
+        get
+        {
+            return _speedGrade;
+        }
+        set
+        {
+            switch (value)
+            {
+                case Speed.HighTopLowAcc:
+                    fwd_accel = 75f;
+                    fwd_max_speed = 180;
+                    fwd_boost_speed = 225;
+                    fwd_boost_decel = 2.0f;
+                    break;
+
+                case Speed.Normal:
+                    fwd_accel = 80f;
+                    fwd_max_speed = 170;
+                    fwd_boost_speed = 220;
+                    fwd_boost_decel = 2.5f;
+                    break;
+
+                case Speed.LowTopHighAcc:
+                    fwd_accel = 85f;
+                    fwd_max_speed = 160;
+                    fwd_boost_speed = 215;
+                    fwd_boost_decel = 2.7f;
+                    break;
+            }
+            _speedGrade = value;
+        }
+    }
+
+    [SerializeField]
+    private Power _powerGrade = Power.Normal;
+    public Power PowerGrade
+    {
+        get
+        {
+            return _powerGrade;
+        }
+        set
+        {
+            switch (value)
+            {
+                case Power.High:
+                    attack_damage_multiplier = 0.5f;
+                    damage_damper = 0.6f;
+                    break;
+
+                case Power.Normal:
+                    attack_damage_multiplier = 0.3f;
+                    damage_damper = 1.0f;
+                    break;
+
+                case Power.Low:
+                    attack_damage_multiplier = 0.2f;
+                    damage_damper = 1.2f;
+                    break;
+            }
+            _powerGrade = value;
+        }
+    }
+
+    [SerializeField]
+    private Health _healthGrade = Health.Normal;
+    public Health HealtGrade
+    {
+        get
+        {
+            return _healthGrade;
+        }
+        set
+        {
+            switch (value)
+            {
+                case Health.Resilient:
+                    starting_health = 120f;
+                    max_bonus_health = 150f;
+                    health_per_frame_healing = 0.3f;
+                    break;
+
+                case Health.Normal:
+                    starting_health = 100f;
+                    max_bonus_health = 125f;
+                    health_per_frame_healing = 0.2f;
+                    break;
+
+                case Health.Weak:
+                    starting_health = 85f;
+                    max_bonus_health = 100f;
+                    health_per_frame_healing = 0.2f;
+                    break;
+            }
+            _healthGrade = value;
+        }
+    }
+
+    #endregion
+
+    #region Instance Variables
     /* AI indicator */
     public bool isAI = true;
     public TrackPoint.PathChoice AIPathChoice = TrackPoint.PathChoice.PATH_A;
 
-
     /* Related to air and returning mechanics */
-    public float gravity = 1700f;
-    public float returningToTrackSpeed = 0.8f;
-    public float timeAllowedNotOnTrack = 2f;
-    public float timeSpentReturning = 1.5f;
+    private float gravity = 1700f;
+    private float returningToTrackSpeed = 0.8f;
+    private float timeAllowedNotOnTrack = 2f;
+    private float timeSpentReturning = 1.5f;
 
 
     /*Ship handling parameters, must be multiples of 5!! */
-    public float fwd_accel = 80f;
-    public float fwd_max_speed = 130f;
-    public float fwd_boost_speed = 170f;
-    public float fwd_boost_decel = 2.5f;
-    public float boost_time_window = 2.2f;
-    public int boost_cost = 10;
+    private float fwd_accel = 80f;
+    private float fwd_max_speed = 170;
+    private float fwd_boost_speed = 220;
+    private float fwd_boost_decel = 2.5f;
+    private float boost_time_window = 2.2f;
+    private int boost_cost = 10;
     public AudioObject boostSound;
+    public float MaxSpeed { get { return fwd_max_speed; } }
 
-    public float brake_speed = 200f;
-    public float turn_speed = 80f;
-    public float hard_turn_multiplier = 2.2f;
+    private float brake_speed = 200f;
+    private float turn_speed = 80f;
+    private float hard_turn_multiplier = 2.2f;
     private float air_turn_speed = 10f;
 
     /* Related to for bouncing against the wall */
-    public float wall_bounce_deccel = 10f;//must be > 1!!
-    public float wall_bounce_threshold = 5f;
-    public float wall_bounce_speed_to_bounce_ratio = 0.1f;
-    public float wall_bounce_curr_speed_deccel = 2f;//must be > 1!!
+    private float wall_bounce_deccel = 10f;//must be > 1!!
+    private float wall_bounce_threshold = 5f;
+    private float wall_bounce_speed_to_bounce_ratio = 0.1f;
+    private float wall_bounce_curr_speed_deccel = 2f;//must be > 1!!
 
     /* Related to for ship animation */
-    public float ship_mesh_tilt = 5f;
-    public float ship_mesh_tilt_hard_turn = 3f;
+    private float ship_mesh_tilt = 5f;
+    private float ship_mesh_tilt_hard_turn = 3f;
 
     /* Related to ship orientation and sticking to the track*/
-    public float hover_height = AppConfig.hoverHeight - 0.5f;
-    public float height_smooth = 7f;                               //How fast the ship will readjust to "hover_height"
-    public float pitch_smooth = 5f;                                //How fast the ship will adjust its rotation to match track normal
-    public float height_correction = 2.2f;
+    private float hover_height = AppConfig.hoverHeight - 0.5f;
+    private float height_smooth = 12f;                               //How fast the ship will readjust to "hover_height"
+    private float pitch_smooth = 5f;                                //How fast the ship will adjust its rotation to match track normal
+    private float height_correction = 2.2f;
     private float rayCastDistance = 10f;
     private float freeFallRayCastDistance = 50f;//50 is good!
     private Vector3 disired_position;
@@ -97,11 +235,11 @@ public class RacePlayer : PausableBehaviour
     private Vector3 attacked_velocity = Vector3.zero;
     public AudioObject bumpSound;
     private float attack_time_window = 0.25f;
-    public float attack_deccel = 10;
-    public float attack_threshold = 5;
-    public float attack_magnitude = 5;
-    public float attacked_magnitude = 2;
-    public float attack_damage_multiplier = 0.3f;
+    private float attack_deccel = 10;
+    private float attack_threshold = 5;
+    private float attacked_magnitude = 2;
+    private float attack_damage_multiplier = 0.3f;
+    private float damage_damper = 1.0f;
     private float attack_bump_damage = 1f;
     private float attack_bump_magnitude = 0.1f;
     private float attack_damage_transfer_factor = -0.8f;
@@ -109,7 +247,8 @@ public class RacePlayer : PausableBehaviour
     private float roll_decel = 1.4f;
     private float attack_roll = 25f;
     private bool dead = false;
-    public bool isDead {
+    public bool isDead
+    {
         get
         {
             return dead;
@@ -126,14 +265,16 @@ public class RacePlayer : PausableBehaviour
     private Material redMaterial;
     private Color baseTint = new Color(0f, 0f, 0f, 1.0f);
     private Color tintColor = new Color(0f, 1f, 0.2f, 1.0f);
-    public float starting_health = 100f;
-    public float max_bonus_health = 150f;
-    public float health_per_frame_healing = 0.2f;
-    public float health_blink_speed = 20f;
+    private float starting_health = 100f;
+    private float max_bonus_health = 125f;
+    private float health_per_frame_healing = 0.2f;
+    private float health_blink_speed = 20f;
     public bool cheat_infinite_boost = false;
     private bool over_healing_area = false;
     private float health_warning_thresh = 25f;
     private float player_health;
+    public float StartingHealth { get { return starting_health; } }
+    public float MaxBonusHealth { get { return max_bonus_health; } }
     public float health
     {
         get
@@ -150,7 +291,7 @@ public class RacePlayer : PausableBehaviour
     private Vector3 lastCheckPointPosition;
     private TrackPoint lastCheckPoint;
     private TrackPoint current_TrackPoint;
- 
+
     public bool startedLap1 { get; private set; }
     private bool finishedWithRace = false;
     public bool finished
@@ -160,7 +301,8 @@ public class RacePlayer : PausableBehaviour
             return finishedWithRace;
         }
     }
-    private bool isEffectiveAI {
+    private bool isEffectiveAI
+    {
         get
         {
             return finishedWithRace || isAI;
@@ -183,31 +325,34 @@ public class RacePlayer : PausableBehaviour
     private float boostPlayerToCamera_Z = 6f; //how much farther away the camera is during boost
     private float boostCameraSpeed = 0.7f;
     private float boostCameraDistance = 0f;
-    
+
     private Vector3 _playerToCamera = new Vector3(0, 10, -20);
     public BezierSpline CameraPath { get; set; }
-    public Quaternion cameraRotation { get { return Quaternion.Euler(6, 0, 0); }}
+    public Quaternion cameraRotation { get { return Quaternion.Euler(6, 0, 0); } }
     public Vector3 playerToCamera
     {
         get
         {
-            if (finishedWithRace){
+            if (finishedWithRace)
+            {
                 return finishedCameraPosition;
             }
-            if(current_speed <= fwd_max_speed)
+            if (current_speed <= fwd_max_speed)
             {
                 return _playerToCamera;
             }
-            float target_z_distance = Mathf.Lerp(0, boostPlayerToCamera_Z, 
-                (current_speed - fwd_max_speed)/ (fwd_boost_speed - fwd_max_speed));
+            float target_z_distance = Mathf.Lerp(0, boostPlayerToCamera_Z,
+                (current_speed - fwd_max_speed) / (fwd_boost_speed - fwd_max_speed));
             //control how fast the camera can zoom out
-            if(target_z_distance - boostCameraDistance > boostCameraSpeed)
+            if (target_z_distance - boostCameraDistance > boostCameraSpeed)
             {
                 boostCameraDistance += boostCameraSpeed;
-            } else if (boostCameraDistance - target_z_distance > boostCameraSpeed)
+            }
+            else if (boostCameraDistance - target_z_distance > boostCameraSpeed)
             {
                 boostCameraDistance -= boostCameraSpeed;
-            } else
+            }
+            else
             {
                 boostCameraDistance = target_z_distance;
             }
@@ -228,7 +373,9 @@ public class RacePlayer : PausableBehaviour
     private Light playerTrail;
     private MeshRenderer shipRenderer;
     private Quaternion base_ship_rotation;
+    #endregion
 
+    #region PausableBehaviour Members
     protected override void _awake()
     {
         player_health = starting_health;
@@ -248,7 +395,7 @@ public class RacePlayer : PausableBehaviour
         //Set up ship renderer properties
         base_ship_rotation = shipRenderer.transform.localRotation;
         shipMaterial = shipRenderer.material;
-        shipMaterial.SetColor("_Tint", baseTint);      
+        shipMaterial.SetColor("_Tint", baseTint);
         redMaterial = new Material(Shader.Find("Transparent/Diffuse"));
         redMaterial.color = new Color32(1, 0, 0, 1);
 
@@ -262,7 +409,7 @@ public class RacePlayer : PausableBehaviour
         tilt = Quaternion.identity;
 
         if (Physics.Raycast(transform.position, -transform.up, out downHit, rayCastDistance, AppConfig.groundMask))
-        { 
+        {
             transform.position = downHit.point + hover_height * transform.up;
             transform.rotation = Quaternion.FromToRotation(transform.up, downHit.normal) * transform.rotation;
             global_orientation = transform.rotation;
@@ -272,7 +419,8 @@ public class RacePlayer : PausableBehaviour
             lastCheckPoint = placementManager.firstCheckPoint_A;
             lastCheckPointUp = transform.up;
             lastCheckPointPosition = transform.position + (AppConfig.hoverHeight) * lastCheckPointUp;
-        } else
+        }
+        else
         {
             Debug.LogError(name + " not above track!");
         }
@@ -295,7 +443,7 @@ public class RacePlayer : PausableBehaviour
 
                 player_health = starting_health;
                 shipMaterial.SetFloat("_Blend", 0);
-                
+
                 return_to_track();
             }
             return;
@@ -315,7 +463,7 @@ public class RacePlayer : PausableBehaviour
             float deltaTime = (pauseInvariantTime - timeStartReturning) * returningToTrackSpeed;
             transform.position = Vector3.Lerp(returningToTrackPositionBegin, returningToTrackPositionEnd, deltaTime);
             transform.rotation = Quaternion.Lerp(returningToTrackRotationBegin, returningToTrackRotationEnd, deltaTime);
-            if((pauseInvariantTime - timeStartReturning) >= timeSpentReturning)
+            if ((pauseInvariantTime - timeStartReturning) >= timeSpentReturning)
             {
                 status = PlayerStatus.ONTRACK;
             }
@@ -330,10 +478,10 @@ public class RacePlayer : PausableBehaviour
 
 
         //TODO:refactor into function
-        if (Physics.Raycast(transform.position + height_above_cast * prev_up, -prev_up, out downHit, 
+        if (Physics.Raycast(transform.position + height_above_cast * prev_up, -prev_up, out downHit,
             inFreefall ? freeFallRayCastDistance : rayCastDistance, AppConfig.groundMask))
         {
-            if(status == PlayerStatus.INAIR)
+            if (status == PlayerStatus.INAIR)
             {
                 bumpSound.Play();
             }
@@ -343,9 +491,9 @@ public class RacePlayer : PausableBehaviour
 
             if (accelerating)
             {
-                current_speed += (current_speed >= fwd_max_speed) ? 
+                current_speed += (current_speed >= fwd_max_speed) ?
                     (
-                        ((current_speed == fwd_max_speed) && !finishedWithRace ) ? 0 : -fwd_boost_decel
+                        ((current_speed == fwd_max_speed) && !finishedWithRace) ? 0 : -fwd_boost_decel
                     ) : fwd_accel * Time.deltaTime;
             }
             else if (current_speed > 0)
@@ -358,11 +506,11 @@ public class RacePlayer : PausableBehaviour
                 current_speed = 0f;
             }
 
-            turnShip();         
+            turnShip();
 
             Vector3 desired_up = Vector3.Lerp(prev_up, downHit.normal, Time.deltaTime * pitch_smooth);
             tilt.SetLookRotation(transform.forward - Vector3.Project(transform.forward, desired_up), desired_up);
-            transform.rotation =  tilt * global_orientation;
+            transform.rotation = tilt * global_orientation;
 
             previousGravity = -downHit.normal;
 
@@ -400,7 +548,7 @@ public class RacePlayer : PausableBehaviour
             {
                 turnShip();
 
-                transform.rotation = tilt * global_orientation ;
+                transform.rotation = tilt * global_orientation;
                 if (totalPitch != 0f)
                 {
                     transform.localRotation *= Quaternion.AngleAxis(totalPitch, transform.forward);
@@ -412,14 +560,16 @@ public class RacePlayer : PausableBehaviour
             }
         }
     }
+    #endregion
 
-
+    #region Private Methods
     private void setLightColor()
     {
-        if(current_speed <= fwd_max_speed)
+        if (current_speed <= fwd_max_speed)
         {
             playerTrail.intensity = (baseIntensity * current_speed) / fwd_max_speed;
-        } else
+        }
+        else
         {
             playerTrail.intensity = maxIntensity * (current_speed - fwd_max_speed) / (fwd_boost_speed - fwd_max_speed) + baseIntensity;
         }
@@ -516,10 +666,10 @@ public class RacePlayer : PausableBehaviour
         //Player is using boost power
         if (player_inputs.boostButton && (pauseInvariantTime - lastTimeBoostPower > boost_time_window))
         {
-            if(player_health <= 2f) return;
+            if (player_health <= 2f) return;
 
-            float boost_factor = 1f ;//want to use less than normal boost power if low health
-            if(player_health <= boost_cost + 1)
+            float boost_factor = 1f;//want to use less than normal boost power if low health
+            if (player_health <= boost_cost + 1)
             {
                 boost_factor = player_health / (boost_cost + 1);
             }
@@ -528,7 +678,7 @@ public class RacePlayer : PausableBehaviour
             boostEffects();
             lastTimeBoostPower = pauseInvariantTime;
 
-            if(!cheat_infinite_boost)
+            if (!cheat_infinite_boost)
                 slowlyDamage((int)(boost_factor * boost_cost));
         }
 
@@ -602,169 +752,6 @@ public class RacePlayer : PausableBehaviour
         }
     }
 
-    void OnTriggerEnter(Collider coll)
-    {
-        switch (coll.gameObject.tag)
-        {
-
-            //create a velocity vector from bouncing off the wall
-            case "CollissionWall":
-
-                if (Physics.Raycast(transform.position, -transform.right, out wallHit, rayCastDistance, AppConfig.wallMask))
-                {
-                    current_speed /= wall_bounce_curr_speed_deccel;
-                }
-                else if (Physics.Raycast(transform.position, transform.right, out wallHit, rayCastDistance, AppConfig.wallMask))
-                {
-                    current_speed /= wall_bounce_curr_speed_deccel;
-                }
-                else if (Physics.Raycast(transform.position - 2f * transform.forward, transform.forward, out wallHit, rayCastDistance, AppConfig.wallMask))
-                {
-                    current_speed = 0f;
-                } else
-                {
-                    Debug.LogWarning("Detected hit with wall but cannot find wall on left, right or front!");
-                    return;
-                }
-
-                shakeCameraForSeconds(timeCameraShakeBump);
-                damage(attack_bump_damage);
-                bumpSound.Play();
-
-                wall_bounce_velocity = wallHit.normal * wall_bounce_speed_to_bounce_ratio * current_speed;
-
-                break;
-
-            //when we hit a boost panel
-            case "BoostPanel":
-                current_speed = fwd_boost_speed;
-                boostEffects();
-                coll.gameObject.GetComponent<BoostPanel>().boostAnimation();
-                break;
-
-            //when we cross the finish line
-            case "FinishLine":
-                if (status == PlayerStatus.RETURNINGTOTRACK) return;
-
-                startedLap1 = true;
-                placementManager.crossFinish(this);
-                break;
-
-            //when we hit a trackpoint trigger
-            case "TrackPoint":
-                if (status != PlayerStatus.RETURNINGTOTRACK)
-                {
-                    TrackPoint trackPoint = coll.gameObject.GetComponent<TrackPoint>();
-
-                    //AI should only stick to one path
-                    if (!isEffectiveAI || AIPathChoice == trackPoint.pathChoice)
-                    {
-                        current_TrackPoint = trackPoint;
-                    }
-                    
-                    if(placementManager.updateTrackPoint(this, trackPoint)){
-                        lastCheckPoint = trackPoint;
-                        lastCheckPointUp = transform.up;
-                        lastCheckPointPosition = transform.position + (AppConfig.hoverHeight) * lastCheckPointUp;
-                    }
-                }
-                break;
-
-            //attack or bump other player
-            case "Player":
-                if (!playersToAttack.ContainsKey(coll.name))
-                {
-                    playersToAttack.Add(coll.name, coll.gameObject.GetComponent<RacePlayer>());
-                }
-                bump(coll.gameObject.GetComponent<RacePlayer>(), false);
-
-                //the AI may decide to attack another player >:)
-                //TODO: I should add more special effects for this. It's not obvious they're attacking
-                if (isAI)
-                {
-                    callAfterSeconds(0.1f, () =>
-                    {
-                        attack_player();
-                    });
-                }
-                break;
-
-            //Make sure falling player doesn't fall through ground
-            case "Ground":            
-                if(status == PlayerStatus.INAIR || inFreefall)
-                {
-                    if (Physics.Raycast(transform.position -5 * transform.forward, transform.forward, out downHit, 15, AppConfig.groundMask))
-                    {
-                        float rho = Vector3.Dot(transform.forward, downHit.normal);
-                        status = PlayerStatus.ONTRACK;
-                        transform.position = downHit.point + downHit.normal * hover_height;
-                        current_speed *= 1f / (1 + 3 * rho * rho);
-                        downward_speed = 0f;
-                    }
-                }
-                break;
-            case "DeathZone":
-                if(status == PlayerStatus.INAIR)
-                {
-                    return_to_track();
-                }
-                break;
-
-            //Log warning for unhandled tag
-            default:
-                Debug.LogWarning("No behavior for OnTriggerEnter with tag: " + coll.gameObject.tag);
-                break;
-        }
-    }
-
-    void OnTriggerStay(Collider coll)
-    {
-        switch (coll.gameObject.tag)
-        {
-            case "FreeFallZone":
-                inFreefall = true;
-                break;
-
-            //don't do anything for most tags
-            default:
-                break;
-        }
-    }
-
-    void OnTriggerExit(Collider coll)
-    {
-        switch (coll.gameObject.tag)
-        {
-            case "FreeFallZone":
-                inFreefall = false;
-                if (status == PlayerStatus.INAIR)
-                {
-                    lastTimeOnGround = pauseInvariantTime;
-                }
-                break;
-            case "Player":
-                callAfterSeconds(0.4f, () => {
-                    if(playersToAttack.ContainsKey(coll.name))
-                        playersToAttack.Remove(coll.name);
-                });
-                break;
-
-            //don't do anything for most tags
-            default:
-                break;
-        }
-
-    }
-
-
-    /*
-     * Needed to pass inputs to the player
-     */
-    public void passPlayerInputs(PlayerInputDTO _player_inputs)
-    {
-        player_inputs = _player_inputs;
-    }
-
     private void turnShip()
     {
         //Find horizonal input 
@@ -780,7 +767,7 @@ public class RacePlayer : PausableBehaviour
         }
         else
         {
-            
+
             if (current_TrackPoint == null)
             {
                 horizontal_input = player_inputs.horizonalAxis;
@@ -791,7 +778,7 @@ public class RacePlayer : PausableBehaviour
                 setInputsFromAI(out horizontal_input, out vertical_input, out spaceBar);
             }
         }
-   
+
         //calculate turn angle
         float turn_angle = 0f;
         if (status == PlayerStatus.INAIR)
@@ -838,10 +825,10 @@ public class RacePlayer : PausableBehaviour
         int nearEdge = AIUtil.checkIfNearEdge(transform.position, transform.up, current_TrackPoint);
 
         // Need to turn the ship away from the edge
-        if(nearEdge != 0)
+        if (nearEdge != 0)
         {
             spaceBar = true;
-            if(nearEdge > 0)
+            if (nearEdge > 0)
             {
                 horizontal_input = prev_h + max_delta_h;
             }
@@ -874,12 +861,12 @@ public class RacePlayer : PausableBehaviour
 
         horizontal_input *= sign;
 
-        if(status == PlayerStatus.INAIR)
+        if (status == PlayerStatus.INAIR)
         {
             vertical_input = prev_v + max_delta_v;
             vertical_input = vertical_input > 1 ? 1 : vertical_input;
         }
-        else if(prev_v != 0)
+        else if (prev_v != 0)
         {
             vertical_input = prev_v - max_delta_v;
             vertical_input = vertical_input < 0 ? 0 : vertical_input;
@@ -908,7 +895,7 @@ public class RacePlayer : PausableBehaviour
      */
     private void attack_player()
     {
-        if(pauseInvariantTime - lastTimeAttacked > attack_time_window && playersToAttack.Count > 0)
+        if (pauseInvariantTime - lastTimeAttacked > attack_time_window && playersToAttack.Count > 0)
         {
             lastTimeAttacked = pauseInvariantTime;
 
@@ -920,7 +907,7 @@ public class RacePlayer : PausableBehaviour
             Debug.Log(name + " Attacked " + opponent);
 
             bump(opponent, true);
-        }       
+        }
     }
 
     /**
@@ -949,12 +936,182 @@ public class RacePlayer : PausableBehaviour
 
         opponent.attack(name, playerToOpponent, _damage, attacking);
     }
+    #endregion
+
+    #region Events
+    void OnTriggerEnter(Collider coll)
+    {
+        switch (coll.gameObject.tag)
+        {
+
+            //create a velocity vector from bouncing off the wall
+            case "CollissionWall":
+
+                if (Physics.Raycast(transform.position, -transform.right, out wallHit, rayCastDistance, AppConfig.wallMask))
+                {
+                    current_speed /= wall_bounce_curr_speed_deccel;
+                }
+                else if (Physics.Raycast(transform.position, transform.right, out wallHit, rayCastDistance, AppConfig.wallMask))
+                {
+                    current_speed /= wall_bounce_curr_speed_deccel;
+                }
+                else if (Physics.Raycast(transform.position - 2f * transform.forward, transform.forward, out wallHit, rayCastDistance, AppConfig.wallMask))
+                {
+                    current_speed = 0f;
+                }
+                else
+                {
+                    Debug.LogWarning("Detected hit with wall but cannot find wall on left, right or front!");
+                    return;
+                }
+
+                shakeCameraForSeconds(timeCameraShakeBump);
+                damage(attack_bump_damage);
+                bumpSound.Play();
+
+                wall_bounce_velocity = wallHit.normal * wall_bounce_speed_to_bounce_ratio * current_speed;
+
+                break;
+
+            //when we hit a boost panel
+            case "BoostPanel":
+                current_speed = fwd_boost_speed;
+                boostEffects();
+                coll.gameObject.GetComponent<BoostPanel>().boostAnimation();
+                break;
+
+            //when we cross the finish line
+            case "FinishLine":
+                if (status == PlayerStatus.RETURNINGTOTRACK) return;
+
+                startedLap1 = true;
+                placementManager.crossFinish(this);
+                break;
+
+            //when we hit a trackpoint trigger
+            case "TrackPoint":
+                if (status != PlayerStatus.RETURNINGTOTRACK)
+                {
+                    TrackPoint trackPoint = coll.gameObject.GetComponent<TrackPoint>();
+
+                    //AI should only stick to one path
+                    if (!isEffectiveAI || AIPathChoice == trackPoint.pathChoice)
+                    {
+                        current_TrackPoint = trackPoint;
+                    }
+
+                    if (placementManager.updateTrackPoint(this, trackPoint))
+                    {
+                        lastCheckPoint = trackPoint;
+                        lastCheckPointUp = transform.up;
+                        lastCheckPointPosition = transform.position + (AppConfig.hoverHeight) * lastCheckPointUp;
+                    }
+                }
+                break;
+
+            //attack or bump other player
+            case "Player":
+                if (!playersToAttack.ContainsKey(coll.name))
+                {
+                    playersToAttack.Add(coll.name, coll.gameObject.GetComponent<RacePlayer>());
+                }
+                bump(coll.gameObject.GetComponent<RacePlayer>(), false);
+
+                //the AI may decide to attack another player >:)
+                //TODO: I should add more special effects for this. It's not obvious they're attacking
+                if (isAI)
+                {
+                    callAfterSeconds(0.1f, () =>
+                    {
+                        attack_player();
+                    });
+                }
+                break;
+
+            //Make sure falling player doesn't fall through ground
+            case "Ground":
+                if (status == PlayerStatus.INAIR || inFreefall)
+                {
+                    if (Physics.Raycast(transform.position - 5 * transform.forward, transform.forward, out downHit, 15, AppConfig.groundMask))
+                    {
+                        float rho = Vector3.Dot(transform.forward, downHit.normal);
+                        status = PlayerStatus.ONTRACK;
+                        transform.position = downHit.point + downHit.normal * hover_height;
+                        current_speed *= 1f / (1 + 3 * rho * rho);
+                        downward_speed = 0f;
+                    }
+                }
+                break;
+            case "DeathZone":
+                if (status == PlayerStatus.INAIR)
+                {
+                    return_to_track();
+                }
+                break;
+
+            //Log warning for unhandled tag
+            default:
+                Debug.LogWarning("No behavior for OnTriggerEnter with tag: " + coll.gameObject.tag);
+                break;
+        }
+    }
+
+    void OnTriggerStay(Collider coll)
+    {
+        switch (coll.gameObject.tag)
+        {
+            case "FreeFallZone":
+                inFreefall = true;
+                break;
+
+            //don't do anything for most tags
+            default:
+                break;
+        }
+    }
+
+    void OnTriggerExit(Collider coll)
+    {
+        switch (coll.gameObject.tag)
+        {
+            case "FreeFallZone":
+                inFreefall = false;
+                if (status == PlayerStatus.INAIR)
+                {
+                    lastTimeOnGround = pauseInvariantTime;
+                }
+                break;
+            case "Player":
+                callAfterSeconds(0.4f, () =>
+                {
+                    if (playersToAttack.ContainsKey(coll.name))
+                        playersToAttack.Remove(coll.name);
+                });
+                break;
+
+            //don't do anything for most tags
+            default:
+                break;
+        }
+
+    }
+    #endregion
+
+    #region Public Methods
+    /*
+     * Needed to pass inputs to the player
+     */
+    public void passPlayerInputs(PlayerInputDTO _player_inputs)
+    {
+        player_inputs = _player_inputs;
+    }
 
     /**
      * called when one player attacks another from _dir direction with _damage
      */
     public void attack(string attackerName, Vector3 _dir, float _damage, bool _attacking)
     {
+        _damage *= damage_damper;
         attacked_velocity = _dir;
         if (_attacking)
         {
@@ -974,7 +1131,7 @@ public class RacePlayer : PausableBehaviour
      */
     public void slowlyDamage(int _damage)
     {
-        while(_damage > 0)
+        while (_damage > 0)
         {
             callAfterSeconds(0.1f * _damage, () =>
             {
@@ -1026,4 +1183,5 @@ public class RacePlayer : PausableBehaviour
         Camera.main.transform.localPosition = finishedCameraPosition;
         Camera.main.transform.localRotation = finishedCameraRotation;
     }
+    #endregion
 }

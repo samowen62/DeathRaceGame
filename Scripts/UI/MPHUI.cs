@@ -26,13 +26,13 @@ public class MPHUI : PausableBehaviour
 
     private Color getColor()
     {
-        if (player.speed < player.fwd_max_speed)
+        if (player.speed < player.MaxSpeed)
         {
-            return Color.Lerp(minColor, midColor, player.speed / player.fwd_max_speed);
+            return Color.Lerp(minColor, midColor, player.speed / player.MaxSpeed);
         }
         else
         {
-            return Color.Lerp(midColor, maxColor, (player.speed - player.fwd_max_speed) / player.fwd_max_speed);
+            return Color.Lerp(midColor, maxColor, (player.speed - player.MaxSpeed) / player.MaxSpeed);
         }
     }
 }

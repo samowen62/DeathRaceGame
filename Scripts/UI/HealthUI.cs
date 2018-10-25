@@ -34,19 +34,19 @@ public class HealthUI : PausableBehaviour
         textComponent.text = _HEALTH;
         textComponent.color = current_color;
         imageComponent.color = current_color;
-        current_scale.x = player.health / player.starting_health;
+        current_scale.x = player.health / player.StartingHealth;
         scaleComponent.localScale = current_scale;
     }
 
     private Color getColor()
     {
-        if (player.health <= player.starting_health)
+        if (player.health <= player.StartingHealth)
         {
-            return Color.Lerp(minColor, midColor, player.health / player.starting_health);
+            return Color.Lerp(minColor, midColor, player.health / player.StartingHealth);
         }
         else
         {
-            return Color.Lerp(midColor, maxColor, (player.health - player.starting_health) / (player.max_bonus_health - player.starting_health));
+            return Color.Lerp(midColor, maxColor, (player.health - player.StartingHealth) / (player.MaxBonusHealth - player.StartingHealth));
         }
     }
 }
