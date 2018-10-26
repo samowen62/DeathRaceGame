@@ -379,6 +379,7 @@ public class RacePlayer : PausableBehaviour
     protected override void _awake()
     {
         player_health = starting_health;
+        attack_time_window = isAI ? 2.0f : attack_time_window;// for less aggressive AI
         player_inputs = new PlayerInputDTO();
         playersToAttack = new Dictionary<string, RacePlayer>();
 
