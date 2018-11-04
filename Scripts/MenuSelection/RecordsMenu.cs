@@ -21,6 +21,7 @@ public class RecordsMenu : MonoBehaviour
     public RacerPicture[] racerPictures;
     private Dictionary<string, Texture2D> racerPictureMap = new Dictionary<string, Texture2D>();
 
+    private GameObject _noRecordsDisplay;
     private TrackRecordItem _recordTemplate;
     private Button _backButton;
     private AsyncOperation async = null;
@@ -28,6 +29,7 @@ public class RecordsMenu : MonoBehaviour
     // Use this for initialization
     void Awake () {
         _backButton = GameObject.Find("BackButton").GetComponent<Button>();
+        _noRecordsDisplay = GameObject.Find("NoRecords");
         _backButton.onClick.AddListener(delegate () { backButtonClicked(); });
         UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, _backButton, gameObject);
 
@@ -42,11 +44,13 @@ public class RecordsMenu : MonoBehaviour
 
 
         // no records to display
-        //TODO: display something indicating that there are no records to display
         if(records.TrackRecords.Count < 1)
         {
             Destroy(GameObject.Find("ScrollRect/RecordContainer/Record"));
             return;
+        } else
+        {
+            _noRecordsDisplay.SetActive(false);
         }
 
         if(records.TrackRecords.Count < 3)

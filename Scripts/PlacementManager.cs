@@ -124,12 +124,15 @@ public class PlacementManager : PausableBehaviour
         if (validCross(player)) {
 
             listOfPlayers[player].finishLap(pauseInvariantTime);
-            gameEventsUI.PlayerLapMessage(player.name, listOfPlayers[player].lap);
 
             //check if player finished
             if (listOfPlayers[player].finished)
             {
                 gameContext.finishPlayer(player);
+            }
+            else
+            {
+                gameEventsUI.PlayerLapMessage(player.name, listOfPlayers[player].lap);
             }
         }
     }

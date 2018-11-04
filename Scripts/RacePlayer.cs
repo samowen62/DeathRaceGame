@@ -160,14 +160,14 @@ public class RacePlayer : PausableBehaviour
     private float timeSpentReturning = 1.5f;
 
 
-    /*Ship handling parameters, must be multiples of 5!! */
+    /* Ship handling parameters, must be multiples of 5!! */
     private float fwd_accel = 80f;
     private float fwd_max_speed = 170;
     private float fwd_boost_speed = 220;
     private float fwd_boost_decel = 2.5f;
     private float boost_time_window = 2.2f;
     private int boost_cost = 10;
-    public AudioObject boostSound;
+    private AudioObject boostSound;
     public float MaxSpeed { get { return fwd_max_speed; } }
 
     private float brake_speed = 200f;
@@ -233,7 +233,7 @@ public class RacePlayer : PausableBehaviour
     private Dictionary<string, RacePlayer> playersToAttack;
     private Vector3 attack_velocity = Vector3.zero;
     private Vector3 attacked_velocity = Vector3.zero;
-    public AudioObject bumpSound;
+    private AudioObject bumpSound;
     private float attack_time_window = 0.25f;
     private float attack_deccel = 10;
     private float attack_threshold = 5;
@@ -386,26 +386,23 @@ public class RacePlayer : PausableBehaviour
         gameEventsUI = AppConfig.findOnly<GameEventsUI>();
         placementManager = AppConfig.findOnly<PlacementManager>();
 
+        // Set up variables referring to children
         electricalEffect = transform.GetComponentInChildren<ElectricalEffect>();
-        shipRenderer = transform.Find("Ship").gameObject.GetComponent<MeshRenderer>();
-        if (shipRenderer == null)
-        {
-            Debug.LogError("Please name the ship prefab 'Ship' in this instance of RacePlayer.cs");
-        }
-
-        //Set up ship renderer properties
-        base_ship_rotation = shipRenderer.transform.localRotation;
-        shipMaterial = shipRenderer.material;
-        shipMaterial.SetColor("_Tint", baseTint);
-        redMaterial = new Material(Shader.Find("Transparent/Diffuse"));
-        redMaterial.color = new Color32(1, 0, 0, 1);
-
-        //TODO: do this for all subobjects so we don't have to manually set them and potentially mix them up between racers
         playerTrail = shipRenderer.transform.Find("Light").GetComponent<Light>();
         CameraPath = transform.Find("CameraPath").GetComponent<BezierSpline>();
         explosion = transform.Find("explosion").GetComponent<Explosion>();
         swipeTrail = shipRenderer.transform.Find("AttackTrail").GetComponent<SwipeTrail>();
         electricalEffect = transform.Find("ElectricEffect").GetComponent<ElectricalEffect>();
+        boostSound = transform.Find("FlyByAudio").GetComponent<AudioObject>();
+        bumpSound = transform.Find("RacerHitAudio").GetComponent<AudioObject>();
+        shipRenderer = transform.Find("Ship").gameObject.GetComponent<MeshRenderer>();
+
+        // Set up ship renderer properties
+        base_ship_rotation = shipRenderer.transform.localRotation;
+        shipMaterial = shipRenderer.material;
+        shipMaterial.SetColor("_Tint", baseTint);
+        redMaterial = new Material(Shader.Find("Transparent/Diffuse"));
+        redMaterial.color = new Color32(1, 0, 0, 1);
 
         tilt = Quaternion.identity;
 
