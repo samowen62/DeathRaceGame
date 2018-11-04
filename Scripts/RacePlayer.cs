@@ -388,6 +388,7 @@ public class RacePlayer : PausableBehaviour
 
         // Set up variables referring to children
         electricalEffect = transform.GetComponentInChildren<ElectricalEffect>();
+        shipRenderer = transform.Find("Ship").gameObject.GetComponent<MeshRenderer>();
         playerTrail = shipRenderer.transform.Find("Light").GetComponent<Light>();
         CameraPath = transform.Find("CameraPath").GetComponent<BezierSpline>();
         explosion = transform.Find("explosion").GetComponent<Explosion>();
@@ -395,7 +396,6 @@ public class RacePlayer : PausableBehaviour
         electricalEffect = transform.Find("ElectricEffect").GetComponent<ElectricalEffect>();
         boostSound = transform.Find("FlyByAudio").GetComponent<AudioObject>();
         bumpSound = transform.Find("RacerHitAudio").GetComponent<AudioObject>();
-        shipRenderer = transform.Find("Ship").gameObject.GetComponent<MeshRenderer>();
 
         // Set up ship renderer properties
         base_ship_rotation = shipRenderer.transform.localRotation;
@@ -423,8 +423,7 @@ public class RacePlayer : PausableBehaviour
             Debug.LogError(name + " not above track!");
         }
     }
-
-    //TODO: refactor this into a few private functions
+    
     protected override void _update()
     {
         if (cameraIsShaking)
@@ -452,7 +451,6 @@ public class RacePlayer : PausableBehaviour
         }
 
         setColorForHealth();
-
         setLightColor();
 
         //Player is returning to the track. Block other behavior by returning
@@ -471,11 +469,9 @@ public class RacePlayer : PausableBehaviour
         checkMiscMovement();
 
         bool accelerating = isEffectiveAI || player_inputs.forwardButton;
-
         prev_up = transform.up;
-
-
-        //TODO:refactor into function
+        
+        // if player is above the track, recalculate position and orientation
         if (Physics.Raycast(transform.position + height_above_cast * prev_up, -prev_up, out downHit,
             inFreefall ? freeFallRayCastDistance : rayCastDistance, AppConfig.groundMask))
         {
@@ -505,22 +501,9 @@ public class RacePlayer : PausableBehaviour
             }
 
             turnShip();
-
-            Vector3 desired_up = Vector3.Lerp(prev_up, downHit.normal, Time.deltaTime * pitch_smooth);
-            tilt.SetLookRotation(transform.forward - Vector3.Project(transform.forward, desired_up), desired_up);
-            transform.rotation = tilt * global_orientation;
-
-            previousGravity = -downHit.normal;
-
+            adjustOrientation();
             checkGroundMovement();
-
-            //Smoothly adjust our height
-            float distance = downHit.distance - height_above_cast;
-            smooth_y = Mathf.Lerp(smooth_y, hover_height - distance, Time.deltaTime * height_smooth);
-            smooth_y = Mathf.Max(distance / -3, smooth_y); //sanity check on smooth_y
-
-            transform.localPosition += prev_up * smooth_y;
-            transform.position += transform.forward * (current_speed * Time.deltaTime);
+            adjustPosition();
 
         }
         /* Player is not above the track. Handle possibilities here*/
@@ -813,6 +796,24 @@ public class RacePlayer : PausableBehaviour
         }
 
         global_orientation = Quaternion.Euler(0, turn_angle, 0);
+    }
+
+    private void adjustOrientation()
+    {
+        Vector3 desired_up = Vector3.Lerp(prev_up, downHit.normal, Time.deltaTime * pitch_smooth);
+        tilt.SetLookRotation(transform.forward - Vector3.Project(transform.forward, desired_up), desired_up);
+        transform.rotation = tilt * global_orientation;
+        previousGravity = -downHit.normal;
+    }
+
+    private void adjustPosition()
+    {
+        float distance = downHit.distance - height_above_cast;
+        smooth_y = Mathf.Lerp(smooth_y, hover_height - distance, Time.deltaTime * height_smooth);
+        smooth_y = Mathf.Max(distance / -3, smooth_y); //sanity check on smooth_y
+
+        transform.localPosition += prev_up * smooth_y;
+        transform.position += transform.forward * (current_speed * Time.deltaTime);
     }
 
     private void setInputsFromAI(out float horizontal_input, out float vertical_input, out bool spaceBar)
