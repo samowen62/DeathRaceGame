@@ -21,7 +21,18 @@ public class HealingPlatform : MonoBehaviour
         }
         else
         {
-            rend.material.SetColor("_Color", HSBColor.ToColor(new HSBColor(Mathf.PingPong(Time.time * Speed, 1), 1, 1)));
+            if (rend.materials.Length > 1)
+            {
+                var color = HSBColor.ToColor(new HSBColor(Mathf.PingPong(Time.time * Speed, 1), 1, 1));
+                foreach (var material in rend.materials)
+                {
+                    material.SetColor("_Color", color);
+                }
+            }
+            else
+            {
+                rend.material.SetColor("_Color", HSBColor.ToColor(new HSBColor(Mathf.PingPong(Time.time * Speed, 1), 1, 1)));
+            }
         }
         
     }
