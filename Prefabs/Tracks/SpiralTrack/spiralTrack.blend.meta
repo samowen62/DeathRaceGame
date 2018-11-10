@@ -52,6 +52,7 @@ ModelImporter:
     100088: WallCollidersSmooth1
     100090: WallCollidersSmooth2
     100092: WallCollidersSmooth
+    100094: HealCollider
     400000: BezierCurve
     400002: BezierCurve_001
     400004: Cube_001
@@ -99,6 +100,7 @@ ModelImporter:
     400088: WallCollidersSmooth1
     400090: WallCollidersSmooth2
     400092: WallCollidersSmooth
+    400094: HealCollider
     2300000: BezierCurve
     2300002: BezierCurve_001
     2300004: Cube_001
@@ -143,6 +145,7 @@ ModelImporter:
     2300082: WallCollidersSmooth1
     2300084: WallCollidersSmooth2
     2300086: WallCollidersSmooth
+    2300088: HealCollider
     3300000: BezierCurve
     3300002: BezierCurve_001
     3300004: Cube_001
@@ -187,6 +190,7 @@ ModelImporter:
     3300082: WallCollidersSmooth1
     3300084: WallCollidersSmooth2
     3300086: WallCollidersSmooth
+    3300088: HealCollider
     4300000: Cube_006
     4300002: Cube_005
     4300004: Cube_004
@@ -231,6 +235,7 @@ ModelImporter:
     4300082: WallCollidersSmooth2
     4300084: WallCollidersSmooth1
     4300086: WallCollidersSmooth
+    4300088: HealCollider
     7400000: Default Take
     9500000: //RootNode
   materials:
