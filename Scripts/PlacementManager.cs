@@ -121,8 +121,8 @@ public class PlacementManager : PausableBehaviour
     public void crossFinish(RacePlayer player)
     {
         //I think this is failing on AI finish
-        if (validCross(player)) {
-
+        if (validCross(player))
+        {
             listOfPlayers[player].finishLap(pauseInvariantTime);
 
             //check if player finished
