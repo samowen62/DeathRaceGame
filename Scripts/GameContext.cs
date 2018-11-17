@@ -69,7 +69,11 @@ public class GameContext : MonoBehaviour {
                 canvas.transform.Find("Speed").GetComponent<MPHUI>().player = player;
                 canvas.transform.Find("CenterTextBG").GetComponent<CenterTextUI>().player = player;
 
+                var machineCatcher = AppConfig.findOnly<MachineCatcher>();
                 AppConfig.changeParent(player.gameObject, Camera.main.gameObject);
+                AppConfig.changeParent(player.gameObject, machineCatcher.gameObject);
+                machineCatcher.SetInitialPosition();
+
             }
             else
             {

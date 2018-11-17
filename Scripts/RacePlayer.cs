@@ -285,6 +285,7 @@ public class RacePlayer : PausableBehaviour
 
     private PlacementManager placementManager;
     private GameEventsUI gameEventsUI;
+    private MachineCatcher catcher;
 
     /* Last checkpoint of the player */
     private Vector3 lastCheckPointUp;
@@ -385,6 +386,7 @@ public class RacePlayer : PausableBehaviour
 
         gameEventsUI = AppConfig.findOnly<GameEventsUI>();
         placementManager = AppConfig.findOnly<PlacementManager>();
+        catcher = AppConfig.findOnly<MachineCatcher>();
 
         // Set up variables referring to children
         electricalEffect = transform.GetComponentInChildren<ElectricalEffect>();
@@ -462,6 +464,11 @@ public class RacePlayer : PausableBehaviour
             if ((pauseInvariantTime - timeStartReturning) >= timeSpentReturning)
             {
                 status = PlayerStatus.ONTRACK;
+
+                if (!isEffectiveAI)
+                {
+                    catcher.Leave();
+                }
             }
             return;
         }
@@ -697,6 +704,10 @@ public class RacePlayer : PausableBehaviour
 
     private void return_to_track()
     {
+        if (!isEffectiveAI)
+        {
+            catcher.Enter();
+        }
         status = PlayerStatus.RETURNINGTOTRACK;
         timeStartReturning = pauseInvariantTime;
         attack_velocity = Vector3.zero;
