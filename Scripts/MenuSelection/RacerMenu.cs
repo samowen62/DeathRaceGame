@@ -46,7 +46,7 @@ public class RacerMenu : MonoBehaviour {
                 case PLAYER_3:
                 case PLAYER_4:
                     button.onClick.AddListener(() => chooseRacer(button));
-                    UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, button, gameObject);
+                    //UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, button, gameObject);
                     break;
 
                 case BACK_BUTTON:
@@ -77,8 +77,9 @@ public class RacerMenu : MonoBehaviour {
 
     private void proceedButtonClicked()
     {
-        if (selectedRacer == null) return;
+        if (selectedRacer == null || loadingBlocked) return;
 
+        loadingBlocked = true;
         gameData.mainPlayer = selectedRacer.name;
         DontDestroyOnLoad(gameData);
         sceneFade.fade();

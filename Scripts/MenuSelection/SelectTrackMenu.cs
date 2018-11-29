@@ -11,14 +11,15 @@ public class SelectTrackMenu : MonoBehaviour {
     public Button backButton;
 
     private const string BACK_BUTTON = "Back";
-    private bool loadingBlocked = false;
+    private bool loadingBlocked;
     private AsyncOperation async = null;
 
     // Use this for initialization
     void Start()
     {
         Debug.Log("Death Race Game Start!!");
-        
+        loadingBlocked = false;
+
         backButton.onClick.AddListener(delegate () { backButtonClicked(); });
         UIUtil.addTrigger(() => hoverSound.Play(), EventTriggerType.PointerEnter, backButton, gameObject);
 
@@ -40,6 +41,7 @@ public class SelectTrackMenu : MonoBehaviour {
 
     private void loadTrack(string trackName)
     {
+        if (loadingBlocked) return;
         loadingBlocked = true;
         gameData.ReInitialize(trackName);
         DontDestroyOnLoad(gameData);

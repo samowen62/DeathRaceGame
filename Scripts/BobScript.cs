@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
-using UnityEditor;
+
+#if UNITY_EDITOR
+    using UnityEditor;
+#endif  
 
 public class BobScript : PausableBehaviour {
 
@@ -22,6 +25,7 @@ public class BobScript : PausableBehaviour {
 
 }
 
+#if UNITY_EDITOR
 [CustomEditor(typeof(BobScript))]
 public class EditorRaycastEditor : Editor
 {
@@ -34,3 +38,4 @@ public class EditorRaycastEditor : Editor
             t.transform.position + new Vector3(0, -t.distance));
     }
 }
+#endif

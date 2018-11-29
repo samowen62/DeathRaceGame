@@ -1,5 +1,6 @@
-﻿using UnityEditor;
-using UnityEngine;
+﻿#if UNITY_EDITOR
+    using UnityEditor;
+    using UnityEngine;
 
 [CustomEditor(typeof(SpinScript))]
 public class SpinScriptInspector : Editor
@@ -17,3 +18,4 @@ public class SpinScriptInspector : Editor
         EditorUtility.SetDirty(spinner);
     }
 }
+#endif

@@ -64,7 +64,7 @@ public class MachineCatcher : PausableBehaviour {
     {
         catcher.gameObject.SetActive(visible);
         innerRing.gameObject.SetActive(visible);
-        innerRing.gameObject.SetActive(visible);
+        outerRing.gameObject.SetActive(visible);
     }
 
     public void Leave()

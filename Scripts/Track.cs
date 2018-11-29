@@ -3,7 +3,9 @@ using System.Xml;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 public class Track : MonoBehaviour {
 
@@ -202,6 +204,7 @@ public class Track : MonoBehaviour {
         }
     }
 
+#if UNITY_EDITOR
     /**
      * Used to remove unecessary items from the menu when not generating trackPoints
      */
@@ -229,4 +232,5 @@ public class Track : MonoBehaviour {
             }
         }
     }
+#endif
 }
