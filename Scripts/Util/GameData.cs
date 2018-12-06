@@ -78,14 +78,14 @@ public class GameData : PausableBehaviour
         return Array.IndexOf(PlayerNames, playerName) >= 0;
     }
 
-    public string getPlacement(string playerName)
+    public int getPlacement(string playerName)
     {
         if(validatePlayerName(playerName))
         {
-            return playerData[playerName].placements[currentTrack] + "";
+            return playerData[playerName].placements[currentTrack];
         }
 
-        return null;
+        return 0;
     }
 
     public string getTotalTime(string playerName)
@@ -113,6 +113,7 @@ public class GameData : PausableBehaviour
         if(playersFinished == PlayerNames.Length)
         {
             Debug.Log("GAME IS OVER");
+            playersFinished = 0;
         }
     }
 

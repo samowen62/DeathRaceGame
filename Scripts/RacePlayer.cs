@@ -1012,7 +1012,6 @@ public class RacePlayer : PausableBehaviour
 
                     if (placementManager.updateTrackPoint(this, trackPoint))
                     {
-                        Debug.Log(name + " " + trackPoint.pathChoice + " " + trackPoint.num_in_seq);
                         lastCheckPoint = trackPoint;
                         lastCheckPointUp = transform.up;
                         lastCheckPointPosition = transform.position + (AppConfig.hoverHeight) * lastCheckPointUp;

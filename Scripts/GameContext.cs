@@ -206,8 +206,10 @@ public class GameContext : MonoBehaviour {
             }
 
             // show "New Record!" if player set a record
+            if(gameData.getPlacement(playerMain.name) == 1)
             if (gameData.TrySaveRaceRecords(playerMain.name))
             {
+                    Debug.Log("new rexord ;3");
                 newRecordUI.Activate();
             }
 
@@ -218,7 +220,7 @@ public class GameContext : MonoBehaviour {
                 var newFinishUI = createPlacementFinishUI(
                     AppConfig.getRacerDisplayName(playerName),
                     gameData.getTotalTime(playerName),
-                    gameData.getPlacement(playerName),
+                    gameData.getPlacement(playerName) + "",
                     (i + 1) * -50);
                 
                 // add to pausable components
