@@ -43,9 +43,12 @@ public class SelectTrackMenu : MonoBehaviour {
     {
         if (loadingBlocked) return;
         loadingBlocked = true;
-        gameData.ReInitialize(trackName);
-        DontDestroyOnLoad(gameData);
-        gameData.loadSceneAfterSeconds("RacerMenu", 0.0f);
+
+        // get the singleton reference rather than this object's
+        var gameDataSingleton = GameData.Instance ?? gameData;
+        gameDataSingleton.ReInitialize(trackName);
+        DontDestroyOnLoad(gameDataSingleton);
+        gameDataSingleton.loadSceneAfterSeconds("RacerMenu", 0.0f);
     }
 
 

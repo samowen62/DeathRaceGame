@@ -7,6 +7,9 @@ using System.Linq;
 
 public class GameData : PausableBehaviour
 {
+    /* keep this as a singleton */
+    private static GameData _instance;
+    public static GameData Instance { get { return _instance; } }
 
     /* params to be set by the user */
     private int numTracks;
@@ -33,7 +36,13 @@ public class GameData : PausableBehaviour
     public object async;
 
     // Use this for initialization
-    protected override void _awake () {
+    protected override void _awake ()
+    {
+        if(_instance == null)
+        {
+            _instance = this;
+        }
+
         initialize();
     }
 
