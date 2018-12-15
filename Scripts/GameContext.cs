@@ -121,12 +121,12 @@ public class GameContext : MonoBehaviour {
     private void handleInputs()
     {
         //pause game
-        if (!paused && Input.GetKey(AppConfig.PAUSE_BUTTON) && (Time.fixedTime - pauseLastPressed > buttonPressTime))
+        if (!paused && Input.GetButton("Pause Game") && (Time.fixedTime - pauseLastPressed > buttonPressTime))
         {
             pauseGame();
         }
         //un pause game
-        else if(paused && Input.GetKey(AppConfig.PAUSE_BUTTON) && (Time.fixedTime - pauseLastPressed > buttonPressTime))
+        else if(paused && Input.GetButton("Pause Game") && (Time.fixedTime - pauseLastPressed > buttonPressTime))
         {
             unpauseGame();
         }
@@ -209,7 +209,6 @@ public class GameContext : MonoBehaviour {
             if(gameData.getPlacement(playerMain.name) == 1)
             if (gameData.TrySaveRaceRecords(playerMain.name))
             {
-                    Debug.Log("new rexord ;3");
                 newRecordUI.Activate();
             }
 

@@ -60,7 +60,7 @@ public class RecordsMenu : MonoBehaviour
 
 
         int i = 0;
-        foreach (var record in records.TrackRecords)
+        foreach (KeyValuePair<string, SavedData.TrackRecord> record in records.TrackRecords)
         {
             if(i == 0)
             {
@@ -85,6 +85,8 @@ public class RecordsMenu : MonoBehaviour
             Quaternion.identity) as TrackRecordItem;
         newRecordItem.transform.parent = _recordTemplate.transform.parent;
         newRecordItem.transform.localPosition = new Vector3(0, downwardDistance, 0);
+        newRecordItem.transform.localScale = new Vector3(1, 1, 1);
+        newRecordItem.transform.localRotation = Quaternion.identity;
         newRecordItem.UpdateWith(trackName, trackRecord,
             racerPictureMap[trackRecord.BestTotalTimeRacerName], racerPictureMap[trackRecord.BestLapTimeRacerName]);
     }

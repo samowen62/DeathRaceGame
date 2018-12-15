@@ -22,11 +22,11 @@ public class PlayerInputDTO  {
     {
         horizonalAxis = Input.GetAxis("Horizontal");
         verticalAxis = Input.GetAxis("Vertical");
-        sharpTurnButton = Input.GetKey(AppConfig.SHARP_TURN_BUTTON);
-        pauseButton = Input.GetKey(AppConfig.PAUSE_BUTTON);
-        boostButton = Input.GetKey(AppConfig.BOOST_BUTTON);
-        forwardButton = Input.GetKey(AppConfig.FORWARD_BUTTON);
-        attackButton = Input.GetKey(AppConfig.ATTACK_BUTTON);
+        sharpTurnButton = Input.GetButton("Hard Drift");
+        pauseButton = Input.GetButton("Pause Game");
+        boostButton = Input.GetButton("Boost");
+        forwardButton = verticalAxis > 0;
+        attackButton = Input.GetButton("Side Attack");
     }
 
     public void setToZero()

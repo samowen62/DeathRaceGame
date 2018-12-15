@@ -27,7 +27,7 @@ public class TrackRecordItem : MonoBehaviour {
         {
             load();
         }
-        _trackName.text = AppConfig.getTrackDisplayName(trackName);
+        _trackName.text = trackName;
         _bestLapRacer.text = "Best Lap Time:\n" + AppConfig.formatSecondsToTime(trackData.BestLapTime ?? 0);
         _bestOverallRacer.text = "Best Overall Time:\n" + AppConfig.formatSecondsToTime(trackData.BestTotalTime ?? 0);
 

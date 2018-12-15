@@ -6,7 +6,7 @@ public class SavedData {
 
     public SavedData()
     {
-        this.TrackRecords = new Dictionary<string, SavedData.TrackRecord>();
+        this.TrackRecords = new Dictionary<string, TrackRecord>();
     }
 
     // map of track names to track records

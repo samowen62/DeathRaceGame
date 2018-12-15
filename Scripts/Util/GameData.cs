@@ -57,7 +57,14 @@ public class GameData : PausableBehaviour
         playerData = new Dictionary<string, DataDTO>();
         foreach (string player in PlayerNames)
         {
-            playerData.Add(player, new DataDTO(numTracks));
+            if (playerData.ContainsKey(player))
+            {
+                playerData[player] = new DataDTO(numTracks);
+            }
+            else
+            {
+                playerData.Add(player, new DataDTO(numTracks));
+            }
         }
     }
 
@@ -165,7 +172,7 @@ public class GameData : PausableBehaviour
             BestTotalTime = totalLapTime
         };
 
-        return DataLoader.SaveBestTimeRecord(playerRecord, playerMainName, "Track " + currentTrack);
+        return DataLoader.SaveBestTimeRecord(playerRecord, playerMainName, sceneSequence[currentTrack]);
     }
 
     public void loadNextTrack()
