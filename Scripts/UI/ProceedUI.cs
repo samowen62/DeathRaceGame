@@ -13,6 +13,7 @@ public class ProceedUI : PausableBehaviour {
     private Text exitText;
     private AsyncOperation async = null;
 
+    private bool loadingBlocked = false;
     private bool appearing = false;
     private float startTime = 0f;
     private float endTime = 0.3f;
@@ -41,6 +42,9 @@ public class ProceedUI : PausableBehaviour {
 
     private void returnToMain()
     {
+        if (loadingBlocked) return;
+        loadingBlocked = true;
+
         sceneFade.fade();
         callAfterSeconds(sceneFade.duration, () =>
         {
@@ -94,6 +98,9 @@ public class ProceedUI : PausableBehaviour {
 
     private void goToNext()
     {
+        if (loadingBlocked) return;
+        loadingBlocked = true;
+
         sceneFade.fade();
         callAfterSeconds(sceneFade.duration, () =>
         {

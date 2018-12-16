@@ -15,6 +15,8 @@ public class RaceResults : MonoBehaviour {
 
     public AudioObject hoverSound;
 
+    private bool loadingBlocked = false;
+
     void Awake () {
         gameData = FindObjectOfType<GameData>();
 
@@ -51,6 +53,8 @@ public class RaceResults : MonoBehaviour {
 
     private void LoadLevel(string levelName)
     {
+        if (loadingBlocked) return;
+        loadingBlocked = true;
         StartCoroutine(PerformLoad(levelName));
     }
 
