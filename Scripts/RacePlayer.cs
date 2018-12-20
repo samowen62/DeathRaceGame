@@ -9,6 +9,7 @@ public class RacePlayer : PausableBehaviour
     public enum Speed { HighTopLowAcc, Normal, LowTopHighAcc }
     public enum Power { High, Normal, Low }
     public enum Health { Resilient, Normal, Weak }
+    public enum AIDifficulty { Hard, Normal, Easy }
 
     [SerializeField]
     private Handling _handlingGrade = Handling.Normal;
@@ -146,6 +147,38 @@ public class RacePlayer : PausableBehaviour
         }
     }
 
+    [SerializeField]
+    private AIDifficulty _aiDifficultyGrade = AIDifficulty.Normal;
+    public AIDifficulty AIDifficultyGrade
+    {
+        get
+        {
+            return _aiDifficultyGrade;
+        }
+        set
+        {
+            switch (value)
+            {
+                case AIDifficulty.Hard:
+                    ai_attack_allowed_inc = 3f;
+                    ai_attack_allowed_cooldown = 2f;
+                    break;
+
+                case AIDifficulty.Normal:
+                    ai_attack_allowed_inc = 5f;
+                    ai_attack_allowed_cooldown = 4f;
+                    break;
+
+                case AIDifficulty.Easy:
+                    ai_attack_allowed_inc = 10f;
+                    ai_attack_allowed_cooldown = 20f;
+                    break;
+            }
+            _aiDifficultyGrade = value;
+        }
+    }
+
+
     #endregion
 
     #region Instance Variables
@@ -234,6 +267,8 @@ public class RacePlayer : PausableBehaviour
     private Vector3 attack_velocity = Vector3.zero;
     private Vector3 attacked_velocity = Vector3.zero;
     private AudioObject bumpSound;
+    private float ai_attack_allowed_inc = 3f;
+    private float ai_attack_allowed_cooldown = 3f;
     private float attack_time_window = 0.25f;
     private float attack_deccel = 10;
     private float attack_threshold = 5;
@@ -380,7 +415,7 @@ public class RacePlayer : PausableBehaviour
     protected override void _awake()
     {
         player_health = starting_health;
-        attack_time_window = isAI ? 2.0f : attack_time_window;// for less aggressive AI
+        attack_time_window = isAI ? 1.0f : attack_time_window;// for less aggressive AI TODO: put in difficulty of AI
         player_inputs = new PlayerInputDTO();
         playersToAttack = new Dictionary<string, RacePlayer>();
 
@@ -905,7 +940,8 @@ public class RacePlayer : PausableBehaviour
      */
     private void attack_player()
     {
-        if (pauseInvariantTime - lastTimeAttacked > attack_time_window && playersToAttack.Count > 0)
+        float timeWindow = isAI ? ai_attack_allowed_cooldown : attack_time_window;
+        if (pauseInvariantTime - lastTimeAttacked > timeWindow && playersToAttack.Count > 0)
         {
             lastTimeAttacked = pauseInvariantTime;
 
@@ -1028,9 +1064,13 @@ public class RacePlayer : PausableBehaviour
                 bump(coll.gameObject.GetComponent<RacePlayer>(), false);
 
                 //the AI may decide to attack another player >:)
-                //TODO: I should add more special effects for this. It's not obvious they're attacking
+                //TODO: add more special effects for this. It's not obvious they're attacking
                 if (isAI)
                 {
+                    // only allow AI to attack within 1 second intervals every <ai_attack_allowed_inc> seconds
+                    if (((int)pauseInvariantTime % ai_attack_allowed_inc) != 0)
+                        return;
+
                     callAfterSeconds(0.1f, () =>
                     {
                         attack_player();
