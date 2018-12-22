@@ -7,10 +7,6 @@ public class HealthUI : PausableBehaviour
     private const string _HEALTH = "HEALTH: ";
     private const int barLength = 120;
 
-    public Color maxColor = Color.blue;
-    public Color midColor = Color.green;
-    public Color minColor = Color.red;
-
     private Color current_color;
     private Vector3 current_scale = Vector3.one;
 
@@ -42,11 +38,13 @@ public class HealthUI : PausableBehaviour
     {
         if (player.health <= player.StartingHealth)
         {
-            return Color.Lerp(minColor, midColor, player.health / player.StartingHealth);
+            //.25 to 0
+            return new HSBColor(player.health / (4 * player.StartingHealth), 1, 1).ToColor();
         }
         else
         {
-            return Color.Lerp(midColor, maxColor, (player.health - player.StartingHealth) / (player.MaxBonusHealth - player.StartingHealth));
+            //TODO: make .5 to .25 as it lowers
+            return new HSBColor((player.health - player.StartingHealth) / (4 * (player.MaxBonusHealth - player.StartingHealth)) + 0.25f, 1, 1).ToColor();
         }
     }
 }
