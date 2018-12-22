@@ -128,19 +128,19 @@ public class RacePlayer : PausableBehaviour
                 case Health.Resilient:
                     starting_health = 120f;
                     max_bonus_health = 150f;
-                    health_per_frame_healing = 0.3f;
+                    health_per_frame_healing = 4.0f;
                     break;
 
                 case Health.Normal:
                     starting_health = 100f;
                     max_bonus_health = 125f;
-                    health_per_frame_healing = 0.2f;
+                    health_per_frame_healing = 3.0f;
                     break;
 
                 case Health.Weak:
                     starting_health = 85f;
                     max_bonus_health = 100f;
-                    health_per_frame_healing = 0.2f;
+                    health_per_frame_healing = 2.0f;
                     break;
             }
             _healthGrade = value;

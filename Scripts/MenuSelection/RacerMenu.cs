@@ -68,7 +68,10 @@ public class RacerMenu : MonoBehaviour {
 
     private void chooseRacer( Button button)
     {
-        if (selectedRacer == null || loadingBlocked) selectedRacer.deselect();
+        if (loadingBlocked) return;
+
+        if(selectedRacer != null)
+            selectedRacer.deselect();
 
         selectedRacer = button.GetComponent<RacerOption>();
         selectedRacer.select();

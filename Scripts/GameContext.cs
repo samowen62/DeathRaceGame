@@ -159,6 +159,9 @@ public class GameContext : MonoBehaviour {
         pauseLastPressed = Time.fixedTime;
         paused = pause;
 
+        if(pauseUIComponents == null)
+            pauseUIComponents = GameObject.FindGameObjectsWithTag("PauseUI");
+
         foreach (var component in pauseUIComponents)
         {
             component.SetActive(pause);
