@@ -323,8 +323,8 @@ public class RacePlayer : PausableBehaviour
     private MachineCatcher catcher;
 
     /* Last checkpoint of the player */
-    private Vector3 lastCheckPointUp;
     private Vector3 lastCheckPointPosition;
+    private Quaternion lastCheckPointRotation;
     private TrackPoint lastCheckPoint;
     private TrackPoint current_TrackPoint;
 
@@ -450,10 +450,11 @@ public class RacePlayer : PausableBehaviour
             global_orientation = transform.rotation;
             previousGravity = -downHit.normal;
 
-            // set last checkpoint on startup in case we immediately die
+            // set last checkpoint on startup in case we immediately die,
+            // but set the place we return to as the starting point
             lastCheckPoint = placementManager.firstCheckPoint_A;
-            lastCheckPointUp = transform.up;
-            lastCheckPointPosition = transform.position + (AppConfig.hoverHeight) * lastCheckPointUp;
+            lastCheckPointRotation = transform.rotation;
+            lastCheckPointPosition = transform.position + (AppConfig.hoverHeight) * (lastCheckPointRotation * Vector3.up);
         }
         else
         {
@@ -755,7 +756,7 @@ public class RacePlayer : PausableBehaviour
 
         returningToTrackRotationBegin = transform.rotation;
         returningToTrackPositionBegin = transform.position;
-        returningToTrackRotationEnd = Quaternion.LookRotation(lastCheckPoint.tangent, lastCheckPointUp);
+        returningToTrackRotationEnd = lastCheckPointRotation;
         returningToTrackPositionEnd = lastCheckPointPosition;
     }
 
@@ -992,6 +993,7 @@ public class RacePlayer : PausableBehaviour
 
             //create a velocity vector from bouncing off the wall
             case "CollissionWall":
+                if (status == PlayerStatus.RETURNINGTOTRACK) return;
 
                 if (Physics.Raycast(transform.position, -transform.right, out wallHit, rayCastDistance, AppConfig.wallMask))
                 {
@@ -1021,6 +1023,8 @@ public class RacePlayer : PausableBehaviour
 
             //when we hit a boost panel
             case "BoostPanel":
+                if (status == PlayerStatus.RETURNINGTOTRACK) return;
+
                 current_speed = fwd_boost_speed;
                 boostEffects();
                 coll.gameObject.GetComponent<BoostPanel>().boostAnimation();
@@ -1036,27 +1040,28 @@ public class RacePlayer : PausableBehaviour
 
             //when we hit a trackpoint trigger
             case "TrackPoint":
-                if (status != PlayerStatus.RETURNINGTOTRACK)
+                if (status == PlayerStatus.RETURNINGTOTRACK) return;
+
+                TrackPoint trackPoint = coll.gameObject.GetComponent<TrackPoint>();
+
+                //AI should only stick to one path
+                if (!isEffectiveAI || AIPathChoice == trackPoint.pathChoice)
                 {
-                    TrackPoint trackPoint = coll.gameObject.GetComponent<TrackPoint>();
+                    current_TrackPoint = trackPoint;
+                }
 
-                    //AI should only stick to one path
-                    if (!isEffectiveAI || AIPathChoice == trackPoint.pathChoice)
-                    {
-                        current_TrackPoint = trackPoint;
-                    }
-
-                    if (placementManager.updateTrackPoint(this, trackPoint))
-                    {
-                        lastCheckPoint = trackPoint;
-                        lastCheckPointUp = transform.up;
-                        lastCheckPointPosition = transform.position + (AppConfig.hoverHeight) * lastCheckPointUp;
-                    }
+                if (placementManager.updateTrackPoint(this, trackPoint))
+                {
+                    lastCheckPoint = trackPoint;
+                    lastCheckPointRotation = Quaternion.LookRotation(lastCheckPoint.tangent, transform.up);
+                    lastCheckPointPosition = transform.position + (AppConfig.hoverHeight) * transform.up;
                 }
                 break;
 
             //attack or bump other player
             case "Player":
+                if (status == PlayerStatus.RETURNINGTOTRACK) return;
+
                 if (!playersToAttack.ContainsKey(coll.name))
                 {
                     playersToAttack.Add(coll.name, coll.gameObject.GetComponent<RacePlayer>());
