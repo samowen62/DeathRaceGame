@@ -28,6 +28,20 @@ ModelImporter:
     100040: TrackUpsideDown
     100042: HealingPanel
     100044: HealingPath
+    100046: Plane_006
+    100048: Plane_007
+    100050: Plane_008
+    100052: Plane_009
+    100054: Plane_010
+    100056: Plane_011
+    100058: Plane_012
+    100060: Plane_013
+    100062: Plane_014
+    100064: Plane_015
+    100066: Plane_016
+    100068: Plane_017
+    100070: Plane_018
+    100072: Plane_019
     400000: //RootNode
     400002: BezierCurveA
     400004: BezierCurveB
@@ -51,6 +65,20 @@ ModelImporter:
     400040: TrackUpsideDown
     400042: HealingPanel
     400044: HealingPath
+    400046: Plane_006
+    400048: Plane_007
+    400050: Plane_008
+    400052: Plane_009
+    400054: Plane_010
+    400056: Plane_011
+    400058: Plane_012
+    400060: Plane_013
+    400062: Plane_014
+    400064: Plane_015
+    400066: Plane_016
+    400068: Plane_017
+    400070: Plane_018
+    400072: Plane_019
     2300000: //RootNode
     2300002: BezierCurveA
     2300004: BezierCurveB
@@ -74,6 +102,20 @@ ModelImporter:
     2300040: TrackUpsideDown
     2300042: HealingPanel
     2300044: HealingPath
+    2300046: Plane_006
+    2300048: Plane_007
+    2300050: Plane_008
+    2300052: Plane_009
+    2300054: Plane_010
+    2300056: Plane_011
+    2300058: Plane_012
+    2300060: Plane_013
+    2300062: Plane_014
+    2300064: Plane_015
+    2300066: Plane_016
+    2300068: Plane_017
+    2300070: Plane_018
+    2300072: Plane_019
     3300000: //RootNode
     3300002: BezierCurveA
     3300004: BezierCurveB
@@ -97,6 +139,20 @@ ModelImporter:
     3300040: TrackUpsideDown
     3300042: HealingPanel
     3300044: HealingPath
+    3300046: Plane_006
+    3300048: Plane_007
+    3300050: Plane_008
+    3300052: Plane_009
+    3300054: Plane_010
+    3300056: Plane_011
+    3300058: Plane_012
+    3300060: Plane_013
+    3300062: Plane_014
+    3300064: Plane_015
+    3300066: Plane_016
+    3300068: Plane_017
+    3300070: Plane_018
+    3300072: Plane_019
     4300000: BezierCurve
     4300002: Plane
     4300004: BezierCurveA
@@ -120,6 +176,20 @@ ModelImporter:
     4300040: TrackUpsideDown
     4300042: HealingPanel
     4300044: HealingPath
+    4300046: Plane_015
+    4300048: Plane_014
+    4300050: Plane_013
+    4300052: Plane_012
+    4300054: Plane_011
+    4300056: Plane_010
+    4300058: Plane_009
+    4300060: Plane_008
+    4300062: Plane_007
+    4300064: Plane_006
+    4300066: Plane_018
+    4300068: Plane_017
+    4300070: Plane_016
+    4300072: Plane_019
     7400000: Default Take
     9500000: //RootNode
   materials:
