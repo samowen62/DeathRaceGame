@@ -23,11 +23,11 @@ public class CenterTextUI : PausableBehaviour
     protected override void _update () {
         
         //order of these is important
-        if(player.finished)
+        if(player.Finished)
         {
             status = CenterText.FINISHED;
             updateText();
-        } else if(player.isDead)
+        } else if(player.IsDead)
         {
             status = CenterText.DEATH;
             updateText();

@@ -254,7 +254,7 @@ public class RacePlayer : PausableBehaviour
     private float totalPitch;
     private float max_pitch = 40;
     private float min_pitch = -20;
-    private float pitch_per_vert = 2f;
+    private float pitch_per_vert = 1.2f;
     private float air_speed_damping = 0.6f;
     private float pitch_decel = 10f;
 
@@ -282,7 +282,7 @@ public class RacePlayer : PausableBehaviour
     private float roll_decel = 1.4f;
     private float attack_roll = 25f;
     private bool dead = false;
-    public bool isDead
+    public bool IsDead
     {
         get
         {
@@ -328,9 +328,9 @@ public class RacePlayer : PausableBehaviour
     private TrackPoint lastCheckPoint;
     private TrackPoint current_TrackPoint;
 
-    public bool startedLap1 { get; private set; }
+    public bool StartedLap1 { get; private set; }
     private bool finishedWithRace = false;
-    public bool finished
+    public bool Finished
     {
         get
         {
@@ -364,8 +364,8 @@ public class RacePlayer : PausableBehaviour
 
     private Vector3 _playerToCamera = new Vector3(0, 10, -20);
     public BezierSpline CameraPath { get; set; }
-    public Quaternion cameraRotation { get { return Quaternion.Euler(6, 0, 0); } }
-    public Vector3 playerToCamera
+    public Quaternion CameraRotation { get { return Quaternion.Euler(6, 0, 0); } }
+    public Vector3 PlayerToCamera
     {
         get
         {
@@ -708,7 +708,7 @@ public class RacePlayer : PausableBehaviour
 
         if (!isAI && current_speed >= fwd_max_speed)
         {
-            Camera.main.transform.localPosition = playerToCamera;
+            Camera.main.transform.localPosition = PlayerToCamera;
         }
     }
 
@@ -734,7 +734,7 @@ public class RacePlayer : PausableBehaviour
         callAfterSeconds(timeCameraShakeBump, () =>
         {
             cameraIsShaking = false;
-            Camera.main.transform.localPosition = playerToCamera;
+            Camera.main.transform.localPosition = PlayerToCamera;
         });
     }
 
@@ -1034,7 +1034,7 @@ public class RacePlayer : PausableBehaviour
             case "FinishLine":
                 if (status == PlayerStatus.RETURNINGTOTRACK) return;
 
-                startedLap1 = true;
+                StartedLap1 = true;
                 placementManager.crossFinish(this);
                 break;
 

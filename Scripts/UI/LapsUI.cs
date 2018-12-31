@@ -23,7 +23,7 @@ public class LapsUI : PausableBehaviour {
 
     protected override void _update () {
 
-        if (!player.startedLap1) return;
+        if (!player.StartedLap1) return;
 
         string text = "";
         float[] lapTimes = placementManager.getLapTimesForPlayer(player);
@@ -38,7 +38,7 @@ public class LapsUI : PausableBehaviour {
             }
         }
 
-        if (!player.finished)
+        if (!player.Finished)
         {
             text += CURRENT_LAP + AppConfig.formatSecondsToTime(pauseInvariantTime - lastLapStart);
         }

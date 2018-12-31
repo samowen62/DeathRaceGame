@@ -17,7 +17,7 @@ public class PlacementUI : PausableBehaviour
 
     protected override void _update()
     {
-        if (!player.finished)
+        if (!player.Finished)
         {
             if (pauseInvariantTime - timeLastUpdated > 0.7f)
             {

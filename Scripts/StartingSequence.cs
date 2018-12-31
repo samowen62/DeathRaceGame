@@ -47,14 +47,14 @@ public class StartingSequence : PausableBehaviour
             // ensures camera has same z-axis as main racer
             cameraDir = Vector3.ProjectOnPlane(cameraDir.normalized, mainRacer.transform.up);
             Camera.main.transform.rotation = 
-                Quaternion.LookRotation(cameraDir, mainRacer.transform.up) * mainRacer.cameraRotation;
+                Quaternion.LookRotation(cameraDir, mainRacer.transform.up) * mainRacer.CameraRotation;
         }
         else if (progress > scriptBegin && progress < scriptEnd)
         {
             if (!boostSound.started)
             {
-                Camera.main.transform.localPosition = mainRacer.playerToCamera;
-                Camera.main.transform.localRotation = mainRacer.cameraRotation;
+                Camera.main.transform.localPosition = mainRacer.PlayerToCamera;
+                Camera.main.transform.localRotation = mainRacer.CameraRotation;
                 boostSound.Play();
             }
 

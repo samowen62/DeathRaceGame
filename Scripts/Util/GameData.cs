@@ -120,6 +120,10 @@ public class GameData : PausableBehaviour
     public void addPlayerFinish(string playerName, float[] lapTimes)
     {
         playersFinished++;
+
+        // for the release defect TODO: delet!
+        Debug.Log("GameData.cs: " + playerName + " " + currentTrack + " " + playerData.Count + " " + playersFinished);
+        Debug.Log("GameData.cs: " + playerData[playerName].placements.Length);
         playerData[playerName].placements[currentTrack] = playersFinished;
         playerData[playerName].lapTimes[currentTrack] = lapTimes.ToList();
 

@@ -179,7 +179,7 @@ public class GameContext : MonoBehaviour {
      */
     public void finishPlayer(RacePlayer player)
     {
-        if (player.finished) return;
+        if (player.Finished) return;
 
         gameData.addPlayerFinish(player.name, 
             placementManager.getLapTimesForPlayer(player));
