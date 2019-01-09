@@ -202,7 +202,7 @@ public class GameContext : MonoBehaviour {
             {                
                 placementManager.forcePlayerFinish(unfinishedPlayer);
                 gameData.addPlayerFinish(unfinishedPlayer.name, 
-                    placementManager.getLapTimesForPlayer(player));
+                    placementManager.getLapTimesForPlayer(unfinishedPlayer));
                 if (!(player.Equals(playerMain))){
                     unfinishedPlayer.finishRace();
                 }

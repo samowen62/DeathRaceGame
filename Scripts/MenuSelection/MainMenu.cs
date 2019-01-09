@@ -20,12 +20,11 @@ public class MainMenu : MonoBehaviour {
 
     // Use this for initialization
     void Awake () {
-        Debug.Log("Death Race Game Start!!");
+        Debug.Log("Game Start");
         Button [] buttons = FindObjectsOfType<Button>();
 
         foreach(var button in buttons)
         {
-            Debug.Log(button.name);
             switch (button.name)
             {
                 case START_GAME_BUTTON:
@@ -57,7 +56,6 @@ public class MainMenu : MonoBehaviour {
         {
             selectSound.Play();
             startBlocked = true;
-            Debug.Log("Started Test Track sequence");
 
             LoadLevel(AppConfig.MENU_TRACK);
         }
@@ -65,18 +63,20 @@ public class MainMenu : MonoBehaviour {
 
     private void howToPlayButtonClicked()
     {
+        if (startBlocked) return;
+
         selectSound.Play();
         startBlocked = true;
-        Debug.Log("How To Play Clicked");
 
         LoadLevel(AppConfig.MENU_HOWTOPLAY);
     }
 
     private void recordsButtonClicked()
     {
+        if (startBlocked) return;
+
         selectSound.Play();
         startBlocked = true;
-        Debug.Log("Records Clicked");
 
         LoadLevel(AppConfig.MENU_RECORDS);
     }

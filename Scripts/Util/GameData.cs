@@ -159,7 +159,7 @@ public class GameData : PausableBehaviour
     public List<string> getPlayersByPlacement()
     {
         return playerData
-            .OrderBy(e => e.Value.placements.ToList().Sum())
+            .OrderBy(e => e.Value.placements.Sum())
             .Select(e => AppConfig.getRacerDisplayName(e.Key))
             .ToList();
     }
