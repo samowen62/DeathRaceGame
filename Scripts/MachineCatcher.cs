@@ -8,7 +8,6 @@ public class MachineCatcher : PausableBehaviour {
     private GameObject catcher;
     private GameObject innerRing;
     private GameObject outerRing;
-    private Vector3 up;
     private float topPos = 35f;
     private float bottomPos = 8.5f;
     private float moveSpeed = 100;
@@ -21,7 +20,6 @@ public class MachineCatcher : PausableBehaviour {
         catcher = transform.Find("Catcher").gameObject;
         innerRing = transform.Find("InnerRing").gameObject;
         outerRing = transform.Find("OuterRing").gameObject;
-        up = transform.forward;
     }
 
     // Update is called once per frame
@@ -49,9 +47,9 @@ public class MachineCatcher : PausableBehaviour {
             transform.localPosition = new Vector3(0, newPos, 0);
             
         }
-        catcher.transform.Rotate(up, 18 * Time.deltaTime);
-        innerRing.transform.Rotate(up, -160 * Time.deltaTime);
-        outerRing.transform.Rotate(up, 160 * Time.deltaTime);
+        catcher.transform.RotateAround(catcher.transform.position, catcher.transform.forward, 18 * Time.deltaTime);
+        innerRing.transform.RotateAround(innerRing.transform.position, innerRing.transform.forward, -160 * Time.deltaTime);
+        outerRing.transform.RotateAround(outerRing.transform.position, outerRing.transform.forward, 160 * Time.deltaTime);
     }
 
     public void Enter()
@@ -79,6 +77,15 @@ public class MachineCatcher : PausableBehaviour {
         transform.localRotation = rotation;
         transform.localScale = new Vector3(4, 4, 4);
         transform.localPosition = new Vector3(0, topPos, 0);
+
+        // because unity is too dumb to just call _awake on initialization
+        if (catcher == null)
+        {
+            catcher = transform.Find("Catcher").gameObject;
+            innerRing = transform.Find("InnerRing").gameObject;
+            outerRing = transform.Find("OuterRing").gameObject;
+        }
+
         setVisible(false);
     }
 }

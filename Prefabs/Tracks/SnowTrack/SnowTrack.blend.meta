@@ -59,6 +59,14 @@ ModelImporter:
     100102: CollisionTrackA
     100104: CollisionTrack
     100106: CollisionWallSteps
+    100108: Plane_028
+    100110: Plane_029
+    100112: Plane_030
+    100114: Plane_031
+    100116: Plane_032
+    100118: Plane_033
+    100120: Plane_034
+    100122: Plane_035
     400000: //RootNode
     400002: BezierCurveA
     400004: BezierCurveB
@@ -113,6 +121,14 @@ ModelImporter:
     400102: CollisionTrackA
     400104: CollisionTrack
     400106: CollisionWallSteps
+    400108: Plane_028
+    400110: Plane_029
+    400112: Plane_030
+    400114: Plane_031
+    400116: Plane_032
+    400118: Plane_033
+    400120: Plane_034
+    400122: Plane_035
     2300000: //RootNode
     2300002: BezierCurveA
     2300004: BezierCurveB
@@ -167,6 +183,14 @@ ModelImporter:
     2300102: CollisionTrackA
     2300104: CollisionTrack
     2300106: CollisionWallSteps
+    2300108: Plane_028
+    2300110: Plane_029
+    2300112: Plane_030
+    2300114: Plane_031
+    2300116: Plane_032
+    2300118: Plane_033
+    2300120: Plane_034
+    2300122: Plane_035
     3300000: //RootNode
     3300002: BezierCurveA
     3300004: BezierCurveB
@@ -221,6 +245,14 @@ ModelImporter:
     3300102: CollisionTrackA
     3300104: CollisionTrack
     3300106: CollisionWallSteps
+    3300108: Plane_028
+    3300110: Plane_029
+    3300112: Plane_030
+    3300114: Plane_031
+    3300116: Plane_032
+    3300118: Plane_033
+    3300120: Plane_034
+    3300122: Plane_035
     4300000: BezierCurve
     4300002: Plane
     4300004: BezierCurveA
@@ -275,6 +307,14 @@ ModelImporter:
     4300102: CollisionTrackA
     4300104: CollisionTrack
     4300106: CollisionWallSteps
+    4300108: Plane_028
+    4300110: Plane_034
+    4300112: Plane_033
+    4300114: Plane_032
+    4300116: Plane_031
+    4300118: Plane_030
+    4300120: Plane_029
+    4300122: Plane_035
     7400000: Default Take
     9500000: //RootNode
   materials:
