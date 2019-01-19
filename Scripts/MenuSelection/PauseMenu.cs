@@ -69,6 +69,8 @@ public class PauseMenu : MonoBehaviour
             loadingBlocked = true;
             Debug.Log("Started Test Track sequence");
 
+            //need to unfreeze any pausable dontdestroyonload objects
+            context.gameData.behaviorBlocked = false;
             SyncLoadLevel(AppConfig.MENU_MAIN);
         }
     }

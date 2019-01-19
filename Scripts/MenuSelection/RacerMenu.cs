@@ -30,8 +30,10 @@ public class RacerMenu : MonoBehaviour {
     private bool loadingBlocked = false;
 
     // Use this for initialization
-    void Start () {
+    void Start ()
+    {
         gameData = FindObjectOfType<GameData>();
+        gameData.behaviorBlocked = false;
 
         Button[] buttons = FindObjectsOfType<Button>();
 
@@ -92,13 +94,12 @@ public class RacerMenu : MonoBehaviour {
 
     private void backButtonClicked()
     {
-        if (!loadingBlocked)
-        {
-            loadingBlocked = true;
-            Debug.Log("Back to main");
+        if (loadingBlocked) return;
 
-            LoadLevel(AppConfig.MENU_MAIN);
-        }
+        loadingBlocked = true;
+        Debug.Log("Back to main");
+
+        LoadLevel(AppConfig.MENU_MAIN);
     }
 
     private void LoadLevel(string levelName)
