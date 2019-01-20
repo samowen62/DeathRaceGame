@@ -838,7 +838,28 @@ public class RacePlayer : PausableBehaviour
             }
             else
             {
-                shipRenderer.transform.localRotation = Quaternion.AngleAxis((spaceBar ? ship_mesh_tilt_hard_turn : ship_mesh_tilt) * turn_angle, shipRenderer.transform.forward) * base_ship_rotation;
+                if (current_TrackPoint != null 
+                    && isEffectiveAI 
+                    && !spaceBar
+                    && current_TrackPoint.usesAISmoothing)
+                {
+                    turn_angle = Vector3.Dot(current_TrackPoint.tangent, shipRenderer.transform.forward.normalized);
+                    turn_angle *= AppConfig.radToDeg;
+                    if (turn_angle < 0)
+                    {
+                        turn_angle = Math.Max(turn_angle, -2f);
+                    }
+                    else
+                    {
+                        turn_angle = Math.Min(turn_angle, 2f);
+                    }
+
+                    shipRenderer.transform.localRotation = Quaternion.AngleAxis(turn_angle, shipRenderer.transform.forward) * base_ship_rotation;
+                }
+                else
+                {
+                    shipRenderer.transform.localRotation = Quaternion.AngleAxis((spaceBar ? ship_mesh_tilt_hard_turn : ship_mesh_tilt) * turn_angle, shipRenderer.transform.forward) * base_ship_rotation;
+                }
             }
         }
 

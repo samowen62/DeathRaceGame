@@ -15,6 +15,8 @@ public class TrackPoint : MonoBehaviour {
 
     public bool isCheckPoint;
 
+    public bool usesAISmoothing = false;
+
     public List<TrackPoint> nextValidCheckPoints;
 
     //for checkpoints on only 1 path and to avoid turning backwards. checkpoints need a  list<int> to signify which num_in_seq's are of the next valid checkpoint

@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public static class AppConfig {
@@ -23,6 +24,8 @@ public static class AppConfig {
     public static readonly KeyCode ATTACK_BUTTON = KeyCode.E;
 
     public static float hoverHeight = 1.8f;
+    public static float radToDeg = 180 / Mathf.PI;
+    public static float degToRad = Mathf.PI / 180f;
 
     public static void DrawLine(Vector3 start, Vector3 end, Color color)
     {
