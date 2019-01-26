@@ -17,6 +17,8 @@ public static class AppConfig {
     public static readonly string TRACK_PAPER_ENGINE = "paperEngine";
     public static readonly string TRACK_STAIRS = "StairsTrack";
 
+    public static readonly string ACH_RACE_FINISH = "Race Finished";
+
     public static readonly KeyCode PAUSE_BUTTON = KeyCode.F;
     public static readonly KeyCode BOOST_BUTTON = KeyCode.Q;
     public static readonly KeyCode SHARP_TURN_BUTTON = KeyCode.Space;

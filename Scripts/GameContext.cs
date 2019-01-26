@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
+using Steamworks;
 
 public class GameContext : MonoBehaviour {
 
@@ -229,6 +230,9 @@ public class GameContext : MonoBehaviour {
                 pausableComponents = pausableComponents.Concat(new PausableBehaviour[] { newFinishUI }).ToArray();
                 newFinishUI.startAnimation();
             }
+
+            //TODO: create manager class for these
+            //SteamUserStats.SetAchievement(AppConfig.ACH_RACE_FINISH);
 
             //scene
             proceedUI.AppearAfterSeconds(initialPlacementFinishUI.waitingTime);
