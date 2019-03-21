@@ -52,6 +52,21 @@ ModelImporter:
     100088: TreeBase2
     100090: TreeBase3
     100092: TreeBase3_001
+    100094: Hut_001
+    100096: HutTree
+    100098: HutTree_001
+    100100: Tree1_002
+    100102: Tree1_003
+    100104: Tree2_001
+    100106: Tree2_002
+    100108: Tree3
+    100110: Tree3_001
+    100112: Tree3_002
+    100114: Tree4
+    100116: Tree4_001
+    100118: Tree4_002
+    100120: TreePlatform_001
+    100122: Window1
     400000: altTrack
     400002: AltTrackPlane_longer_
     400004: AltTrackPlane_longer__001
@@ -99,6 +114,21 @@ ModelImporter:
     400088: TreeBase2
     400090: TreeBase3
     400092: TreeBase3_001
+    400094: Hut_001
+    400096: HutTree
+    400098: HutTree_001
+    400100: Tree1_002
+    400102: Tree1_003
+    400104: Tree2_001
+    400106: Tree2_002
+    400108: Tree3
+    400110: Tree3_001
+    400112: Tree3_002
+    400114: Tree4
+    400116: Tree4_001
+    400118: Tree4_002
+    400120: TreePlatform_001
+    400122: Window1
     2300000: altTrack
     2300002: AltTrackPlane_longer_
     2300004: AltTrackPlane_longer__001
@@ -144,6 +174,22 @@ ModelImporter:
     2300084: TreeBase2
     2300086: TreeBase3
     2300088: TreeBase3_001
+    2300090: Hut_001
+    2300092: HutTree
+    2300094: HutTree_001
+    2300096: Tree1_002
+    2300098: Tree1_003
+    2300100: Tree2_001
+    2300102: Tree2_002
+    2300104: Tree3
+    2300106: Tree3_001
+    2300108: Tree3_002
+    2300110: Tree4
+    2300112: Tree4_001
+    2300114: Tree4_002
+    2300116: TreePlatform_001
+    2300118: Window1
+    2300120: VisibleWall
     3300000: altTrack
     3300002: AltTrackPlane_longer_
     3300004: AltTrackPlane_longer__001
@@ -189,6 +235,22 @@ ModelImporter:
     3300084: TreeBase2
     3300086: TreeBase3
     3300088: TreeBase3_001
+    3300090: Hut_001
+    3300092: HutTree
+    3300094: HutTree_001
+    3300096: Tree1_002
+    3300098: Tree1_003
+    3300100: Tree2_001
+    3300102: Tree2_002
+    3300104: Tree3
+    3300106: Tree3_001
+    3300108: Tree3_002
+    3300110: Tree4
+    3300112: Tree4_001
+    3300114: Tree4_002
+    3300116: TreePlatform_001
+    3300118: Window1
+    3300120: VisibleWall
     4300000: TrackPoints
     4300002: AltTrackPlane_longer__001
     4300004: WallVisible_002
@@ -234,6 +296,22 @@ ModelImporter:
     4300084: Cube_002
     4300086: Cube_001
     4300088: Cube
+    4300090: Tree1_003
+    4300092: Tree3_002
+    4300094: Tree2_002
+    4300096: Tree4_002
+    4300098: HutTree_001
+    4300100: Hut_001
+    4300102: Window1
+    4300104: HutTree
+    4300106: Tree1_002
+    4300108: Tree2_001
+    4300110: Tree3_001
+    4300112: Tree4_001
+    4300114: TreePlatform_001
+    4300116: Tree4
+    4300118: Tree3
+    4300120: VisibleWall
     7400000: Default Take
     9500000: //RootNode
   materials:
@@ -279,7 +357,7 @@ ModelImporter:
     useFileScale: 1
   tangentSpace:
     normalSmoothAngle: 60
-    normalImportMode: 0
+    normalImportMode: 1
     tangentImportMode: 3
   importAnimation: 1
   copyAvatar: 0
